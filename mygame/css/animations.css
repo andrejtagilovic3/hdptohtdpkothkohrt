@@ -1,0 +1,579 @@
+/* Анимации для системы боёв */
+
+/* Экран поиска */
+.search-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    padding: 40px;
+}
+
+.search-spinner {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.spinner {
+    width: 80px;
+    height: 80px;
+    border: 4px solid var(--glass-border);
+    border-top: 4px solid var(--neon-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    box-shadow: 0 0 30px var(--neon-blue);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.search-content h2 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    color: var(--neon-blue);
+    text-shadow: 0 0 20px var(--neon-blue);
+}
+
+.search-content p {
+    color: var(--text-secondary);
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+
+.search-dots {
+    display: flex;
+    gap: 8px;
+}
+
+.search-dots span {
+    width: 10px;
+    height: 10px;
+    background: var(--neon-blue);
+    border-radius: 50%;
+    animation: searchDots 1.5s infinite;
+    box-shadow: 0 0 10px var(--neon-blue);
+}
+
+.search-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.search-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes searchDots {
+    0%, 60%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    30% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+
+/* Экран битвы */
+.battle-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: var(--glass-bg);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.round-info {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--neon-purple);
+    text-shadow: 0 0 10px var(--neon-purple);
+}
+
+.skip-btn {
+    background: var(--accent-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 8px 12px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.skip-btn:hover {
+    color: var(--neon-blue);
+    border-color: var(--neon-blue);
+}
+
+/* Арена битвы */
+.battle-arena {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 30px 20px;
+    position: relative;
+    height: 350px;
+}
+
+.fighter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    width: 45%;
+}
+
+.fighter.player {
+    animation: slideInLeft 0.8s ease-out;
+}
+
+.fighter.enemy {
+    animation: slideInRight 0.8s ease-out;
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%) translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0) translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%) translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0) translateY(0);
+        opacity: 1;
+    }
+}
+
+/* HP бары */
+.hp-bar {
+    width: 120px;
+    height: 8px;
+    background: var(--accent-bg);
+    border-radius: 4px;
+    margin-bottom: 15px;
+    position: relative;
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+}
+
+.hp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--neon-green), #28a745);
+    border-radius: 3px;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 10px var(--neon-green);
+}
+
+.hp-fill.low {
+    background: linear-gradient(90deg, var(--neon-red), #dc3545);
+    box-shadow: 0 0 10px var(--neon-red);
+}
+
+.hp-text {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* NFT контейнер */
+.nft-container {
+    position: relative;
+    text-align: center;
+}
+
+.fighter-nft {
+    width: 100px;
+    height: 100px;
+    border-radius: 15px;
+    object-fit: cover;
+    border: 2px solid var(--neon-blue);
+    box-shadow: 0 0 20px var(--neon-blue);
+    transition: all 0.3s ease;
+}
+
+.fighter.player .fighter-nft {
+    border-color: var(--neon-green);
+    box-shadow: 0 0 20px var(--neon-green);
+}
+
+.fighter.enemy .fighter-nft {
+    border-color: var(--neon-red);
+    box-shadow: 0 0 20px var(--neon-red);
+}
+
+.nft-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 8px;
+    color: var(--text-primary);
+}
+
+/* Индикаторы атаки */
+.attack-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 30px;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.attack-indicator.show {
+    animation: attackPulse 0.6s ease-out;
+}
+
+@keyframes attackPulse {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.5);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+/* VS разделитель */
+.vs-divider {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+}
+
+.vs-icon {
+    background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 30px var(--neon-purple);
+    animation: vsGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes vsGlow {
+    from {
+        box-shadow: 0 0 30px var(--neon-purple);
+    }
+    to {
+        box-shadow: 0 0 50px var(--neon-blue);
+    }
+}
+
+/* Анимации урона */
+.damage-animation {
+    animation: takeDamage 0.6s ease-out;
+}
+
+@keyframes takeDamage {
+    0% {
+        transform: translateX(0);
+        filter: brightness(1);
+    }
+    25% {
+        transform: translateX(-10px);
+        filter: brightness(1.5) saturate(2);
+    }
+    50% {
+        transform: translateX(10px);
+        filter: brightness(0.5) saturate(0.5);
+    }
+    75% {
+        transform: translateX(-5px);
+        filter: brightness(1.2);
+    }
+    100% {
+        transform: translateX(0);
+        filter: brightness(1);
+    }
+}
+
+/* Анимация атаки */
+.attack-animation {
+    animation: performAttack 0.8s ease-out;
+}
+
+@keyframes performAttack {
+    0% {
+        transform: scale(1);
+    }
+    30% {
+        transform: scale(1.1) translateY(-10px);
+    }
+    60% {
+        transform: scale(0.95) translateY(5px);
+    }
+    100% {
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Лог битвы */
+.battle-log {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--glass-bg);
+    border-top: 1px solid var(--glass-border);
+    padding: 15px 20px;
+    max-height: 120px;
+    overflow-y: auto;
+    backdrop-filter: blur(10px);
+}
+
+.battle-log p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+    animation: logFadeIn 0.5s ease-out;
+}
+
+.battle-log p.damage {
+    color: var(--neon-red);
+    font-weight: 600;
+}
+
+.battle-log p.critical {
+    color: var(--neon-purple);
+    font-weight: 600;
+    text-shadow: 0 0 5px var(--neon-purple);
+}
+
+@keyframes logFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Экран результата */
+.result-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    padding: 40px;
+}
+
+.result-animation {
+    margin-bottom: 30px;
+    animation: resultPulse 2s ease-in-out infinite;
+}
+
+.result-animation i {
+    font-size: 80px;
+    color: var(--neon-green);
+    text-shadow: 0 0 30px var(--neon-green);
+}
+
+.result-animation.defeat i {
+    color: var(--neon-red);
+    text-shadow: 0 0 30px var(--neon-red);
+}
+
+@keyframes resultPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+#result-title {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px currentColor;
+}
+
+#result-title.victory {
+    color: var(--neon-green);
+}
+
+#result-title.defeat {
+    color: var(--neon-red);
+}
+
+.reward-info {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 30px;
+    backdrop-filter: blur(10px);
+}
+
+.reward-info p {
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.reward-nft {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.reward-nft img {
+    width: 80px;
+    height: 80px;
+    border-radius: 15px;
+    object-fit: cover;
+    border: 2px solid var(--neon-green);
+    box-shadow: 0 0 20px var(--neon-green);
+    animation: rewardGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes rewardGlow {
+    from {
+        box-shadow: 0 0 20px var(--neon-green);
+    }
+    to {
+        box-shadow: 0 0 40px var(--neon-green);
+    }
+}
+
+#reward-name {
+    font-weight: 600;
+    color: var(--neon-green);
+    text-shadow: 0 0 10px var(--neon-green);
+}
+
+.continue-btn {
+    background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+    border: none;
+    border-radius: 20px;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.continue-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(0, 212, 255, 0.6);
+}
+
+/* Специальные эффекты */
+.screen-transition {
+    animation: screenSlide 0.5s ease-out;
+}
+
+@keyframes screenSlide {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.critical-hit {
+    animation: criticalShake 0.8s ease-out;
+}
+
+@keyframes criticalShake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-10px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(10px);
+    }
+}
+
+.death-animation {
+    animation: fadeOut 1s ease-out forwards;
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0.3;
+        transform: scale(0.8);
+        filter: grayscale(1);
+    }
+}
+
+/* Адаптивность для битвы */
+@media (max-width: 480px) {
+    .battle-arena {
+        padding: 20px 15px;
+        height: 300px;
+    }
+    
+    .fighter-nft {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .hp-bar {
+        width: 100px;
+    }
+    
+    .vs-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 16px;
+    }
+    
+    .battle-log {
+        max-height: 100px;
+        padding: 10px 15px;
+    }
+}

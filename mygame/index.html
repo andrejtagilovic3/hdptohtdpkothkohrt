@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>NFT Battle Arena</title>
+    
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Font Awesome для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Наши стили -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/particles.css">
+</head>
+<body>
+    <!-- Фон с частицами -->
+    <div id="particles-container"></div>
+    
+    <div class="container">
+        <!-- Главное меню -->
+        <div id="main-menu" class="screen active">
+            <div class="header">
+                <div class="user-info">
+                    <div class="stars">
+                        <i class="fas fa-star"></i> 
+                        <span id="star-count">0</span>
+                    </div>
+                    <button class="buy-stars-btn" onclick="buyStars()">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div class="menu-buttons">
+                    <button class="menu-btn" onclick="openCollection()">
+                        <i class="fas fa-box-open"></i>
+                        <span>Коллекция</span>
+                    </button>
+                    <button class="menu-btn" onclick="openShop()">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Магазин</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="center-area">
+                <div id="center-content">
+                    <div class="center-logo">
+                        <i class="fas fa-gamepad"></i>
+                        <p>Выбери NFT для боя</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bottom-controls">
+                <button class="play-btn" onclick="startBattle()" id="play-button">
+                    <i class="fas fa-sword"></i>
+                    <span>Играть (10 ⭐)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Экран поиска противника -->
+        <div id="search-screen" class="screen">
+            <div class="search-content">
+                <div class="search-spinner">
+                    <div class="spinner"></div>
+                </div>
+                <h2>Поиск противника...</h2>
+                <p>Подбираем достойного соперника</p>
+                <div class="search-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран битвы -->
+        <div id="battle-screen" class="screen">
+            <div class="battle-header">
+                <div class="round-info">
+                    <span>Раунд <span id="battle-round">1</span></span>
+                </div>
+                <button class="skip-btn" onclick="skipBattle()">
+                    <i class="fas fa-forward"></i>
+                </button>
+            </div>
+            
+            <div class="battle-arena">
+                <!-- Игрок -->
+                <div class="fighter player" id="player-fighter">
+                    <div class="hp-bar">
+                        <div class="hp-fill" id="player-hp"></div>
+                        <span class="hp-text" id="player-hp-text">100/100</span>
+                    </div>
+                    <div class="nft-container">
+                        <img src="" alt="Player NFT" id="player-nft" class="fighter-nft">
+                        <div class="nft-name" id="player-name">Твой NFT</div>
+                    </div>
+                    <div class="attack-indicator" id="player-attack">⚔️</div>
+                </div>
+
+                <!-- VS -->
+                <div class="vs-divider">
+                    <div class="vs-icon">VS</div>
+                </div>
+
+                <!-- Противник -->
+                <div class="fighter enemy" id="enemy-fighter">
+                    <div class="hp-bar">
+                        <div class="hp-fill" id="enemy-hp"></div>
+                        <span class="hp-text" id="enemy-hp-text">100/100</span>
+                    </div>
+                    <div class="nft-container">
+                        <img src="" alt="Enemy NFT" id="enemy-nft" class="fighter-nft">
+                        <div class="nft-name" id="enemy-name">Противник</div>
+                    </div>
+                    <div class="attack-indicator" id="enemy-attack">⚔️</div>
+                </div>
+            </div>
+            
+            <div class="battle-log" id="battle-log">
+                <p>Битва началась!</p>
+            </div>
+        </div>
+
+        <!-- Экран результата -->
+        <div id="result-screen" class="screen">
+            <div class="result-content">
+                <div class="result-animation" id="result-animation">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h2 id="result-title">Победа!</h2>
+                <div class="reward-info">
+                    <p>Ты выиграл NFT противника:</p>
+                    <div class="reward-nft">
+                        <img src="" alt="Reward" id="reward-nft">
+                        <span id="reward-name">Название NFT</span>
+                    </div>
+                </div>
+                <button class="continue-btn" onclick="backToMenu()">
+                    <i class="fas fa-home"></i>
+                    Продолжить
+                </button>
+            </div>
+        </div>
+
+        <!-- Коллекция -->
+        <div id="collection-screen" class="screen">
+            <div class="screen-header">
+                <h2>
+                    <i class="fas fa-box-open"></i>
+                    Коллекция
+                </h2>
+                <button class="back-btn" onclick="backToMenu()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+            </div>
+            <div class="collection-grid" id="collection-items">
+                <!-- NFT элементы будут добавлены через JS -->
+            </div>
+            <div class="empty-state" id="empty-collection">
+                <i class="fas fa-box"></i>
+                <h3>Коллекция пуста</h3>
+                <p>Купи NFT в магазине или выиграй в битвах</p>
+                <button class="action-btn" onclick="openShop()">
+                    <i class="fas fa-shopping-cart"></i>
+                    В магазин
+                </button>
+            </div>
+        </div>
+
+        <!-- Магазин -->
+        <div id="shop-screen" class="screen">
+            <div class="screen-header">
+                <h2>
+                    <i class="fas fa-shopping-cart"></i>
+                    Магазин NFT
+                </h2>
+                <button class="back-btn" onclick="backToCollection()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+            </div>
+            <div class="shop-grid" id="shop-items">
+                <!-- NFT товары будут добавлены через JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Подключение скриптов -->
+    <script src="js/particles.js"></script>
+    <script src="js/animations.js"></script>
+    <script src="js/battle.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
