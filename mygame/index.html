@@ -1416,6 +1416,7 @@
         function backToCollection() {
             document.getElementById('shop-screen').classList.remove('active');
             document.getElementById('collection-screen').classList.add('active');
+            renderCollection(); // Автоматически рендерим коллекцию при возврате
         }
 
         function renderCenterArea() {
