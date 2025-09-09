@@ -21,6 +21,7 @@
             color: #ffffff;
             height: 100vh;
             overflow: hidden;
+            font-weight: 600; /* Made text bolder overall */
         }
         
         .app-container {
@@ -58,13 +59,13 @@
         
         .user-name {
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700; /* Bolder */
         }
         
         .currency-info {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 4px; /* Reduced gap to move + closer */
         }
         
         .currency-item {
@@ -75,11 +76,11 @@
             padding: 8px 12px;
             border-radius: 20px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700; /* Bolder */
         }
         
         .plus-btn {
-            background: #007AFF;
+            background: #ffffff; /* Changed blue to white */
             border: none;
             border-radius: 20px;
             width: 32px;
@@ -87,7 +88,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: #000000; /* Changed to black for contrast */
             cursor: pointer;
             font-size: 16px;
         }
@@ -114,7 +115,7 @@
             justify-content: center;
             align-items: center;
             background: #000000;
-            margin-bottom: 20px;
+            margin-bottom: 40px; /* Increased to move play button lower */
         }
         
         .center-logo {
@@ -136,7 +137,6 @@
         .center-nft-name {
             font-size: 22px;
             font-weight: 700;
-            margin-bottom: 8px;
         }
         
         .center-nft-status {
@@ -148,9 +148,9 @@
         }
         
         .play-btn {
-            background: #34C759;
+            background: #ffffff; /* Changed green to white for theme */
             border: none;
-            color: white;
+            color: #000000; /* Black for contrast */
             width: 100%;
             padding: 18px;
             font-size: 18px;
@@ -161,7 +161,7 @@
         }
         
         .play-btn:hover {
-            background: #30B454;
+            background: #eeeeee; /* Light gray hover */
         }
         
         .play-btn:disabled {
@@ -193,7 +193,7 @@
         }
         
         .nav-item.active {
-            color: #007AFF;
+            color: #ffffff; /* Changed blue to white */
         }
         
         .nav-item i {
@@ -239,7 +239,7 @@
         
         .nft-card-name {
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700; /* Bolder */
             margin-bottom: 4px;
         }
         
@@ -250,9 +250,9 @@
         }
         
         .nft-card-btn {
-            background: #007AFF;
+            background: #ffffff; /* Changed blue to white */
             border: none;
-            color: white;
+            color: #000000; /* Black for contrast */
             padding: 8px 12px;
             border-radius: 6px;
             font-size: 12px;
@@ -434,7 +434,7 @@
             width: 60px;
             height: 60px;
             border: 3px solid #333333;
-            border-top: 3px solid #007AFF;
+            border-top: 3px solid #ffffff; /* Changed blue to white */
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-bottom: 20px;
@@ -470,6 +470,60 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Purchase Menu Styles */
+        .purchase-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .purchase-content {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 20px;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .purchase-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .purchase-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .purchase-btn {
+            background: #ffffff;
+            color: #000000;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+        }
+
+        .close-purchase {
+            margin-top: 20px;
+            color: #888888;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -485,7 +539,7 @@
                     <i class="fas fa-star" style="color: #ffd700;"></i>
                     <span id="star-count">0</span>
                 </div>
-                <button class="plus-btn" onclick="buyStars()">+</button>
+                <button class="plus-btn" onclick="showPurchaseMenu()">+</button>
             </div>
         </div>
 
@@ -581,6 +635,16 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Upgrade Screen -->
+            <div id="upgrade-screen" class="screen">
+                <div class="main-content">
+                    <h2 class="section-title">Апгрейд</h2>
+                    <div class="friends-placeholder">
+                        <p style="margin-top: 20px; color: #666;">Раздел в разработке</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Bottom Navigation -->
@@ -592,6 +656,10 @@
             <button class="nav-item" onclick="switchScreen('collection')">
                 <i class="fas fa-box-open"></i>
                 <span>Коллекция</span>
+            </button>
+            <button class="nav-item" onclick="switchScreen('upgrade')">
+                <i class="fas fa-arrow-up"></i>
+                <span>Апгрейд</span>
             </button>
             <button class="nav-item" onclick="switchScreen('profile')">
                 <i class="fas fa-user"></i>
@@ -609,6 +677,23 @@
             <div class="searching-text">
                 Поиск соперника...<br>
                 <span id="search-status">Подключение к серверу</span>
+            </div>
+        </div>
+
+        <!-- Purchase Overlay -->
+        <div id="purchase-overlay" class="purchase-overlay">
+            <div class="purchase-content">
+                <div class="purchase-title">Купить звёзды</div>
+                <div class="purchase-options">
+                    <button class="purchase-btn" onclick="purchaseStars(50)">50 звёзд</button>
+                    <button class="purchase-btn" onclick="purchaseStars(100)">100 звёзд</button>
+                    <button class="purchase-btn" onclick="purchaseStars(200)">200 звёзд</button>
+                    <button class="purchase-btn" onclick="purchaseStars(500)">500 звёзд</button>
+                    <button class="purchase-btn" onclick="purchaseStars(1000)">1000 звёзд</button>
+                    <button class="purchase-btn" onclick="purchaseStars(2000)">2000 звёзд</button>
+                    <button class="purchase-btn" onclick="purchaseStars(5000)">5000 звёзд</button>
+                </div>
+                <div class="close-purchase" onclick="closePurchaseMenu()">Закрыть</div>
             </div>
         </div>
     </div>
@@ -698,11 +783,20 @@
             }
         }
 
-        function buyStars() {
-            stars += 100;
-            totalStarsEarned += 100;
+        function showPurchaseMenu() {
+            document.getElementById('purchase-overlay').style.display = 'flex';
+        }
+
+        function closePurchaseMenu() {
+            document.getElementById('purchase-overlay').style.display = 'none';
+        }
+
+        function purchaseStars(amount) {
+            stars += amount;
+            totalStarsEarned += amount;
             updateUI();
-            alert('Куплено 100 звёзд! (Тест)');
+            alert(`Куплено ${amount} звёзд! (Тест)`);
+            closePurchaseMenu();
         }
 
         function startBattleSearch() {
@@ -876,10 +970,16 @@
             const rewardDiv = document.getElementById('reward-info');
             const log = document.getElementById('battle-log');
             
-            const playerWins = playerHP > 0;
-            const adjustedResult = playerWins && Math.random() < 0.15; // 15% шанс неожиданного поражения
-            
-            if (playerHP <= 0 || adjustedResult) {
+            if (playerHP > 0) {
+                resultDiv.textContent = 'ПОБЕДА!';
+                resultDiv.className = 'battle-result win';
+                log.textContent = 'Невероятная победа! Вы оказались сильнее!';
+                
+                const rewardNft = { ...botNft, buyPrice: botNft.price };
+                collection.push(rewardNft);
+                localStorage.setItem('collection', JSON.stringify(collection));
+                rewardDiv.innerHTML = `Вы получили NFT: ${botNft.name}!`;
+            } else {
                 resultDiv.textContent = 'ПОРАЖЕНИЕ!';
                 resultDiv.className = 'battle-result lose';
                 log.textContent = 'Вы потерпели поражение...';
@@ -893,15 +993,6 @@
                     localStorage.setItem('collection', JSON.stringify(collection));
                     rewardDiv.innerHTML = `Ваш NFT захвачен противником!`;
                 }
-            } else {
-                resultDiv.textContent = 'ПОБЕДА!';
-                resultDiv.className = 'battle-result win';
-                log.textContent = 'Невероятная победа! Вы оказались сильнее!';
-                
-                const rewardNft = { ...botNft, buyPrice: botNft.price };
-                collection.push(rewardNft);
-                localStorage.setItem('collection', JSON.stringify(collection));
-                rewardDiv.innerHTML = `Вы получили NFT: ${botNft.name}!`;
             }
             
             resultDiv.style.display = 'block';
@@ -934,6 +1025,8 @@
             } else if (screen === 'collection') {
                 document.getElementById('collection-screen').classList.add('active');
                 renderCollection();
+            } else if (screen === 'upgrade') {
+                document.getElementById('upgrade-screen').classList.add('active');
             } else if (screen === 'profile') {
                 document.getElementById('profile-screen').classList.add('active');
                 renderProfile();
