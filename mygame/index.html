@@ -668,6 +668,12 @@
             border: none;
         }
 
+        .telegram-pay-btn {
+            background: linear-gradient(45deg, #0088cc, #00a2e4) !important;
+            color: white !important;
+            border: 2px solid #00a2e4 !important;
+        }
+
         .close-purchase {
             margin-top: 20px;
             color: #888888;
@@ -678,6 +684,33 @@
             color: #ffd700;
             text-decoration: underline;
             cursor: pointer;
+        }
+
+        .withdraw-section {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .withdraw-btn {
+            background: linear-gradient(45deg, #4caf50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .withdraw-btn:disabled {
+            background: #333333;
+            color: #888888;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -768,9 +801,19 @@
                                 <div>NFT в коллекции: <span id="profile-nft-count">0</span></div>
                                 <div>Звёзд заработано: <span id="profile-stars-earned">0</span></div>
                                 <div>Дуэли проведено: <span id="profile-battles-count">0</span></div>
+                                <div>Звёзд для вывода: <span id="withdrawable-stars">0</span></div>
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="withdraw-section">
+                        <h3>Вывод звёзд</h3>
+                        <p style="color: #888888; margin: 10px 0;">Минимальная сумма для вывода: 300 звёзд</p>
+                        <button class="withdraw-btn" id="withdraw-btn" onclick="initiateWithdrawal()">
+                            Вывести звёзды
+                        </button>
+                    </div>
+
                     <button class="play-btn" onclick="showBattleHistory()" style="margin-bottom: 15px; font-size: 16px;">
                         История дуэлей
                     </button>
@@ -883,9 +926,12 @@
                     <button class="purchase-btn" onclick="purchaseStars(100)">100 звёзд</button>
                     <button class="purchase-btn" onclick="purchaseStars(200)">200 звёзд</button>
                     <button class="purchase-btn" onclick="purchaseStars(500)">500 звёзд</button>
-                    <button class="purchase-btn" onclick="purchaseStars(1000)">1000 звёзд</button>
-                    <button class="purchase-btn" onclick="purchaseStars(2000)">2000 звёзд</button>
-                    <button class="purchase-btn" onclick="purchaseStars(5000)">5000 звёзд</button>
+                    <button class="purchase-btn telegram-pay-btn" onclick="buyStarsWithTelegram(1000, 1)">
+                        💎 1000 звёзд (1 звезда TG)
+                    </button>
+                    <button class="purchase-btn telegram-pay-btn" onclick="buyStarsWithTelegram(5000, 1)">
+                        💎 5000 звёзд (1 звезда TG)
+                    </button>
                 </div>
                 <div class="close-purchase" onclick="closePurchaseMenu()">Закрыть</div>
             </div>
@@ -921,6 +967,7 @@
         let activeBattleNft = null;
         let totalStarsEarned = 0;
         let battleHistory = [];
+        let withdrawableStars = 0;
         
         const tgUser = Telegram.WebApp.initDataUnsafe?.user;
         let userName = tgUser?.first_name || 'Игрок';
@@ -942,22 +989,25 @@
             renderShop();
             renderProfile();
             updateUserInfo();
+            setupTelegramPayments();
         }
 
         async function loadData() {
             try {
-                const [starsStr, collectionStr, activeNftStr, totalEarnedStr, historyStr] = await Promise.all([
+                const [starsStr, collectionStr, activeNftStr, totalEarnedStr, historyStr, withdrawableStr] = await Promise.all([
                     getCloudItem('stars'),
                     getCloudItem('collection'),
                     getCloudItem('activeBattleNft'),
                     getCloudItem('totalStarsEarned'),
-                    getCloudItem('battleHistory')
+                    getCloudItem('battleHistory'),
+                    getCloudItem('withdrawableStars')
                 ]);
                 stars = parseInt(starsStr) || 100;
                 collection = JSON.parse(collectionStr) || [];
                 activeBattleNft = JSON.parse(activeNftStr) || null;
                 totalStarsEarned = parseInt(totalEarnedStr) || 0;
                 battleHistory = JSON.parse(historyStr) || [];
+                withdrawableStars = parseInt(withdrawableStr) || 0;
             } catch (error) {
                 console.error('Error loading data:', error);
             }
@@ -970,7 +1020,8 @@
                     setCloudItem('collection', JSON.stringify(collection)),
                     setCloudItem('activeBattleNft', JSON.stringify(activeBattleNft)),
                     setCloudItem('totalStarsEarned', totalStarsEarned.toString()),
-                    setCloudItem('battleHistory', JSON.stringify(battleHistory))
+                    setCloudItem('battleHistory', JSON.stringify(battleHistory)),
+                    setCloudItem('withdrawableStars', withdrawableStars.toString())
                 ]);
             } catch (error) {
                 console.error('Error saving data:', error);
@@ -1010,6 +1061,17 @@
             document.getElementById('profile-nft-count').textContent = collection.length;
             document.getElementById('profile-stars-earned').textContent = totalStarsEarned;
             document.getElementById('profile-battles-count').textContent = battleHistory.length;
+            document.getElementById('withdrawable-stars').textContent = withdrawableStars;
+            
+            const withdrawBtn = document.getElementById('withdraw-btn');
+            if (withdrawableStars >= 300) {
+                withdrawBtn.disabled = false;
+                withdrawBtn.textContent = `Вывести ${withdrawableStars} звёзд`;
+            } else {
+                withdrawBtn.disabled = true;
+                withdrawBtn.textContent = `Минимум 300 звёзд для вывода`;
+            }
+            
             updatePlayButton();
             saveData();
         }
@@ -1040,8 +1102,84 @@
             stars += amount;
             totalStarsEarned += amount;
             updateUI();
-            alert(`Куплено ${amount} звёзд! (Тест)`);
+            alert(`🎉 Куплено ${amount} звёзд!`);
             closePurchaseMenu();
+        }
+
+        function setupTelegramPayments() {
+            Telegram.WebApp.onEvent('invoiceClosed', function(event) {
+                console.log('Invoice closed:', event);
+                if (event.status === 'paid') {
+                    const payload = JSON.parse(event.payload || '{}');
+                    const starsAmount = payload.starsAmount || 1000;
+                    
+                    stars += starsAmount;
+                    totalStarsEarned += starsAmount;
+                    updateUI();
+                    
+                    Telegram.WebApp.showAlert(`🎉 Успешно! Получено ${starsAmount} звёзд!`);
+                }
+            });
+        }
+
+        function buyStarsWithTelegram(starsAmount, telegramStarsPrice) {
+            try {
+                const tg = Telegram.WebApp;
+                const user = tg.initDataUnsafe.user;
+                
+                const payload = JSON.stringify({
+                    userId: user?.id,
+                    starsAmount: starsAmount,
+                    timestamp: Date.now(),
+                    type: 'stars_purchase'
+                });
+
+                tg.openInvoice({
+                    title: `Покупка ${starsAmount} игровых звёзд`,
+                    description: `Пополнение счета для NFT дуэлей`,
+                    payload: payload,
+                    provider_token: '',
+                    currency: 'XTR',
+                    prices: [{ label: `${starsAmount} игровых звёзд`, amount: telegramStarsPrice * 100 }],
+                    photo_url: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/imgg/1.gif',
+                    need_name: false,
+                    need_phone_number: false,
+                    need_email: false,
+                    need_shipping_address: false,
+                    is_flexible: false
+                });
+                
+            } catch (error) {
+                console.error('Error creating invoice:', error);
+                Telegram.WebApp.showAlert('Ошибка при создании счета. Попробуйте позже.');
+            }
+        }
+
+        function initiateWithdrawal() {
+            if (withdrawableStars < 300) {
+                Telegram.WebApp.showAlert('Минимальная сумма для вывода: 300 звёзд');
+                return;
+            }
+            
+            Telegram.WebApp.showConfirm(
+                `Вы уверены, что хотите вывести ${withdrawableStars} звёзд?`,
+                function(confirmed) {
+                    if (confirmed) {
+                        processWithdrawal();
+                    }
+                }
+            );
+        }
+
+        function processWithdrawal() {
+            Telegram.WebApp.showPopup({
+                title: 'Запрос на вывод',
+                message: `Запрос на вывод ${withdrawableStars} звёзд отправлен администратору. Ожидайте обработки в течение 24 часов.`,
+                buttons: [{ type: 'ok', text: 'Понятно' }]
+            }, function(btnId) {
+                withdrawableStars = 0;
+                updateUI();
+            });
         }
 
         function startBattleSearch() {
@@ -1301,6 +1439,7 @@
             
             let result;
             let reward;
+            let starsWon = 0;
             
             if (playerHP > 0) {
                 resultDiv.textContent = 'ПОБЕДА!';
@@ -1309,7 +1448,12 @@
                 
                 const rewardNft = { ...botNft, buyPrice: botNft.price };
                 collection.push(rewardNft);
-                rewardDiv.innerHTML = `Вы получили NFT: ${botNft.name}!`;
+                
+                starsWon = Math.floor(Math.random() * 50) + 50;
+                stars += starsWon;
+                withdrawableStars += starsWon;
+                
+                rewardDiv.innerHTML = `Вы получили NFT: ${botNft.name}!<br>+${starsWon} звёзд для вывода`;
                 rewardDiv.classList.add('win');
                 rewardDiv.classList.remove('lose');
                 
@@ -1345,7 +1489,8 @@
                     name: botNft.name,
                     img: botNft.img
                 },
-                reward: reward
+                reward: reward,
+                starsWon: starsWon
             });
             
             resultDiv.style.display = 'block';
@@ -1584,7 +1729,7 @@
                         </div>
                     </div>
                     <div style="text-align: center; margin-top: 10px; font-size: 14px; color: #cccccc;">
-                        ${battle.reward}
+                        ${battle.reward}${battle.starsWon ? ` (+${battle.starsWon} звёзд)` : ''}
                     </div>
                 `;
                 
