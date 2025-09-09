@@ -1609,6 +1609,128 @@
                 historyList.appendChild(historyItem);
             });
         }
+
+        // Реферальная система
+        function generateReferralCode() {
+            if (!referralCode) {
+                referralCode = 'ref_' + Math.random().toString(36).substr(2, 8);
+                saveData();
+            }
+        }
+
+        function inviteFriend() {
+            const botUrl = `https://t.me/your_bot_name?start=${referralCode}`;
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(botUrl)}&text=${encodeURIComponent('Присоединяйся к NFT игре! 🎮')}`;
+            
+            if (Telegram.WebApp.openTelegramLink) {
+                Telegram.WebApp.openTelegramLink(shareUrl);
+            } else {
+                window.open(shareUrl, '_blank');
+            }
+        }
+
+        function copyReferralLink() {
+            const botUrl = `https://t.me/your_bot_name?start=${referralCode}`;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(botUrl).then(() => {
+                    showToast('Ссылка скопирована!');
+                });
+            } else {
+                // Fallback для старых браузеров
+                const textArea = document.createElement('textarea');
+                textArea.value = botUrl;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast('Ссылка скопирована!');
+            }
+        }
+
+        function showToast(message) {
+            // Создаем простой toast
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: #333;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                z-index: 10000;
+                font-size: 14px;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 2000);
+        }
+
+        function showTerms() {
+            alert('Условия партнёрства:\n\n• Пригласите 50+ активных игроков\n• Свяжитесь с поддержкой для получения статуса партнёра\n• Получайте % от покупок ваших рефералов');
+        }
+
+        function renderFriends() {
+            const friendsList = document.getElementById('friends-list');
+            const friendsCount = document.getElementById('friends-count');
+            
+            friendsCount.textContent = `(${referredFriends.length})`;
+            
+            if (referredFriends.length === 0) {
+                friendsList.innerHTML = `
+                    <div class="no-friends">
+                        Друг должен зайти в приложение по вашей<br>ссылке, чтобы вы получили звёзды.
+                    </div>
+                `;
+            } else {
+                friendsList.innerHTML = '';
+                referredFriends.forEach(friend => {
+                    const friendItem = document.createElement('div');
+                    friendItem.className = 'friend-item';
+                    friendItem.innerHTML = `
+                        <div class="friend-info">
+                            <div class="friend-avatar">${friend.name.charAt(0).toUpperCase()}</div>
+                            <div class="friend-name">${friend.name}</div>
+                        </div>
+                        <div class="friend-reward">
+                            <i class="fas fa-star"></i>
+                            10 звёзд
+                        </div>
+                    `;
+                    friendsList.appendChild(friendItem);
+                });
+            }
+        }
+
+        function switchScreen(screen) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.nav-item').classList.add('active');
+            
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            
+            if (screen === 'main') {
+                document.getElementById('main-screen').classList.add('active');
+                renderCenterArea();
+            } else if (screen === 'collection') {
+                document.getElementById('collection-screen').classList.add('active');
+                renderCollection();
+            } else if (screen === 'upgrade') {
+                document.getElementById('upgrade-screen').classList.add('active');
+            } else if (screen === 'profile') {
+                document.getElementById('profile-screen').classList.add('active');
+                renderProfile();
+            } else if (screen === 'friends') {
+                document.getElementById('friends-screen').classList.add('active');
+                renderFriends(); // Добавляем рендеринг друзей
+            }
+            
+            currentScreen = screen;
+        }
     </script>
 </body>
 </html>
