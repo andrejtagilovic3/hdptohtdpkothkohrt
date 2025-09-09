@@ -1469,6 +1469,16 @@
             alert(`Продан за ${sellPrice} звёзд!`);
         }
 
+        function showRules() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('rules-screen').classList.add('active');
+        }
+
+        function backToMain() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('main-screen').classList.add('active');
+        }
+
         function setToBattle(index) {
             activeBattleNft = collection[index];
             renderCollection();
