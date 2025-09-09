@@ -1302,6 +1302,10 @@
             let result;
             let reward;
             
+            // Создаем копию данных NFT для истории до их изменения
+            const battlePlayerNft = activeBattleNft ? { ...activeBattleNft } : null;
+            const battleBotNft = { ...botNft };
+            
             if (playerHP > 0) {
                 resultDiv.textContent = 'ПОБЕДА!';
                 resultDiv.className = 'battle-result win';
@@ -1334,16 +1338,17 @@
                 result = 'lose';
             }
             
+            // Добавляем в историю с сохраненными данными
             battleHistory.push({
                 date: new Date().toLocaleDateString('ru-RU'),
                 result: result,
                 playerNft: {
-                    name: activeBattleNft ? activeBattleNft.name : 'Неизвестно',
-                    img: activeBattleNft ? activeBattleNft.img : ''
+                    name: battlePlayerNft ? battlePlayerNft.name : 'Неизвестно',
+                    img: battlePlayerNft ? battlePlayerNft.img : 'https://via.placeholder.com/60x60?text=?'
                 },
                 botNft: {
-                    name: botNft.name,
-                    img: botNft.img
+                    name: battleBotNft.name,
+                    img: battleBotNft.img
                 },
                 reward: reward
             });
@@ -1390,6 +1395,18 @@
             currentScreen = screen;
         }
 
+        // Функция для перехода в коллекцию из главного экрана
+        function goToCollection() {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.nav-item')[1].classList.add('active'); // коллекция - второй элемент
+            
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('collection-screen').classList.add('active');
+            
+            renderCollection();
+            currentScreen = 'collection';
+        }
+
         function openShop() {
             document.getElementById('collection-screen').classList.remove('active');
             document.getElementById('shop-screen').classList.add('active');
@@ -1411,7 +1428,7 @@
                     <div class="center-nft-status">Готов к дуэли</div>
                 `;
             } else {
-                centerDiv.innerHTML = '<div class="center-logo">//</div><div class="center-message">У вас не выбран NFT для дуэли, выберите его в <span class="clickable-link" onclick="switchScreen(\'collection\')">коллекции</span></div>';
+                centerDiv.innerHTML = '<div class="center-logo">//</div><div class="center-message">У вас не выбран NFT для дуэли, выберите его в <span class="clickable-link" onclick="goToCollection()">коллекции</span></div>';
             }
         }
 
@@ -1492,9 +1509,9 @@
                 alert(`Куплен ${nft.name}!`);
                 renderShop();
                 
+                // Переходим в коллекцию после покупки
                 setTimeout(() => {
-                    switchScreen('collection');
-                    renderCollection();
+                    backToCollection();
                 }, 500);
             } else {
                 alert('Недостаточно звёзд!');
@@ -1574,12 +1591,12 @@
                     </div>
                     <div class="battle-history-nfts">
                         <div class="history-nft">
-                            <img src="${battle.playerNft.img}" class="history-nft-img" alt="${battle.playerNft.name}">
+                            <img src="${battle.playerNft.img}" class="history-nft-img" alt="${battle.playerNft.name}" onerror="this.src='https://via.placeholder.com/60x60/333333/888888?text=?'">
                             <div class="history-nft-name">${battle.playerNft.name}</div>
                         </div>
                         <div class="history-vs">VS</div>
                         <div class="history-nft">
-                            <img src="${battle.botNft.img}" class="history-nft-img" alt="${battle.botNft.name}">
+                            <img src="${battle.botNft.img}" class="history-nft-img" alt="${battle.botNft.name}" onerror="this.src='https://via.placeholder.com/60x60/333333/888888?text=?'">
                             <div class="history-nft-name">${battle.botNft.name}</div>
                         </div>
                     </div>
