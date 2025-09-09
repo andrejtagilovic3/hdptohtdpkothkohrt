@@ -115,7 +115,7 @@
             justify-content: center;
             align-items: center;
             background: #000000;
-            margin-bottom: 40px; /* Increased to move play button lower */
+            margin-bottom: 80px; /* Increased further to move play button lower for easier clicking */
         }
         
         .center-logo {
@@ -247,6 +247,7 @@
             font-size: 12px;
             color: #888888;
             margin-bottom: 8px;
+            font-weight: 600; /* Bolder */
         }
         
         .nft-card-btn {
@@ -256,6 +257,7 @@
             padding: 8px 12px;
             border-radius: 6px;
             font-size: 12px;
+            font-weight: 700; /* Bolder text for buttons */
             cursor: pointer;
             width: 100%;
             margin-bottom: 4px;
@@ -263,6 +265,7 @@
         
         .nft-card-btn.secondary {
             background: #333333;
+            color: #ffffff;
             margin-bottom: 0;
         }
         
@@ -293,6 +296,18 @@
             object-fit: cover;
             margin-bottom: 12px;
             border: 2px solid #333333;
+        }
+        
+        .shake {
+            animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(-5px, 0); }
+            50% { transform: translate(5px, 0); }
+            75% { transform: translate(-5px, 0); }
+            100% { transform: translate(0, 0); }
         }
         
         .participant-name {
@@ -701,6 +716,8 @@
     <script>
         Telegram.WebApp.ready();
 
+        const cloudStorage = Telegram.WebApp.CloudStorage;
+
         // Расширенный список NFT подарков (14 штук)
         const nftTemplates = [
             { name: 'Календарь', img: 'https://raw.githubusercontent.com/yourusername/yourrepo/main/calendar.gif', tier: 'basic' },
@@ -722,10 +739,10 @@
         const nftPrices = [100, 150, 200, 250, 80, 90, 70, 85, 95, 200, 75, 60, 220, 240];
 
         // Инициализация
-        let stars = parseInt(localStorage.getItem('stars')) || 100;
-        let collection = JSON.parse(localStorage.getItem('collection')) || [];
-        let activeBattleNft = JSON.parse(localStorage.getItem('activeBattleNft')) || null;
-        let totalStarsEarned = parseInt(localStorage.getItem('totalStarsEarned')) || 0;
+        let stars = 100;
+        let collection = [];
+        let activeBattleNft = null;
+        let totalStarsEarned = 0;
         
         // Telegram user data
         const tgUser = Telegram.WebApp.initDataUnsafe?.user;
@@ -741,13 +758,62 @@
 
         init();
 
-        function init() {
+        async function init() {
+            await loadData();
             updateUI();
             renderCenterArea();
             renderCollection();
             renderShop();
             renderProfile();
             updateUserInfo();
+        }
+
+        async function loadData() {
+            try {
+                const [starsStr, collectionStr, activeNftStr, totalEarnedStr] = await Promise.all([
+                    getCloudItem('stars'),
+                    getCloudItem('collection'),
+                    getCloudItem('activeBattleNft'),
+                    getCloudItem('totalStarsEarned')
+                ]);
+                stars = parseInt(starsStr) || 100;
+                collection = JSON.parse(collectionStr) || [];
+                activeBattleNft = JSON.parse(activeNftStr) || null;
+                totalStarsEarned = parseInt(totalEarnedStr) || 0;
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+
+        async function saveData() {
+            try {
+                await Promise.all([
+                    setCloudItem('stars', stars.toString()),
+                    setCloudItem('collection', JSON.stringify(collection)),
+                    setCloudItem('activeBattleNft', JSON.stringify(activeBattleNft)),
+                    setCloudItem('totalStarsEarned', totalStarsEarned.toString())
+                ]);
+            } catch (error) {
+                console.error('Error saving data:', error);
+            }
+        }
+
+        function getCloudItem(key) {
+            return new Promise((resolve, reject) => {
+                cloudStorage.getItem(key, (error, value) => {
+                    if (error) reject(error);
+                    else resolve(value);
+                });
+            });
+        }
+
+        function setCloudItem(key, value) {
+            return new Promise((resolve, reject) => {
+                cloudStorage.setItem(key, value, (error, success) => {
+                    if (error || !success) reject(error);
+                    else resolve();
+                });
+            });
         }
 
         function updateUserInfo() {
@@ -764,9 +830,8 @@
             document.getElementById('star-count').textContent = stars;
             document.getElementById('profile-nft-count').textContent = collection.length;
             document.getElementById('profile-stars-earned').textContent = totalStarsEarned;
-            localStorage.setItem('stars', stars);
-            localStorage.setItem('totalStarsEarned', totalStarsEarned);
             updatePlayButton();
+            saveData();
         }
 
         function updatePlayButton() {
@@ -904,6 +969,13 @@
             
             const isMiss = Math.random() < 0.08;
             const log = document.getElementById('battle-log');
+            let targetImg;
+            
+            if (isPlayerTurn) {
+                targetImg = document.getElementById('bot-img');
+            } else {
+                targetImg = document.getElementById('player-img');
+            }
             
             if (isMiss) {
                 if (isPlayerTurn) {
@@ -927,6 +999,9 @@
                         log.textContent = `Соперник наносит вам ${damage} урона!`;
                     }
                 }
+                // Add shake animation
+                targetImg.classList.add('shake');
+                setTimeout(() => targetImg.classList.remove('shake'), 500);
             }
             
             updateHPBars();
@@ -977,7 +1052,6 @@
                 
                 const rewardNft = { ...botNft, buyPrice: botNft.price };
                 collection.push(rewardNft);
-                localStorage.setItem('collection', JSON.stringify(collection));
                 rewardDiv.innerHTML = `Вы получили NFT: ${botNft.name}!`;
             } else {
                 resultDiv.textContent = 'ПОРАЖЕНИЕ!';
@@ -989,8 +1063,6 @@
                         nft.name !== activeBattleNft.name || nft.img !== activeBattleNft.img
                     );
                     activeBattleNft = null;
-                    localStorage.removeItem('activeBattleNft');
-                    localStorage.setItem('collection', JSON.stringify(collection));
                     rewardDiv.innerHTML = `Ваш NFT захвачен противником!`;
                 }
             }
@@ -998,6 +1070,7 @@
             resultDiv.style.display = 'block';
             rewardDiv.style.display = 'block';
             document.getElementById('back-to-menu-btn').style.display = 'block';
+            updateUI();
         }
 
         function backToMainFromBattle() {
@@ -1150,7 +1223,6 @@
             
             if (activeBattleNft && activeBattleNft.name === nft.name && activeBattleNft.img === nft.img) {
                 activeBattleNft = null;
-                localStorage.removeItem('activeBattleNft');
             }
             
             collection.splice(index, 1);
@@ -1162,7 +1234,6 @@
 
         function setToBattle(index) {
             activeBattleNft = collection[index];
-            localStorage.setItem('activeBattleNft', JSON.stringify(activeBattleNft));
             renderCollection();
             renderCenterArea();
             updateUI();
