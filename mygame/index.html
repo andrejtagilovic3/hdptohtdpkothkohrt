@@ -58,13 +58,13 @@
         
         .user-name {
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
         }
         
         .currency-info {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
         }
         
         .currency-item {
@@ -75,7 +75,7 @@
             padding: 8px 12px;
             border-radius: 20px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
         }
         
         .plus-btn {
@@ -90,6 +90,7 @@
             color: white;
             cursor: pointer;
             font-size: 16px;
+            font-weight: 700;
         }
         
         .content-area {
@@ -107,14 +108,14 @@
         
         .center-area {
             text-align: center;
-            padding: 60px 20px;
-            min-height: 300px;
+            padding: 40px 20px;
+            min-height: 250px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             background: #000000;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
         
         .center-logo {
@@ -141,6 +142,7 @@
         
         .center-nft-status {
             font-size: 16px;
+            font-weight: 600;
             color: #888888;
             background: #1a1a1a;
             padding: 6px 12px;
@@ -185,6 +187,7 @@
             background: transparent;
             color: #888888;
             font-size: 12px;
+            font-weight: 600;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -239,12 +242,13 @@
         
         .nft-card-name {
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 4px;
         }
         
         .nft-card-price {
             font-size: 12px;
+            font-weight: 600;
             color: #888888;
             margin-bottom: 8px;
         }
@@ -256,6 +260,7 @@
             padding: 8px 12px;
             border-radius: 6px;
             font-size: 12px;
+            font-weight: 600;
             cursor: pointer;
             width: 100%;
             margin-bottom: 4px;
@@ -266,7 +271,6 @@
             margin-bottom: 0;
         }
         
-        /* Battle styles */
         .battle-arena {
             background: #1a1a1a;
             border-radius: 16px;
@@ -297,7 +301,7 @@
         
         .participant-name {
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 12px;
         }
         
@@ -329,7 +333,7 @@
         .hp-text {
             font-size: 14px;
             color: #cccccc;
-            font-weight: 600;
+            font-weight: 700;
         }
         
         .vs-text {
@@ -345,10 +349,10 @@
             padding: 16px;
             margin: 20px 0;
             font-size: 16px;
+            font-weight: 600;
             color: #cccccc;
             min-height: 80px;
             border: 1px solid #333333;
-            font-weight: 500;
         }
         
         .battle-result {
@@ -374,6 +378,7 @@
             margin: 15px 0;
             text-align: center;
             font-size: 16px;
+            font-weight: 600;
         }
         
         .profile-header {
@@ -406,6 +411,7 @@
         
         .profile-stats {
             font-size: 14px;
+            font-weight: 600;
             color: #888888;
         }
         
@@ -414,6 +420,7 @@
             padding: 80px 20px;
             color: #888888;
             font-size: 18px;
+            font-weight: 600;
         }
         
         .searching-overlay {
@@ -447,6 +454,7 @@
         
         .searching-text {
             font-size: 18px;
+            font-weight: 600;
             color: #cccccc;
             text-align: center;
         }
@@ -458,8 +466,85 @@
             padding: 12px 20px;
             border-radius: 8px;
             font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
             margin-top: 20px;
+        }
+
+        .buy-stars-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .buy-stars-modal {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 350px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .buy-stars-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        .star-packages {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .star-package {
+            background: #333333;
+            border: 2px solid #555555;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .star-package:hover {
+            border-color: #007AFF;
+            background: #2a2a2a;
+        }
+
+        .package-amount {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        .package-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #888888;
+        }
+
+        .close-modal {
+            background: #666666;
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
         }
         
         .fade-in {
@@ -474,7 +559,6 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Top Bar -->
         <div class="top-bar">
             <div class="user-info">
                 <div class="user-avatar" id="user-avatar">👤</div>
@@ -485,13 +569,11 @@
                     <i class="fas fa-star" style="color: #ffd700;"></i>
                     <span id="star-count">0</span>
                 </div>
-                <button class="plus-btn" onclick="buyStars()">+</button>
+                <button class="plus-btn" onclick="openBuyStars()">+</button>
             </div>
         </div>
 
-        <!-- Content Area -->
         <div class="content-area">
-            <!-- Main Screen -->
             <div id="main-screen" class="screen active">
                 <div class="main-content">
                     <div id="center-area" class="center-area">
@@ -501,7 +583,6 @@
                 </div>
             </div>
 
-            <!-- Collection Screen -->
             <div id="collection-screen" class="screen">
                 <div class="main-content">
                     <h2 class="section-title">Коллекция</h2>
@@ -512,7 +593,6 @@
                 </div>
             </div>
 
-            <!-- Shop Screen -->
             <div id="shop-screen" class="screen">
                 <div class="main-content">
                     <h2 class="section-title">Магазин NFT</h2>
@@ -520,7 +600,6 @@
                 </div>
             </div>
 
-            <!-- Battle Screen -->
             <div id="battle-screen" class="screen">
                 <div class="main-content">
                     <h2 class="section-title">Битва</h2>
@@ -554,7 +633,6 @@
                 </div>
             </div>
 
-            <!-- Profile Screen -->
             <div id="profile-screen" class="screen">
                 <div class="main-content">
                     <div class="profile-header">
@@ -572,7 +650,6 @@
                 </div>
             </div>
 
-            <!-- Friends Screen -->
             <div id="friends-screen" class="screen">
                 <div class="main-content">
                     <div class="friends-placeholder">
@@ -583,7 +660,6 @@
             </div>
         </div>
 
-        <!-- Bottom Navigation -->
         <div class="bottom-nav">
             <button class="nav-item active" onclick="switchScreen('main')">
                 <i class="fas fa-home"></i>
@@ -603,7 +679,6 @@
             </button>
         </div>
 
-        <!-- Searching Overlay -->
         <div id="searching-overlay" class="searching-overlay" style="display: none;">
             <div class="searching-animation"></div>
             <div class="searching-text">
@@ -611,12 +686,49 @@
                 <span id="search-status">Подключение к серверу</span>
             </div>
         </div>
+
+        <div id="buy-stars-overlay" class="buy-stars-overlay" style="display: none;">
+            <div class="buy-stars-modal">
+                <h2 class="buy-stars-title">Купить звёзды</h2>
+                <div class="star-packages">
+                    <div class="star-package" onclick="buyStarsPack(50)">
+                        <div class="package-amount">50</div>
+                        <div class="package-label">звёзд</div>
+                    </div>
+                    <div class="star-package" onclick="buyStarsPack(100)">
+                        <div class="package-amount">100</div>
+                        <div class="package-label">звёзд</div>
+                    </div>
+                    <div class="star-package" onclick="buyStarsPack(200)">
+                        <div class="package-amount">200</div>
+                        <div class="package-label">звёзд</div>
+                    </div>
+                    <div class="star-package" onclick="buyStarsPack(500)">
+                        <div class="package-amount">500</div>
+                        <div class="package-label">звёзд</div>
+                    </div>
+                    <div class="star-package" onclick="buyStarsPack(1000)">
+                        <div class="package-amount">1000</div>
+                        <div class="package-label">звёзд</div>
+                    </div>
+                    <div class="star-package" onclick="buyStarsPack(2000)">
+                        <div class="package-amount">2000</div>
+                        <div class="package-label">звёзд</div>
+                    </div>
+                </div>
+                <div class="star-package" onclick="buyStarsPack(5000)" style="margin-bottom: 20px;">
+                    <div class="package-amount">5000</div>
+                    <div class="package-label">звёзд</div>
+                </div>
+                <button class="close-modal" onclick="closeBuyStars()">Закрыть</button>
+            </div>
+        </div>
     </div>
 
     <script>
         Telegram.WebApp.ready();
 
-        // Расширенный список NFT подарков (14 штук)
+        // ===== NFT TEMPLATES - ЗАМЕНИ НА СВОИ GIF'ы =====
         const nftTemplates = [
             { name: 'Календарь', img: 'https://raw.githubusercontent.com/yourusername/yourrepo/main/calendar.gif', tier: 'basic' },
             { name: 'Doge Pop', img: 'https://raw.githubusercontent.com/yourusername/yourrepo/main/doge.gif', tier: 'basic' },
@@ -636,18 +748,15 @@
         
         const nftPrices = [100, 150, 200, 250, 80, 90, 70, 85, 95, 200, 75, 60, 220, 240];
 
-        // Инициализация
         let stars = parseInt(localStorage.getItem('stars')) || 100;
         let collection = JSON.parse(localStorage.getItem('collection')) || [];
         let activeBattleNft = JSON.parse(localStorage.getItem('activeBattleNft')) || null;
         let totalStarsEarned = parseInt(localStorage.getItem('totalStarsEarned')) || 0;
         
-        // Telegram user data
         const tgUser = Telegram.WebApp.initDataUnsafe?.user;
         let userName = tgUser?.first_name || 'Игрок';
         let userAvatar = tgUser?.photo_url || '👤';
         
-        // Battle variables
         let playerHP = 100;
         let botHP = 100;
         let botNft = null;
@@ -698,383 +807,17 @@
             }
         }
 
-        function buyStars() {
-            stars += 100;
-            totalStarsEarned += 100;
+        function openBuyStars() {
+            document.getElementById('buy-stars-overlay').style.display = 'flex';
+        }
+
+        function closeBuyStars() {
+            document.getElementById('buy-stars-overlay').style.display = 'none';
+        }
+
+        function buyStarsPack(amount) {
+            stars += amount;
+            totalStarsEarned += amount;
             updateUI();
-            alert('Куплено 100 звёзд! (Тест)');
-        }
-
-        function startBattleSearch() {
-            if (!activeBattleNft || stars < 10) return;
-            
-            stars -= 10;
-            updateUI();
-            
-            // Показываем overlay поиска
-            document.getElementById('searching-overlay').style.display = 'flex';
-            
-            const searchStatuses = [
-                'Подключение к серверу...',
-                'Поиск игроков...',
-                'Проверка совместимости...',
-                'Соперник найден!'
-            ];
-            
-            let statusIndex = 0;
-            const statusElement = document.getElementById('search-status');
-            
-            const updateStatus = () => {
-                if (statusIndex < searchStatuses.length) {
-                    statusElement.textContent = searchStatuses[statusIndex];
-                    statusIndex++;
-                    if (statusIndex < searchStatuses.length) {
-                        setTimeout(updateStatus, 800);
-                    } else {
-                        setTimeout(startBattle, 500);
-                    }
-                }
-            };
-            
-            updateStatus();
-        }
-
-        function startBattle() {
-            // Скрываем overlay поиска
-            document.getElementById('searching-overlay').style.display = 'none';
-            
-            // Подбираем соперника по ценовой категории
-            const playerPrice = activeBattleNft.buyPrice;
-            let suitableNfts = [];
-            
-            // Находим подходящих соперников (аналогичная или меньшая цена)
-            nftTemplates.forEach((template, index) => {
-                if (nftPrices[index] <= playerPrice + 50) { // +50 для некоторого разнообразия
-                    suitableNfts.push({ ...template, price: nftPrices[index] });
-                }
-            });
-            
-            // Если нет подходящих, берем любого
-            if (suitableNfts.length === 0) {
-                const randomIndex = Math.floor(Math.random() * nftTemplates.length);
-                botNft = { ...nftTemplates[randomIndex], price: nftPrices[randomIndex] };
-            } else {
-                const randomIndex = Math.floor(Math.random() * suitableNfts.length);
-                botNft = suitableNfts[randomIndex];
-            }
-            
-            // Переходим к битве
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('battle-screen').classList.add('active');
-            initializeBattle();
-        }
-
-        function initializeBattle() {
-            playerHP = 100;
-            botHP = 100;
-            battleInProgress = true;
-            
-            document.getElementById('player-img').src = activeBattleNft.img;
-            document.getElementById('bot-img').src = botNft.img;
-            
-            updateHPBars();
-            
-            document.getElementById('battle-result').style.display = 'none';
-            document.getElementById('reward-info').style.display = 'none';
-            document.getElementById('back-to-menu-btn').style.display = 'none';
-            
-            const playerFirst = Math.random() < 0.5;
-            const log = document.getElementById('battle-log');
-            
-            if (playerFirst) {
-                log.textContent = 'Вы атакуете первыми! Приготовьтесь...';
-                setTimeout(() => performAttack(true), 2000);
-            } else {
-                log.textContent = 'Соперник атакует первым! Защищайтесь...';
-                setTimeout(() => performAttack(false), 2000);
-            }
-        }
-
-        function performAttack(isPlayerTurn) {
-            if (!battleInProgress) return;
-            
-            let damage;
-            const isLowHP = (isPlayerTurn ? botHP : playerHP) <= 25;
-            const isCritical = Math.random() < (isLowHP ? 0.3 : 0.15);
-            
-            if (isCritical) {
-                damage = Math.floor(Math.random() * 30) + 45;
-            } else {
-                damage = Math.floor(Math.random() * 35) + 8;
-            }
-            
-            const isMiss = Math.random() < 0.08;
-            const log = document.getElementById('battle-log');
-            
-            if (isMiss) {
-                if (isPlayerTurn) {
-                    log.textContent = 'Промах! Ваша атака не попала в цель!';
-                } else {
-                    log.textContent = 'Уклонение! Вы избежали атаки соперника!';
-                }
-            } else {
-                if (isPlayerTurn) {
-                    botHP = Math.max(0, botHP - damage);
-                    if (isCritical) {
-                        log.textContent = `КРИТИЧЕСКИЙ УДАР! Вы наносите ${damage} урона сопернику!`;
-                    } else {
-                        log.textContent = `Вы наносите ${damage} урона сопернику!`;
-                    }
-                } else {
-                    playerHP = Math.max(0, playerHP - damage);
-                    if (isCritical) {
-                        log.textContent = `КРИТИЧЕСКАЯ АТАКА СОПЕРНИКА! Вы получаете ${damage} урона!`;
-                    } else {
-                        log.textContent = `Соперник наносит вам ${damage} урона!`;
-                    }
-                }
-            }
-            
-            updateHPBars();
-            
-            if ((playerHP <= 15 || botHP <= 15) && playerHP > 0 && botHP > 0) {
-                setTimeout(() => {
-                    log.textContent = 'Критическое состояние! Следующий удар может быть решающим!';
-                }, 1000);
-            }
-            
-            if (playerHP <= 0 || botHP <= 0) {
-                setTimeout(() => endBattle(), 2000);
-            } else {
-                const delay = Math.random() * 1000 + 1500;
-                setTimeout(() => performAttack(!isPlayerTurn), delay);
-            }
-        }
-
-        function updateHPBars() {
-            const playerBar = document.getElementById('player-hp-bar');
-            const botBar = document.getElementById('bot-hp-bar');
-            const playerText = document.getElementById('player-hp-text');
-            const botText = document.getElementById('bot-hp-text');
-            
-            playerBar.style.width = `${playerHP}%`;
-            botBar.style.width = `${botHP}%`;
-            
-            if (playerHP <= 20) playerBar.classList.add('low');
-            else playerBar.classList.remove('low');
-            
-            if (botHP <= 20) botBar.classList.add('low');
-            else botBar.classList.remove('low');
-            
-            playerText.textContent = `${playerHP}/100 HP`;
-            botText.textContent = `${botHP}/100 HP`;
-        }
-
-        function endBattle() {
-            battleInProgress = false;
-            const resultDiv = document.getElementById('battle-result');
-            const rewardDiv = document.getElementById('reward-info');
-            const log = document.getElementById('battle-log');
-            
-            const playerWins = playerHP > 0;
-            const adjustedResult = playerWins && Math.random() < 0.15; // 15% шанс неожиданного поражения
-            
-            if (playerHP <= 0 || adjustedResult) {
-                resultDiv.textContent = 'ПОРАЖЕНИЕ!';
-                resultDiv.className = 'battle-result lose';
-                log.textContent = 'Вы потерпели поражение...';
-                
-                if (activeBattleNft) {
-                    collection = collection.filter(nft => 
-                        nft.name !== activeBattleNft.name || nft.img !== activeBattleNft.img
-                    );
-                    activeBattleNft = null;
-                    localStorage.removeItem('activeBattleNft');
-                    localStorage.setItem('collection', JSON.stringify(collection));
-                    rewardDiv.innerHTML = `Ваш NFT захвачен противником!`;
-                }
-            } else {
-                resultDiv.textContent = 'ПОБЕДА!';
-                resultDiv.className = 'battle-result win';
-                log.textContent = 'Невероятная победа! Вы оказались сильнее!';
-                
-                const rewardNft = { ...botNft, buyPrice: botNft.price };
-                collection.push(rewardNft);
-                localStorage.setItem('collection', JSON.stringify(collection));
-                rewardDiv.innerHTML = `Вы получили NFT: ${botNft.name}!`;
-            }
-            
-            resultDiv.style.display = 'block';
-            rewardDiv.style.display = 'block';
-            document.getElementById('back-to-menu-btn').style.display = 'block';
-        }
-
-        function backToMainFromBattle() {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('main-screen').classList.add('active');
-            
-            // Обновляем навигацию
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            document.querySelectorAll('.nav-item')[0].classList.add('active');
-            
-            updateUI();
-            renderCenterArea();
-            currentScreen = 'main';
-        }
-
-        function switchScreen(screen) {
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            event.target.closest('.nav-item').classList.add('active');
-            
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            
-            if (screen === 'main') {
-                document.getElementById('main-screen').classList.add('active');
-                renderCenterArea();
-            } else if (screen === 'collection') {
-                document.getElementById('collection-screen').classList.add('active');
-                renderCollection();
-            } else if (screen === 'profile') {
-                document.getElementById('profile-screen').classList.add('active');
-                renderProfile();
-            } else if (screen === 'friends') {
-                document.getElementById('friends-screen').classList.add('active');
-            }
-            
-            currentScreen = screen;
-        }
-
-        function openShop() {
-            document.getElementById('collection-screen').classList.remove('active');
-            document.getElementById('shop-screen').classList.add('active');
-            renderShop();
-        }
-
-        function backToCollection() {
-            document.getElementById('shop-screen').classList.remove('active');
-            document.getElementById('collection-screen').classList.add('active');
-        }
-
-        function renderCenterArea() {
-            const centerDiv = document.getElementById('center-content');
-            centerDiv.innerHTML = '';
-            if (activeBattleNft) {
-                centerDiv.innerHTML = `
-                    <img src="${activeBattleNft.img}" class="center-nft-img" alt="${activeBattleNft.name}">
-                    <div class="center-nft-name">${activeBattleNft.name}</div>
-                    <div class="center-nft-status">Готов к битве</div>
-                `;
-            } else {
-                centerDiv.innerHTML = '<div class="center-logo">//</div>';
-            }
-        }
-
-        function renderCollection() {
-            const grid = document.getElementById('collection-grid');
-            grid.innerHTML = '';
-            
-            if (collection.length === 0) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888888;">Коллекция пуста<br>Купите NFT в магазине</div>';
-            } else {
-                collection.forEach((nft, index) => {
-                    const isActive = activeBattleNft && activeBattleNft.name === nft.name && activeBattleNft.img === nft.img;
-                    const card = document.createElement('div');
-                    card.className = 'nft-card';
-                    card.innerHTML = `
-                        <img src="${nft.img}" class="nft-card-img" alt="${nft.name}">
-                        <div class="nft-card-name">${nft.name} ${isActive ? '⚔️' : ''}</div>
-                        <div class="nft-card-price">Куплено за ${nft.buyPrice} звёзд</div>
-                        <button class="nft-card-btn" onclick="setToBattle(${index})" ${isActive ? 'disabled' : ''}>
-                            ${isActive ? 'В битве' : 'В битву'}
-                        </button>
-                        <button class="nft-card-btn secondary" onclick="sellNft(${index})">
-                            Продать ${Math.floor(nft.buyPrice * 0.8)} звёзд
-                        </button>
-                    `;
-                    grid.appendChild(card);
-                });
-            }
-        }
-
-        function renderShop() {
-            const grid = document.getElementById('shop-grid');
-            grid.innerHTML = '';
-            
-            nftTemplates.forEach((template, index) => {
-                const price = nftPrices[index];
-                const card = document.createElement('div');
-                card.className = 'nft-card';
-                card.innerHTML = `
-                    <img src="${template.img}" class="nft-card-img" alt="${template.name}">
-                    <div class="nft-card-name">${template.name}</div>
-                    <div class="nft-card-price">${price} звёзд</div>
-                    <button class="nft-card-btn" onclick="buyNft(${index}, ${price})" ${stars < price ? 'disabled' : ''}>
-                        ${stars < price ? 'Недостаточно звёзд' : 'Купить'}
-                    </button>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function renderProfile() {
-            const grid = document.getElementById('profile-collection');
-            grid.innerHTML = '';
-            
-            if (collection.length === 0) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888888;">У вас пока нет NFT</div>';
-            } else {
-                collection.forEach((nft) => {
-                    const isActive = activeBattleNft && activeBattleNft.name === nft.name && activeBattleNft.img === nft.img;
-                    const card = document.createElement('div');
-                    card.className = 'nft-card';
-                    card.innerHTML = `
-                        <img src="${nft.img}" class="nft-card-img" alt="${nft.name}">
-                        <div class="nft-card-name">${nft.name} ${isActive ? '⚔️' : ''}</div>
-                        <div class="nft-card-price">Стоимость: ${nft.buyPrice} звёзд</div>
-                    `;
-                    grid.appendChild(card);
-                });
-            }
-        }
-
-        function buyNft(templateIndex, price) {
-            if (stars >= price) {
-                stars -= price;
-                const nft = { ...nftTemplates[templateIndex], buyPrice: price };
-                collection.push(nft);
-                updateUI();
-                alert(`Куплен ${nft.name}!`);
-                renderShop();
-            } else {
-                alert('Недостаточно звёзд!');
-            }
-        }
-
-        function sellNft(index) {
-            const nft = collection[index];
-            const sellPrice = Math.floor(nft.buyPrice * 0.8);
-            stars += sellPrice;
-            
-            if (activeBattleNft && activeBattleNft.name === nft.name && activeBattleNft.img === nft.img) {
-                activeBattleNft = null;
-                localStorage.removeItem('activeBattleNft');
-            }
-            
-            collection.splice(index, 1);
-            updateUI();
-            renderCollection();
-            renderCenterArea();
-            alert(`Продан за ${sellPrice} звёзд!`);
-        }
-
-        function setToBattle(index) {
-            activeBattleNft = collection[index];
-            localStorage.setItem('activeBattleNft', JSON.stringify(activeBattleNft));
-            renderCollection();
-            renderCenterArea();
-            updateUI();
-            alert(`NFT ${activeBattleNft.name} готов к битве!`);
-        }
-    </script>
-</body>
-</html>
+            closeBuyStars();
+            alert(`Куплено ${amount} звёзд!`);
