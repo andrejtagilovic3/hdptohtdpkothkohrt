@@ -119,10 +119,16 @@
         }
         
         .center-logo {
-            font-size: 80px;
+            font-size: 120px;
             color: #333333;
             opacity: 0.6;
             font-weight: 200;
+        }
+        
+        .center-message {
+            font-size: 16px;
+            color: #888888;
+            margin-top: 20px;
         }
         
         .center-nft-img {
@@ -382,13 +388,21 @@
         }
         
         .reward-info {
-            background: #1a472a;
             border: 1px solid #34623f;
             border-radius: 12px;
             padding: 16px;
             margin: 15px 0;
             text-align: center;
             font-size: 16px;
+        }
+        
+        .reward-info.win {
+            background: #1a472a;
+        }
+        
+        .reward-info.lose {
+            background: #4a1a1a;
+            border-color: #623f3f;
         }
         
         .profile-header {
@@ -431,7 +445,7 @@
             font-size: 18px;
         }
         
-        .searching-overlay {
+        .searching-overlay, .coin-toss-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -453,6 +467,50 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-bottom: 20px;
+        }
+        
+        .coin-container {
+            perspective: 1000px;
+            margin-bottom: 20px;
+        }
+        
+        .coin {
+            width: 150px;
+            height: 150px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.3s;
+        }
+        
+        .front, .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #333333;
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
+        
+        .back {
+            transform: rotateY(180deg);
+        }
+        
+        .coin img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        @keyframes flipFront {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(1800deg); }
+        }
+        
+        @keyframes flipBack {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(1980deg); }
         }
         
         @keyframes spin {
@@ -595,7 +653,7 @@
                     <h2 class="section-title">Битва</h2>
                     <div class="battle-arena">
                         <div class="battle-participants">
-                            <div class="participant">
+                            <div class="participant left">
                                 <img id="player-img" class="participant-img" src="" alt="Player NFT">
                                 <div class="participant-name">Вы</div>
                                 <div class="hp-container">
@@ -604,7 +662,7 @@
                                 <div id="player-hp-text" class="hp-text">100/100 HP</div>
                             </div>
                             <div class="vs-text">VS</div>
-                            <div class="participant">
+                            <div class="participant right">
                                 <img id="bot-img" class="participant-img" src="" alt="Bot NFT">
                                 <div class="participant-name">Соперник</div>
                                 <div class="hp-container">
@@ -693,6 +751,21 @@
                 Поиск соперника...<br>
                 <span id="search-status">Подключение к серверу</span>
             </div>
+        </div>
+
+        <!-- Coin Toss Overlay -->
+        <div id="coin-toss-overlay" class="coin-toss-overlay" style="display: none;">
+            <div class="coin-container">
+                <div id="coin" class="coin">
+                    <div class="front">
+                        <img id="coin-front" src="" alt="Player">
+                    </div>
+                    <div class="back">
+                        <img id="coin-back" src="" alt="Bot">
+                    </div>
+                </div>
+            </div>
+            <div id="coin-result-text" class="searching-text"></div>
         </div>
 
         <!-- Purchase Overlay -->
@@ -925,10 +998,33 @@
             // Переходим к битве
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('battle-screen').classList.add('active');
-            initializeBattle();
+            
+            // Показываем монетку
+            document.getElementById('coin-toss-overlay').style.display = 'flex';
+            document.getElementById('coin-front').src = activeBattleNft.img;
+            document.getElementById('coin-back').src = botNft.img;
+            document.getElementById('coin-result-text').textContent = '';
+            const coin = document.getElementById('coin');
+            coin.style.animation = 'none'; // Reset animation
+            
+            setTimeout(() => {
+                const playerFirst = Math.random() < 0.5;
+                const animationName = playerFirst ? 'flipFront' : 'flipBack';
+                coin.style.animation = `${animationName} 3s ease-out forwards`;
+                
+                coin.addEventListener('animationend', () => {
+                    const text = playerFirst ? 'Вы ходите первым!' : 'Противник ходит первым!';
+                    document.getElementById('coin-result-text').textContent = text;
+                    
+                    setTimeout(() => {
+                        document.getElementById('coin-toss-overlay').style.display = 'none';
+                        initializeBattle(playerFirst);
+                    }, 2000);
+                }, {once: true});
+            }, 1000);
         }
 
-        function initializeBattle() {
+        function initializeBattle(playerFirst) {
             playerHP = 100;
             botHP = 100;
             battleInProgress = true;
@@ -936,22 +1032,90 @@
             document.getElementById('player-img').src = activeBattleNft.img;
             document.getElementById('bot-img').src = botNft.img;
             
-            updateHPBars();
-            
+            // Hide battle result elements
             document.getElementById('battle-result').style.display = 'none';
             document.getElementById('reward-info').style.display = 'none';
             document.getElementById('back-to-menu-btn').style.display = 'none';
             
-            const playerFirst = Math.random() < 0.5;
-            const log = document.getElementById('battle-log');
+            // Get elements to animate
+            const vsText = document.querySelector('.vs-text');
+            const playerHpContainer = document.querySelector('.participant.left .hp-container');
+            const botHpContainer = document.querySelector('.participant.right .hp-container');
+            const playerHpText = document.getElementById('player-hp-text');
+            const botHpText = document.getElementById('bot-hp-text');
+            const playerName = document.querySelector('.participant.left .participant-name');
+            const botName = document.querySelector('.participant.right .participant-name');
+            const playerParticipant = document.querySelector('.participant.left');
+            const botParticipant = document.querySelector('.participant.right');
             
-            if (playerFirst) {
-                log.textContent = 'Вы атакуете первыми! Приготовьтесь...';
-                setTimeout(() => performAttack(true), 2000);
-            } else {
-                log.textContent = 'Соперник атакует первым! Защищайтесь...';
-                setTimeout(() => performAttack(false), 2000);
-            }
+            // Initial hide
+            vsText.style.opacity = 0;
+            playerHpContainer.style.opacity = 0;
+            botHpContainer.style.opacity = 0;
+            playerHpText.style.opacity = 0;
+            botHpText.style.opacity = 0;
+            playerName.style.opacity = 0;
+            botName.style.opacity = 0;
+            playerParticipant.style.opacity = 0;
+            playerParticipant.style.transform = 'translateX(-100vw)';
+            botParticipant.style.opacity = 0;
+            botParticipant.style.transform = 'translateX(100vw)';
+            
+            // Pop in gifts
+            setTimeout(() => {
+                playerParticipant.style.transition = 'transform 1s ease, opacity 1s ease';
+                botParticipant.style.transition = 'transform 1s ease, opacity 1s ease';
+                playerParticipant.style.transform = 'translateX(0)';
+                playerParticipant.style.opacity = 1;
+                botParticipant.style.transform = 'translateX(0)';
+                botParticipant.style.opacity = 1;
+            }, 100);
+            
+            // After pop in + 2 sec hold, transition to depth
+            setTimeout(() => {
+                botParticipant.style.transition = 'transform 0.5s ease';
+                botParticipant.style.transform = 'scale(0.8) translateY(-20px)';
+            }, 2100);
+            
+            // 0.5 sec after depth, fade in VS
+            setTimeout(() => {
+                vsText.style.transition = 'opacity 0.5s ease';
+                vsText.style.opacity = 1;
+                vsText.classList.add('fade-in');
+            }, 2100 + 500);
+            
+            // 0.5 sec after VS, fade in HP
+            setTimeout(() => {
+                playerHpContainer.style.transition = 'opacity 0.5s ease';
+                botHpContainer.style.transition = 'opacity 0.5s ease';
+                playerHpContainer.style.opacity = 1;
+                botHpContainer.style.opacity = 1;
+                playerHpText.style.transition = 'opacity 0.5s ease';
+                botHpText.style.transition = 'opacity 0.5s ease';
+                playerHpText.style.opacity = 1;
+                botHpText.style.opacity = 1;
+                updateHPBars();
+            }, 2100 + 500 + 500);
+            
+            // 0.5 sec after HP, fade in names (avatars)
+            setTimeout(() => {
+                playerName.style.transition = 'opacity 0.5s ease';
+                botName.style.transition = 'opacity 0.5s ease';
+                playerName.style.opacity = 1;
+                botName.style.opacity = 1;
+            }, 2100 + 500 + 500 + 500);
+            
+            // Start battle logic
+            setTimeout(() => {
+                const log = document.getElementById('battle-log');
+                if (playerFirst) {
+                    log.textContent = 'Вы атакуете первыми! Приготовьтесь...';
+                    setTimeout(() => performAttack(true), 2000);
+                } else {
+                    log.textContent = 'Соперник атакует первым! Защищайтесь...';
+                    setTimeout(() => performAttack(false), 2000);
+                }
+            }, 2100 + 500 + 500 + 500 + 500);
         }
 
         function performAttack(isPlayerTurn) {
@@ -1053,6 +1217,8 @@
                 const rewardNft = { ...botNft, buyPrice: botNft.price };
                 collection.push(rewardNft);
                 rewardDiv.innerHTML = `Вы получили NFT: ${botNft.name}!`;
+                rewardDiv.classList.add('win');
+                rewardDiv.classList.remove('lose');
             } else {
                 resultDiv.textContent = 'ПОРАЖЕНИЕ!';
                 resultDiv.className = 'battle-result lose';
@@ -1064,6 +1230,8 @@
                     );
                     activeBattleNft = null;
                     rewardDiv.innerHTML = `Ваш NFT захвачен противником!`;
+                    rewardDiv.classList.add('lose');
+                    rewardDiv.classList.remove('win');
                 }
             }
             
@@ -1131,7 +1299,7 @@
                     <div class="center-nft-status">Готов к битве</div>
                 `;
             } else {
-                centerDiv.innerHTML = '<div class="center-logo">//</div>';
+                centerDiv.innerHTML = '<div class="center-logo">//</div><div class="center-message">У вас не выбран NFT для дуэли, выберите его в коллекции</div>';
             }
         }
 
