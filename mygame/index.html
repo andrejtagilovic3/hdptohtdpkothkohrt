@@ -21,7 +21,7 @@
             color: #ffffff;
             height: 100vh;
             overflow: hidden;
-            font-weight: 600; /* Made text bolder overall */
+            font-weight: 600;
         }
         
         .app-container {
@@ -59,13 +59,13 @@
         
         .user-name {
             font-size: 16px;
-            font-weight: 700; /* Bolder */
+            font-weight: 700;
         }
         
         .currency-info {
             display: flex;
             align-items: center;
-            gap: 4px; /* Reduced gap to move + closer */
+            gap: 4px;
         }
         
         .currency-item {
@@ -76,11 +76,11 @@
             padding: 8px 12px;
             border-radius: 20px;
             font-size: 14px;
-            font-weight: 700; /* Bolder */
+            font-weight: 700;
         }
         
         .plus-btn {
-            background: #ffffff; /* Changed blue to white */
+            background: #ffffff;
             border: none;
             border-radius: 20px;
             width: 32px;
@@ -88,7 +88,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #000000; /* Changed to black for contrast */
+            color: #000000;
             cursor: pointer;
             font-size: 16px;
         }
@@ -115,7 +115,7 @@
             justify-content: center;
             align-items: center;
             background: #000000;
-            margin-bottom: 80px; /* Increased further to move play button lower for easier clicking */
+            margin-bottom: 80px;
         }
         
         .center-logo {
@@ -154,9 +154,9 @@
         }
         
         .play-btn {
-            background: #ffffff; /* Changed green to white for theme */
+            background: #ffffff;
             border: none;
-            color: #000000; /* Black for contrast */
+            color: #000000;
             width: 100%;
             padding: 18px;
             font-size: 18px;
@@ -167,7 +167,7 @@
         }
         
         .play-btn:hover {
-            background: #eeeeee; /* Light gray hover */
+            background: #eeeeee;
         }
         
         .play-btn:disabled {
@@ -199,7 +199,7 @@
         }
         
         .nav-item.active {
-            color: #ffffff; /* Changed blue to white */
+            color: #ffffff;
         }
         
         .nav-item i {
@@ -245,7 +245,7 @@
         
         .nft-card-name {
             font-size: 14px;
-            font-weight: 700; /* Bolder */
+            font-weight: 700;
             margin-bottom: 4px;
         }
         
@@ -253,17 +253,17 @@
             font-size: 12px;
             color: #888888;
             margin-bottom: 8px;
-            font-weight: 600; /* Bolder */
+            font-weight: 600;
         }
         
         .nft-card-btn {
-            background: #ffffff; /* Changed blue to white */
+            background: #ffffff;
             border: none;
-            color: #000000; /* Black for contrast */
+            color: #000000;
             padding: 8px 12px;
             border-radius: 6px;
             font-size: 12px;
-            font-weight: 700; /* Bolder text for buttons */
+            font-weight: 700;
             cursor: pointer;
             width: 100%;
             margin-bottom: 4px;
@@ -274,36 +274,191 @@
             color: #ffffff;
             margin-bottom: 0;
         }
-        
-        /* Battle styles */
-        .battle-arena {
-            background: #1a1a1a;
-            border-radius: 16px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        
-        .battle-participants {
+
+        /* Fullscreen Battle Styles */
+        .battle-screen-fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #000000;
+            z-index: 999;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
+            flex-direction: column;
         }
-        
-        .participant {
-            text-align: center;
+
+        .battle-fullscreen-content {
             flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
-        
-        .participant-img {
-            width: 100px;
-            height: 100px;
+
+        .battle-participants-fullscreen {
+            position: relative;
+            width: 100%;
+            height: 60vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .participant-fullscreen {
+            position: absolute;
+            text-align: center;
+            opacity: 0;
+            transition: all 1s ease;
+        }
+
+        .participant-fullscreen.left {
+            top: 20px;
+            left: 20px;
+        }
+
+        .participant-fullscreen.right {
+            bottom: 20px;
+            right: 20px;
+        }
+
+        .participant-img-fullscreen {
+            width: 120px;
+            height: 120px;
             border-radius: 12px;
             object-fit: cover;
             margin-bottom: 12px;
-            border: 2px solid #333333;
+            border: 3px solid #333333;
         }
-        
+
+        .participant-name-fullscreen {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+
+        .hp-container-fullscreen {
+            background: #333333;
+            border-radius: 12px;
+            padding: 6px;
+            margin-bottom: 8px;
+            width: 140px;
+        }
+
+        .hp-bar-fullscreen {
+            height: 14px;
+            background: #d32f2f;
+            border-radius: 8px;
+            transition: width 0.8s ease;
+            position: relative;
+        }
+
+        .hp-bar-fullscreen.low {
+            background: #ff5722;
+            animation: pulse 0.5s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { opacity: 0.7; }
+            to { opacity: 1; }
+        }
+
+        .hp-text-fullscreen {
+            font-size: 14px;
+            color: #cccccc;
+            font-weight: 600;
+        }
+
+        .vs-text-fullscreen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: bold;
+            color: #666666;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 10;
+        }
+
+        .battle-log-fullscreen {
+            position: fixed;
+            bottom: 120px;
+            left: 20px;
+            right: 20px;
+            background: rgba(26, 26, 26, 0.9);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
+            color: #cccccc;
+            min-height: 60px;
+            border: 1px solid #333333;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .battle-result-fullscreen {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 36px;
+            font-weight: 700;
+            text-align: center;
+            z-index: 20;
+            display: none;
+        }
+
+        .battle-result-fullscreen.win {
+            color: #4caf50;
+        }
+
+        .battle-result-fullscreen.lose {
+            color: #f44336;
+        }
+
+        .reward-info-fullscreen {
+            position: fixed;
+            bottom: 200px;
+            left: 20px;
+            right: 20px;
+            border: 1px solid #34623f;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            font-size: 16px;
+            display: none;
+        }
+
+        .reward-info-fullscreen.win {
+            background: rgba(26, 71, 42, 0.9);
+        }
+
+        .reward-info-fullscreen.lose {
+            background: rgba(74, 26, 26, 0.9);
+            border-color: #623f3f;
+        }
+
+        .back-btn-fullscreen {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: #333333;
+            border: none;
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            display: none;
+        }
+
         .shake {
             animation: shake 0.5s;
         }
@@ -314,95 +469,6 @@
             50% { transform: translate(5px, 0); }
             75% { transform: translate(-5px, 0); }
             100% { transform: translate(0, 0); }
-        }
-        
-        .participant-name {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-        
-        .hp-container {
-            background: #000000;
-            border-radius: 10px;
-            padding: 4px;
-            margin-bottom: 8px;
-        }
-        
-        .hp-bar {
-            height: 12px;
-            background: #d32f2f;
-            border-radius: 6px;
-            transition: width 0.8s ease;
-            position: relative;
-        }
-        
-        .hp-bar.low {
-            background: #ff5722;
-            animation: pulse 0.5s infinite alternate;
-        }
-        
-        @keyframes pulse {
-            from { opacity: 0.7; }
-            to { opacity: 1; }
-        }
-        
-        .hp-text {
-            font-size: 14px;
-            color: #cccccc;
-            font-weight: 600;
-        }
-        
-        .vs-text {
-            font-size: 28px;
-            font-weight: bold;
-            color: #666666;
-            margin: 0 20px;
-        }
-        
-        .battle-log {
-            background: #000000;
-            border-radius: 12px;
-            padding: 16px;
-            margin: 20px 0;
-            font-size: 16px;
-            color: #cccccc;
-            min-height: 80px;
-            border: 1px solid #333333;
-            font-weight: 500;
-        }
-        
-        .battle-result {
-            text-align: center;
-            padding: 24px;
-            font-size: 24px;
-            font-weight: 700;
-        }
-        
-        .battle-result.win {
-            color: #4caf50;
-        }
-        
-        .battle-result.lose {
-            color: #f44336;
-        }
-        
-        .reward-info {
-            border: 1px solid #34623f;
-            border-radius: 12px;
-            padding: 16px;
-            margin: 15px 0;
-            text-align: center;
-            font-size: 16px;
-        }
-        
-        .reward-info.win {
-            background: #1a472a;
-        }
-        
-        .reward-info.lose {
-            background: #4a1a1a;
-            border-color: #623f3f;
         }
         
         .profile-header {
@@ -463,7 +529,7 @@
             width: 60px;
             height: 60px;
             border: 3px solid #333333;
-            border-top: 3px solid #ffffff; /* Changed blue to white */
+            border-top: 3px solid #ffffff;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-bottom: 20px;
@@ -647,40 +713,6 @@
                 </div>
             </div>
 
-            <!-- Battle Screen -->
-            <div id="battle-screen" class="screen">
-                <div class="main-content">
-                    <h2 class="section-title">Битва</h2>
-                    <div class="battle-arena">
-                        <div class="battle-participants">
-                            <div class="participant left">
-                                <img id="player-img" class="participant-img" src="" alt="Player NFT">
-                                <div class="participant-name">Вы</div>
-                                <div class="hp-container">
-                                    <div id="player-hp-bar" class="hp-bar"></div>
-                                </div>
-                                <div id="player-hp-text" class="hp-text">100/100 HP</div>
-                            </div>
-                            <div class="vs-text">VS</div>
-                            <div class="participant right">
-                                <img id="bot-img" class="participant-img" src="" alt="Bot NFT">
-                                <div class="participant-name">Соперник</div>
-                                <div class="hp-container">
-                                    <div id="bot-hp-bar" class="hp-bar"></div>
-                                </div>
-                                <div id="bot-hp-text" class="hp-text">100/100 HP</div>
-                            </div>
-                        </div>
-                        <div id="battle-log" class="battle-log">Подготовка к битве...</div>
-                        <div id="battle-result" class="battle-result" style="display: none;"></div>
-                        <div id="reward-info" class="reward-info" style="display: none;"></div>
-                        <button id="back-to-menu-btn" class="back-btn" onclick="backToMainFromBattle()" style="display: none; width: 100%;">
-                            Вернуться в меню
-                        </button>
-                    </div>
-                </div>
-            </div>
-
             <!-- Profile Screen -->
             <div id="profile-screen" class="screen">
                 <div class="main-content">
@@ -744,6 +776,53 @@
             </button>
         </div>
 
+        <!-- Fullscreen Battle Screen -->
+        <div id="battle-screen-fullscreen" class="battle-screen-fullscreen" style="display: none;">
+            <div class="top-bar">
+                <div class="user-info">
+                    <div class="user-avatar">👤</div>
+                    <div class="user-name" id="battle-user-name">Игрок</div>
+                </div>
+                <div class="currency-info">
+                    <div class="currency-item">
+                        <i class="fas fa-star" style="color: #ffd700;"></i>
+                        <span id="battle-star-count">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="battle-fullscreen-content">
+                <div class="battle-participants-fullscreen">
+                    <div class="participant-fullscreen left" id="player-participant">
+                        <img id="player-img-fullscreen" class="participant-img-fullscreen" src="" alt="Player NFT">
+                        <div class="participant-name-fullscreen" id="player-nft-name">Ваш NFT</div>
+                        <div class="hp-container-fullscreen">
+                            <div id="player-hp-bar-fullscreen" class="hp-bar-fullscreen"></div>
+                        </div>
+                        <div id="player-hp-text-fullscreen" class="hp-text-fullscreen">100/100 HP</div>
+                    </div>
+                    
+                    <div class="vs-text-fullscreen" id="vs-text-fullscreen">VS</div>
+                    
+                    <div class="participant-fullscreen right" id="bot-participant">
+                        <img id="bot-img-fullscreen" class="participant-img-fullscreen" src="" alt="Bot NFT">
+                        <div class="participant-name-fullscreen" id="bot-nft-name">Соперник NFT</div>
+                        <div class="hp-container-fullscreen">
+                            <div id="bot-hp-bar-fullscreen" class="hp-bar-fullscreen"></div>
+                        </div>
+                        <div id="bot-hp-text-fullscreen" class="hp-text-fullscreen">100/100 HP</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="battle-log-fullscreen" class="battle-log-fullscreen">Подготовка к битве...</div>
+            <div id="battle-result-fullscreen" class="battle-result-fullscreen"></div>
+            <div id="reward-info-fullscreen" class="reward-info-fullscreen"></div>
+            <button id="back-to-menu-btn-fullscreen" class="back-btn-fullscreen" onclick="backToMainFromBattle()">
+                Вернуться в меню
+            </button>
+        </div>
+
         <!-- Searching Overlay -->
         <div id="searching-overlay" class="searching-overlay" style="display: none;">
             <div class="searching-animation"></div>
@@ -798,615 +877,4 @@
             { name: 'Pepe', img: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/imgg/3.svg', tier: 'basic' },
             { name: 'Loli Pop', img: 'https://i.getgems.io/Uh4_vqGzSw4MKwPwYEsWI2i6R44t8A7bjly1E4K6IgM/rs:fill:500:500:1/g:ce/czM6Ly9nZXRnZW1zLXMzL25mdC1jb250ZW50LWNhY2hlL2ltYWdlcy9FUUM2emppZDh2Sk5FV3FjWGsxMFhqc2RETFJLYmNQWnpiSHVzdUVXNkZva09XSW0vYzY2YWY5MDRmODg1NmE5OQ', tier: 'premium' },
             { name: 'TEST', img: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/imgg/2.svg', tier: 'basic' },
-            { name: 'TEST2', img: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/imgg/5.svg', tier: 'basic' },
-            { name: 'test3', img: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/imgg/1.gif', tier: 'basic' },
-            { name: 'TESR', img: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/imgg/6.svg', tier: 'basic' },
-            { name: 'TEST11', img: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/imgg/7.svg', tier: 'basic' },
-            { name: 'tesT5', img: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/imgg/8.svg', tier: 'premium' },
-            { name: 'test4', img: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/imgg/9.svg', tier: 'basic' },
-            { name: 'Золотая Рыбка', img: 'https://raw.githubusercontent.com/yourusername/yourrepo/main/golden-fish.gif', tier: 'basic' },
-            { name: 'Магический Кристалл', img: 'https://raw.githubusercontent.com/yourusername/yourrepo/main/magic-crystal.gif', tier: 'premium' },
-            { name: 'Летающий Кит', img: 'https://raw.githubusercontent.com/yourusername/yourrepo/main/flying-whale.gif', tier: 'premium' }
-        ];
-        
-        const nftPrices = [100, 150, 200, 250, 80, 90, 70, 85, 95, 200, 75, 60, 220, 240];
-
-        // Инициализация
-        let stars = 100;
-        let collection = [];
-        let activeBattleNft = null;
-        let totalStarsEarned = 0;
-        
-        // Telegram user data
-        const tgUser = Telegram.WebApp.initDataUnsafe?.user;
-        let userName = tgUser?.first_name || 'Игрок';
-        let userAvatar = tgUser?.photo_url || '👤';
-        
-        // Battle variables
-        let playerHP = 100;
-        let botHP = 100;
-        let botNft = null;
-        let battleInProgress = false;
-        let currentScreen = 'main';
-
-        init();
-
-        async function init() {
-            await loadData();
-            updateUI();
-            renderCenterArea();
-            renderCollection();
-            renderShop();
-            renderProfile();
-            updateUserInfo();
-        }
-
-        async function loadData() {
-            try {
-                const [starsStr, collectionStr, activeNftStr, totalEarnedStr] = await Promise.all([
-                    getCloudItem('stars'),
-                    getCloudItem('collection'),
-                    getCloudItem('activeBattleNft'),
-                    getCloudItem('totalStarsEarned')
-                ]);
-                stars = parseInt(starsStr) || 100;
-                collection = JSON.parse(collectionStr) || [];
-                activeBattleNft = JSON.parse(activeNftStr) || null;
-                totalStarsEarned = parseInt(totalEarnedStr) || 0;
-            } catch (error) {
-                console.error('Error loading data:', error);
-            }
-        }
-
-        async function saveData() {
-            try {
-                await Promise.all([
-                    setCloudItem('stars', stars.toString()),
-                    setCloudItem('collection', JSON.stringify(collection)),
-                    setCloudItem('activeBattleNft', JSON.stringify(activeBattleNft)),
-                    setCloudItem('totalStarsEarned', totalStarsEarned.toString())
-                ]);
-            } catch (error) {
-                console.error('Error saving data:', error);
-            }
-        }
-
-        function getCloudItem(key) {
-            return new Promise((resolve, reject) => {
-                cloudStorage.getItem(key, (error, value) => {
-                    if (error) reject(error);
-                    else resolve(value);
-                });
-            });
-        }
-
-        function setCloudItem(key, value) {
-            return new Promise((resolve, reject) => {
-                cloudStorage.setItem(key, value, (error, success) => {
-                    if (error || !success) reject(error);
-                    else resolve();
-                });
-            });
-        }
-
-        function updateUserInfo() {
-            document.getElementById('user-name').textContent = userName;
-            document.getElementById('profile-name').textContent = userName;
-            
-            if (typeof userAvatar === 'string' && userAvatar.startsWith('http')) {
-                document.getElementById('user-avatar').innerHTML = `<img src="${userAvatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
-                document.getElementById('profile-avatar').innerHTML = `<img src="${userAvatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
-            }
-        }
-
-        function updateUI() {
-            document.getElementById('star-count').textContent = stars;
-            document.getElementById('profile-nft-count').textContent = collection.length;
-            document.getElementById('profile-stars-earned').textContent = totalStarsEarned;
-            updatePlayButton();
-            saveData();
-        }
-
-        function updatePlayButton() {
-            const playBtn = document.getElementById('play-button');
-            if (!activeBattleNft) {
-                playBtn.textContent = 'Выберите NFT для битвы';
-                playBtn.disabled = true;
-            } else if (stars < 10) {
-                playBtn.textContent = 'Недостаточно звёзд (10 звёзд)';
-                playBtn.disabled = true;
-            } else {
-                playBtn.textContent = 'БИТВА (10 звёзд)';
-                playBtn.disabled = false;
-            }
-        }
-
-        function showPurchaseMenu() {
-            document.getElementById('purchase-overlay').style.display = 'flex';
-        }
-
-        function closePurchaseMenu() {
-            document.getElementById('purchase-overlay').style.display = 'none';
-        }
-
-        function purchaseStars(amount) {
-            stars += amount;
-            totalStarsEarned += amount;
-            updateUI();
-            alert(`Куплено ${amount} звёзд! (Тест)`);
-            closePurchaseMenu();
-        }
-
-        function startBattleSearch() {
-            if (!activeBattleNft || stars < 10) return;
-            
-            stars -= 10;
-            updateUI();
-            
-            // Показываем overlay поиска
-            document.getElementById('searching-overlay').style.display = 'flex';
-            
-            const searchStatuses = [
-                'Подключение к серверу...',
-                'Поиск игроков...',
-                'Проверка совместимости...',
-                'Соперник найден!'
-            ];
-            
-            let statusIndex = 0;
-            const statusElement = document.getElementById('search-status');
-            
-            const updateStatus = () => {
-                if (statusIndex < searchStatuses.length) {
-                    statusElement.textContent = searchStatuses[statusIndex];
-                    statusIndex++;
-                    if (statusIndex < searchStatuses.length) {
-                        setTimeout(updateStatus, 800);
-                    } else {
-                        setTimeout(startBattle, 500);
-                    }
-                }
-            };
-            
-            updateStatus();
-        }
-
-        function startBattle() {
-            // Скрываем overlay поиска
-            document.getElementById('searching-overlay').style.display = 'none';
-            
-            // Подбираем соперника по ценовой категории
-            const playerPrice = activeBattleNft.buyPrice;
-            let suitableNfts = [];
-            
-            // Находим подходящих соперников (аналогичная или меньшая цена)
-            nftTemplates.forEach((template, index) => {
-                if (nftPrices[index] <= playerPrice + 50) { // +50 для некоторого разнообразия
-                    suitableNfts.push({ ...template, price: nftPrices[index] });
-                }
-            });
-            
-            // Если нет подходящих, берем любого
-            if (suitableNfts.length === 0) {
-                const randomIndex = Math.floor(Math.random() * nftTemplates.length);
-                botNft = { ...nftTemplates[randomIndex], price: nftPrices[randomIndex] };
-            } else {
-                const randomIndex = Math.floor(Math.random() * suitableNfts.length);
-                botNft = suitableNfts[randomIndex];
-            }
-            
-            // Переходим к битве
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('battle-screen').classList.add('active');
-            
-            // Показываем монетку
-            document.getElementById('coin-toss-overlay').style.display = 'flex';
-            document.getElementById('coin-front').src = activeBattleNft.img;
-            document.getElementById('coin-back').src = botNft.img;
-            document.getElementById('coin-result-text').textContent = '';
-            const coin = document.getElementById('coin');
-            coin.style.animation = 'none'; // Reset animation
-            
-            setTimeout(() => {
-                const playerFirst = Math.random() < 0.5;
-                const animationName = playerFirst ? 'flipFront' : 'flipBack';
-                coin.style.animation = `${animationName} 3s ease-out forwards`;
-                
-                coin.addEventListener('animationend', () => {
-                    const text = playerFirst ? 'Вы ходите первым!' : 'Противник ходит первым!';
-                    document.getElementById('coin-result-text').textContent = text;
-                    
-                    setTimeout(() => {
-                        document.getElementById('coin-toss-overlay').style.display = 'none';
-                        initializeBattle(playerFirst);
-                    }, 2000);
-                }, {once: true});
-            }, 1000);
-        }
-
-        function initializeBattle(playerFirst) {
-            playerHP = 100;
-            botHP = 100;
-            battleInProgress = true;
-            
-            document.getElementById('player-img').src = activeBattleNft.img;
-            document.getElementById('bot-img').src = botNft.img;
-            
-            // Hide battle result elements
-            document.getElementById('battle-result').style.display = 'none';
-            document.getElementById('reward-info').style.display = 'none';
-            document.getElementById('back-to-menu-btn').style.display = 'none';
-            
-            // Get elements to animate
-            const vsText = document.querySelector('.vs-text');
-            const playerHpContainer = document.querySelector('.participant.left .hp-container');
-            const botHpContainer = document.querySelector('.participant.right .hp-container');
-            const playerHpText = document.getElementById('player-hp-text');
-            const botHpText = document.getElementById('bot-hp-text');
-            const playerName = document.querySelector('.participant.left .participant-name');
-            const botName = document.querySelector('.participant.right .participant-name');
-            const playerParticipant = document.querySelector('.participant.left');
-            const botParticipant = document.querySelector('.participant.right');
-            
-            // Initial hide
-            vsText.style.opacity = 0;
-            playerHpContainer.style.opacity = 0;
-            botHpContainer.style.opacity = 0;
-            playerHpText.style.opacity = 0;
-            botHpText.style.opacity = 0;
-            playerName.style.opacity = 0;
-            botName.style.opacity = 0;
-            playerParticipant.style.opacity = 0;
-            playerParticipant.style.transform = 'translateX(-100vw)';
-            botParticipant.style.opacity = 0;
-            botParticipant.style.transform = 'translateX(100vw)';
-            
-            // Pop in gifts
-            setTimeout(() => {
-                playerParticipant.style.transition = 'transform 1s ease, opacity 1s ease';
-                botParticipant.style.transition = 'transform 1s ease, opacity 1s ease';
-                playerParticipant.style.transform = 'translateX(0)';
-                playerParticipant.style.opacity = 1;
-                botParticipant.style.transform = 'translateX(0)';
-                botParticipant.style.opacity = 1;
-            }, 100);
-            
-            // After pop in + 2 sec hold, transition to depth
-            setTimeout(() => {
-                botParticipant.style.transition = 'transform 0.5s ease';
-                botParticipant.style.transform = 'scale(0.8) translateY(-20px)';
-            }, 2100);
-            
-            // 0.5 sec after depth, fade in VS
-            setTimeout(() => {
-                vsText.style.transition = 'opacity 0.5s ease';
-                vsText.style.opacity = 1;
-                vsText.classList.add('fade-in');
-            }, 2100 + 500);
-            
-            // 0.5 sec after VS, fade in HP
-            setTimeout(() => {
-                playerHpContainer.style.transition = 'opacity 0.5s ease';
-                botHpContainer.style.transition = 'opacity 0.5s ease';
-                playerHpContainer.style.opacity = 1;
-                botHpContainer.style.opacity = 1;
-                playerHpText.style.transition = 'opacity 0.5s ease';
-                botHpText.style.transition = 'opacity 0.5s ease';
-                playerHpText.style.opacity = 1;
-                botHpText.style.opacity = 1;
-                updateHPBars();
-            }, 2100 + 500 + 500);
-            
-            // 0.5 sec after HP, fade in names (avatars)
-            setTimeout(() => {
-                playerName.style.transition = 'opacity 0.5s ease';
-                botName.style.transition = 'opacity 0.5s ease';
-                playerName.style.opacity = 1;
-                botName.style.opacity = 1;
-            }, 2100 + 500 + 500 + 500);
-            
-            // Start battle logic
-            setTimeout(() => {
-                const log = document.getElementById('battle-log');
-                if (playerFirst) {
-                    log.textContent = 'Вы атакуете первыми! Приготовьтесь...';
-                    setTimeout(() => performAttack(true), 2000);
-                } else {
-                    log.textContent = 'Соперник атакует первым! Защищайтесь...';
-                    setTimeout(() => performAttack(false), 2000);
-                }
-            }, 2100 + 500 + 500 + 500 + 500);
-        }
-
-        function performAttack(isPlayerTurn) {
-            if (!battleInProgress) return;
-            
-            let damage;
-            const isLowHP = (isPlayerTurn ? botHP : playerHP) <= 25;
-            const isCritical = Math.random() < (isLowHP ? 0.3 : 0.15);
-            
-            if (isCritical) {
-                damage = Math.floor(Math.random() * 30) + 45;
-            } else {
-                damage = Math.floor(Math.random() * 35) + 8;
-            }
-            
-            const isMiss = Math.random() < 0.08;
-            const log = document.getElementById('battle-log');
-            let targetImg;
-            
-            if (isPlayerTurn) {
-                targetImg = document.getElementById('bot-img');
-            } else {
-                targetImg = document.getElementById('player-img');
-            }
-            
-            if (isMiss) {
-                if (isPlayerTurn) {
-                    log.textContent = 'Промах! Ваша атака не попала в цель!';
-                } else {
-                    log.textContent = 'Уклонение! Вы избежали атаки соперника!';
-                }
-            } else {
-                if (isPlayerTurn) {
-                    botHP = Math.max(0, botHP - damage);
-                    if (isCritical) {
-                        log.textContent = `КРИТИЧЕСКИЙ УДАР! Вы наносите ${damage} урона сопернику!`;
-                    } else {
-                        log.textContent = `Вы наносите ${damage} урона сопернику!`;
-                    }
-                } else {
-                    playerHP = Math.max(0, playerHP - damage);
-                    if (isCritical) {
-                        log.textContent = `КРИТИЧЕСКАЯ АТАКА СОПЕРНИКА! Вы получаете ${damage} урона!`;
-                    } else {
-                        log.textContent = `Соперник наносит вам ${damage} урона!`;
-                    }
-                }
-                // Add shake animation
-                targetImg.classList.add('shake');
-                setTimeout(() => targetImg.classList.remove('shake'), 500);
-            }
-            
-            updateHPBars();
-            
-            if ((playerHP <= 15 || botHP <= 15) && playerHP > 0 && botHP > 0) {
-                setTimeout(() => {
-                    log.textContent = 'Критическое состояние! Следующий удар может быть решающим!';
-                }, 1000);
-            }
-            
-            if (playerHP <= 0 || botHP <= 0) {
-                setTimeout(() => endBattle(), 2000);
-            } else {
-                const delay = Math.random() * 1000 + 1500;
-                setTimeout(() => performAttack(!isPlayerTurn), delay);
-            }
-        }
-
-        function updateHPBars() {
-            const playerBar = document.getElementById('player-hp-bar');
-            const botBar = document.getElementById('bot-hp-bar');
-            const playerText = document.getElementById('player-hp-text');
-            const botText = document.getElementById('bot-hp-text');
-            
-            playerBar.style.width = `${playerHP}%`;
-            botBar.style.width = `${botHP}%`;
-            
-            if (playerHP <= 20) playerBar.classList.add('low');
-            else playerBar.classList.remove('low');
-            
-            if (botHP <= 20) botBar.classList.add('low');
-            else botBar.classList.remove('low');
-            
-            playerText.textContent = `${playerHP}/100 HP`;
-            botText.textContent = `${botHP}/100 HP`;
-        }
-
-        function endBattle() {
-            battleInProgress = false;
-            const resultDiv = document.getElementById('battle-result');
-            const rewardDiv = document.getElementById('reward-info');
-            const log = document.getElementById('battle-log');
-            
-            if (playerHP > 0) {
-                resultDiv.textContent = 'ПОБЕДА!';
-                resultDiv.className = 'battle-result win';
-                log.textContent = 'Невероятная победа! Вы оказались сильнее!';
-                
-                const rewardNft = { ...botNft, buyPrice: botNft.price };
-                collection.push(rewardNft);
-                rewardDiv.innerHTML = `Вы получили NFT: ${botNft.name}!`;
-                rewardDiv.classList.add('win');
-                rewardDiv.classList.remove('lose');
-            } else {
-                resultDiv.textContent = 'ПОРАЖЕНИЕ!';
-                resultDiv.className = 'battle-result lose';
-                log.textContent = 'Вы потерпели поражение...';
-                
-                if (activeBattleNft) {
-                    collection = collection.filter(nft => 
-                        nft.name !== activeBattleNft.name || nft.img !== activeBattleNft.img
-                    );
-                    activeBattleNft = null;
-                    rewardDiv.innerHTML = `Ваш NFT захвачен противником!`;
-                    rewardDiv.classList.add('lose');
-                    rewardDiv.classList.remove('win');
-                }
-            }
-            
-            resultDiv.style.display = 'block';
-            rewardDiv.style.display = 'block';
-            document.getElementById('back-to-menu-btn').style.display = 'block';
-            updateUI();
-        }
-
-        function backToMainFromBattle() {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('main-screen').classList.add('active');
-            
-            // Обновляем навигацию
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            document.querySelectorAll('.nav-item')[0].classList.add('active');
-            
-            updateUI();
-            renderCenterArea();
-            currentScreen = 'main';
-        }
-
-        function switchScreen(screen) {
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            event.target.closest('.nav-item').classList.add('active');
-            
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            
-            if (screen === 'main') {
-                document.getElementById('main-screen').classList.add('active');
-                renderCenterArea();
-            } else if (screen === 'collection') {
-                document.getElementById('collection-screen').classList.add('active');
-                renderCollection();
-            } else if (screen === 'upgrade') {
-                document.getElementById('upgrade-screen').classList.add('active');
-            } else if (screen === 'profile') {
-                document.getElementById('profile-screen').classList.add('active');
-                renderProfile();
-            } else if (screen === 'friends') {
-                document.getElementById('friends-screen').classList.add('active');
-            }
-            
-            currentScreen = screen;
-        }
-
-        function openShop() {
-            document.getElementById('collection-screen').classList.remove('active');
-            document.getElementById('shop-screen').classList.add('active');
-            renderShop();
-        }
-
-        function backToCollection() {
-            document.getElementById('shop-screen').classList.remove('active');
-            document.getElementById('collection-screen').classList.add('active');
-        }
-
-        function renderCenterArea() {
-            const centerDiv = document.getElementById('center-content');
-            centerDiv.innerHTML = '';
-            if (activeBattleNft) {
-                centerDiv.innerHTML = `
-                    <img src="${activeBattleNft.img}" class="center-nft-img" alt="${activeBattleNft.name}">
-                    <div class="center-nft-name">${activeBattleNft.name}</div>
-                    <div class="center-nft-status">Готов к битве</div>
-                `;
-            } else {
-                centerDiv.innerHTML = '<div class="center-logo">//</div><div class="center-message">У вас не выбран NFT для дуэли, выберите его в коллекции</div>';
-            }
-        }
-
-        function renderCollection() {
-            const grid = document.getElementById('collection-grid');
-            grid.innerHTML = '';
-            
-            if (collection.length === 0) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888888;">Коллекция пуста<br>Купите NFT в магазине</div>';
-            } else {
-                collection.forEach((nft, index) => {
-                    const isActive = activeBattleNft && activeBattleNft.name === nft.name && activeBattleNft.img === nft.img;
-                    const card = document.createElement('div');
-                    card.className = 'nft-card';
-                    card.innerHTML = `
-                        <img src="${nft.img}" class="nft-card-img" alt="${nft.name}">
-                        <div class="nft-card-name">${nft.name} ${isActive ? '⚔️' : ''}</div>
-                        <div class="nft-card-price">Куплено за ${nft.buyPrice} звёзд</div>
-                        <button class="nft-card-btn" onclick="setToBattle(${index})" ${isActive ? 'disabled' : ''}>
-                            ${isActive ? 'В битве' : 'В битву'}
-                        </button>
-                        <button class="nft-card-btn secondary" onclick="sellNft(${index})">
-                            Продать ${Math.floor(nft.buyPrice * 0.8)} звёзд
-                        </button>
-                    `;
-                    grid.appendChild(card);
-                });
-            }
-        }
-
-        function renderShop() {
-            const grid = document.getElementById('shop-grid');
-            grid.innerHTML = '';
-            
-            nftTemplates.forEach((template, index) => {
-                const price = nftPrices[index];
-                const card = document.createElement('div');
-                card.className = 'nft-card';
-                card.innerHTML = `
-                    <img src="${template.img}" class="nft-card-img" alt="${template.name}">
-                    <div class="nft-card-name">${template.name}</div>
-                    <div class="nft-card-price">${price} звёзд</div>
-                    <button class="nft-card-btn" onclick="buyNft(${index}, ${price})" ${stars < price ? 'disabled' : ''}>
-                        ${stars < price ? 'Недостаточно звёзд' : 'Купить'}
-                    </button>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function renderProfile() {
-            const grid = document.getElementById('profile-collection');
-            grid.innerHTML = '';
-            
-            if (collection.length === 0) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888888;">У вас пока нет NFT</div>';
-            } else {
-                collection.forEach((nft) => {
-                    const isActive = activeBattleNft && activeBattleNft.name === nft.name && activeBattleNft.img === nft.img;
-                    const card = document.createElement('div');
-                    card.className = 'nft-card';
-                    card.innerHTML = `
-                        <img src="${nft.img}" class="nft-card-img" alt="${nft.name}">
-                        <div class="nft-card-name">${nft.name} ${isActive ? '⚔️' : ''}</div>
-                        <div class="nft-card-price">Стоимость: ${nft.buyPrice} звёзд</div>
-                    `;
-                    grid.appendChild(card);
-                });
-            }
-        }
-
-        function buyNft(templateIndex, price) {
-            if (stars >= price) {
-                stars -= price;
-                const nft = { ...nftTemplates[templateIndex], buyPrice: price };
-                collection.push(nft);
-                updateUI();
-                alert(`Куплен ${nft.name}!`);
-                renderShop();
-            } else {
-                alert('Недостаточно звёзд!');
-            }
-        }
-
-        function sellNft(index) {
-            const nft = collection[index];
-            const sellPrice = Math.floor(nft.buyPrice * 0.8);
-            stars += sellPrice;
-            
-            if (activeBattleNft && activeBattleNft.name === nft.name && activeBattleNft.img === nft.img) {
-                activeBattleNft = null;
-            }
-            
-            collection.splice(index, 1);
-            updateUI();
-            renderCollection();
-            renderCenterArea();
-            alert(`Продан за ${sellPrice} звёзд!`);
-        }
-
-        function setToBattle(index) {
-            activeBattleNft = collection[index];
-            renderCollection();
-            renderCenterArea();
-            updateUI();
-            alert(`NFT ${activeBattleNft.name} готов к битве!`);
-        }
-    </script>
-</body>
-</html>
+            { name: 'TEST2', img: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/imgg/5.svg', tier
