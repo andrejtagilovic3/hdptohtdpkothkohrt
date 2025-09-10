@@ -50,33 +50,33 @@
             </div>
 
             <div id="shop-screen" class="screen">
-    <div class="main-content">
-        <div class="shop-header">
-            <h2 class="section-title">Магазин NFT</h2>
-            <div class="filter-container">
-                <button class="filter-btn" id="filter-btn" onclick="toggleFilter()">
-                    <i class="fas fa-dollar-sign"></i>
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-                <div class="filter-dropdown" id="filter-dropdown" style="display: none;">
-                    <div class="filter-option active" onclick="setFilter('price_asc')">
-                        <i class="fas fa-arrow-up"></i>
-                        <span>Цена: по возрастанию</span>
+                <div class="main-content">
+                    <div class="shop-header">
+                        <h2 class="section-title">Магазин NFT</h2>
+                        <div class="filter-container">
+                            <button class="filter-btn" id="filter-btn" onclick="toggleFilter()">
+                                <i class="fas fa-dollar-sign"></i>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="filter-dropdown" id="filter-dropdown" style="display: none;">
+                                <div class="filter-option active" onclick="setFilter('price_asc')">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>Цена: по возрастанию</span>
+                                </div>
+                                <div class="filter-option" onclick="setFilter('price_desc')">
+                                    <i class="fas fa-arrow-down"></i>
+                                    <span>Цена: по убыванию</span>
+                                </div>
+                                <div class="filter-option" onclick="setFilter('popularity')">
+                                    <i class="fas fa-fire"></i>
+                                    <span>По популярности</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="filter-option" onclick="setFilter('price_desc')">
-                        <i class="fas fa-arrow-down"></i>
-                        <span>Цена: по убыванию</span>
-                    </div>
-                    <div class="filter-option" onclick="setFilter('popularity')">
-                        <i class="fas fa-fire"></i>
-                        <span>По популярности</span>
-                    </div>
+                    <div id="shop-grid" class="nft-grid"></div>
                 </div>
             </div>
-        </div>
-        <div id="shop-grid" class="nft-grid"></div>
-    </div>
-</div>
 
             <div id="battle-screen" class="screen">
                 <div class="main-content">
