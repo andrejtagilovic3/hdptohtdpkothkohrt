@@ -26,6 +26,8 @@ let collection = [];
 let activeBattleNft = null;
 let totalStarsEarned = 0;
 let battleHistory = [];
+let referralCode = '';
+let referredFriends = [];
 
 const tgUser = Telegram.WebApp.initDataUnsafe?.user;
 let userName = tgUser?.first_name || 'Игрок';
@@ -51,18 +53,22 @@ async function init() {
 
 async function loadData() {
     try {
-        const [starsStr, collectionStr, activeNftStr, totalEarnedStr, historyStr] = await Promise.all([
+        const [starsStr, collectionStr, activeNftStr, totalEarnedStr, historyStr, referralStr, friendsStr] = await Promise.all([
             getCloudItem('stars'),
             getCloudItem('collection'),
             getCloudItem('activeBattleNft'),
             getCloudItem('totalStarsEarned'),
-            getCloudItem('battleHistory')
+            getCloudItem('battleHistory'),
+            getCloudItem('referralCode'),
+            getCloudItem('referredFriends')
         ]);
         stars = parseInt(starsStr) || 100;
         collection = JSON.parse(collectionStr) || [];
         activeBattleNft = JSON.parse(activeNftStr) || null;
         totalStarsEarned = parseInt(totalEarnedStr) || 0;
         battleHistory = JSON.parse(historyStr) || [];
+        referralCode = referralStr || generateReferralCode();
+        referredFriends = JSON.parse(friendsStr) || [];
     } catch (error) {
         console.error('Error loading data:', error);
     }
@@ -75,7 +81,9 @@ async function saveData() {
             setCloudItem('collection', JSON.stringify(collection)),
             setCloudItem('activeBattleNft', JSON.stringify(activeBattleNft)),
             setCloudItem('totalStarsEarned', totalStarsEarned.toString()),
-            setCloudItem('battleHistory', JSON.stringify(battleHistory))
+            setCloudItem('battleHistory', JSON.stringify(battleHistory)),
+            setCloudItem('referralCode', referralCode),
+            setCloudItem('referredFriends', JSON.stringify(referredFriends))
         ]);
     } catch (error) {
         console.error('Error saving data:', error);
@@ -495,6 +503,8 @@ function switchScreen(screen) {
         renderProfile();
     } else if (screen === 'friends') {
         document.getElementById('friends-screen').classList.add('active');
+        updateReferralLink();
+        renderFriends();
     }
     
     currentScreen = screen;
@@ -631,208 +641,3 @@ function sellNft(index) {
     
     if (activeBattleNft && activeBattleNft.name === nft.name && activeBattleNft.img === nft.img) {
         activeBattleNft = null;
-    }
-    
-    collection.splice(index, 1);
-    updateUI();
-    renderCollection();
-    renderCenterArea();
-    alert(`Продан за ${sellPrice} звёзд!`);
-}
-
-function showRules() {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('rules-screen').classList.add('active');
-}
-
-function backToMainFromRules() {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('main-screen').classList.add('active');
-    document.querySelectorAll('.nav-item')[0].classList.add('active');
-}
-
-function setToBattle(index) {
-    activeBattleNft = collection[index];
-    renderCollection();
-    renderCenterArea();
-    updateUI();
-    
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('main-screen').classList.add('active');
-    
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    document.querySelectorAll('.nav-item')[0].classList.add('active');
-    
-    currentScreen = 'main';
-}
-
-function showBattleHistory() {
-    document.getElementById('profile-screen').classList.remove('active');
-    document.getElementById('battle-history-screen').classList.add('active');
-    renderBattleHistory();
-}
-
-function backToProfile() {
-    document.getElementById('battle-history-screen').classList.remove('active');
-    document.getElementById('profile-screen').classList.add('active');
-}
-
-function renderBattleHistory() {
-    const historyList = document.getElementById('battle-history-list');
-    historyList.innerHTML = '';
-    
-    if (battleHistory.length === 0) {
-        historyList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888888;">История дуэлей пуста<br>Проведите первую дуэль!</div>';
-        return;
-    }
-    
-    battleHistory.slice().reverse().forEach(battle => {
-        const historyItem = document.createElement('div');
-        historyItem.className = 'battle-history-item';
-        
-        historyItem.innerHTML = `
-            <div class="battle-history-header">
-                <span class="battle-result-text ${battle.result}">${battle.result === 'win' ? 'ПОБЕДА' : 'ПОРАЖЕНИЕ'}</span>
-                <span style="color: #888888; font-size: 14px;">${battle.date}</span>
-            </div>
-            <div class="battle-history-nfts">
-                <div class="history-nft">
-                    <img src="${battle.playerNft.img}" class="history-nft-img" alt="${battle.playerNft.name}" onerror="this.src='https://via.placeholder.com/60x60?text=?'">
-                    <div class="history-nft-name">${battle.playerNft.name}</div>
-                </div>
-                <div class="history-vs">VS</div>
-                <div class="history-nft">
-                    <img src="${battle.botNft.img}" class="history-nft-img" alt="${battle.botNft.name}" onerror="this.src='https://via.placeholder.com/60x60?text=?'">
-                    <div class="history-nft-name">${battle.botNft.name}</div>
-                </div>
-            </div>
-            <div style="text-align: center; margin-top: 10px; font-size: 14px; color: #cccccc;">
-                ${battle.reward}
-            </div>
-        `;
-        
-        historyList.appendChild(historyItem);
-    });
-}
-
-// Реферальная система
-function generateReferralCode() {
-    if (!referralCode) {
-        referralCode = 'ref_' + Math.random().toString(36).substr(2, 8);
-        saveData();
-    }
-}
-
-function inviteFriend() {
-    const botUrl = `https://t.me/your_bot_name?start=${referralCode}`;
-    const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(botUrl)}&text=${encodeURIComponent('Присоединяйся к NFT игре! 🎮')}`;
-    
-    if (Telegram.WebApp.openTelegramLink) {
-        Telegram.WebApp.openTelegramLink(shareUrl);
-    } else {
-        window.open(shareUrl, '_blank');
-    }
-}
-
-function copyReferralLink() {
-    const botUrl = `https://t.me/your_bot_name?start=${referralCode}`;
-    
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(botUrl).then(() => {
-            showToast('Ссылка скопирована!');
-        });
-    } else {
-        // Fallback для старых браузеров
-        const textArea = document.createElement('textarea');
-        textArea.value = botUrl;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        showToast('Ссылка скопирована!');
-    }
-}
-
-function showToast(message) {
-    // Создаем простой toast
-    const toast = document.createElement('div');
-    toast.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #333;
-        color: white;
-        padding: 12px 24px;
-        border-radius: 8px;
-        z-index: 10000;
-        font-size: 14px;
-    `;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        document.body.removeChild(toast);
-    }, 2000);
-}
-
-function showTerms() {
-    alert('Условия партнёрства:\n\n• Пригласите 50+ активных игроков\n• Свяжитесь с поддержкой для получения статуса партнёра\n• Получайте % от покупок ваших рефералов');
-}
-
-function renderFriends() {
-    const friendsList = document.getElementById('friends-list');
-    const friendsCount = document.getElementById('friends-count');
-    
-    friendsCount.textContent = `(${referredFriends.length})`;
-    
-    if (referredFriends.length === 0) {
-        friendsList.innerHTML = `
-            <div class="no-friends">
-                Друг должен зайти в приложение по вашей<br>ссылке, чтобы вы получили звёзды.
-            </div>
-        `;
-    } else {
-        friendsList.innerHTML = '';
-        referredFriends.forEach(friend => {
-            const friendItem = document.createElement('div');
-            friendItem.className = 'friend-item';
-            friendItem.innerHTML = `
-                <div class="friend-info">
-                    <div class="friend-avatar">${friend.name.charAt(0).toUpperCase()}</div>
-                    <div class="friend-name">${friend.name}</div>
-                </div>
-                <div class="friend-reward">
-                    <i class="fas fa-star"></i>
-                    10 звёзд
-                </div>
-            `;
-            friendsList.appendChild(friendItem);
-        });
-    }
-}
-
-function switchScreen(screen) {
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    event.target.closest('.nav-item').classList.add('active');
-    
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    
-    if (screen === 'main') {
-        document.getElementById('main-screen').classList.add('active');
-        renderCenterArea();
-    } else if (screen === 'collection') {
-        document.getElementById('collection-screen').classList.add('active');
-        renderCollection();
-    } else if (screen === 'upgrade') {
-        document.getElementById('upgrade-screen').classList.add('active');
-    } else if (screen === 'profile') {
-        document.getElementById('profile-screen').classList.add('active');
-        renderProfile();
-    } else if (screen === 'friends') {
-        document.getElementById('friends-screen').classList.add('active');
-        renderFriends(); // Добавляем рендеринг друзей
-    }
-    
-    currentScreen = screen;
-}
