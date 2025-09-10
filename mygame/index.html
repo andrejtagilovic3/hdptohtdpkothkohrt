@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>My NFT Game</title>
@@ -18,7 +18,6 @@
                 <div class="user-name" id="user-name">Игрок</div>
             </div>
             <div class="currency-info">
-                <button class="rules-btn" onclick="showRules()">📖</button>
                 <div class="currency-item">
                     <i class="fas fa-star" style="color: #ffd700;"></i>
                     <span id="star-count">0</span>
@@ -125,40 +124,52 @@
             <div id="friends-screen" class="screen">
                 <div class="main-content">
                     <h2 class="section-title">Пригласи друзей - Получай Награды!</h2>
-                    <div class="reward-card">
-                        <div class="reward-text">Каждый приглашенный друг = 1 звезда</div>
-                    </div>
-                    <div class="referral-stats">
-                        <div class="stat-item">
-                            <div class="stat-number" id="invited-count">0</div>
-                            <div class="stat-label">Приглашено</div>
+                    <div class="referral-info">
+                        <div class="reward-card">
+                            <div class="reward-text">Каждый приглашенный друг = <span class="reward-amount">1 <i class="fas fa-star" style="color: #ffd700;"></i></span> звезда</div>
                         </div>
-                        <div class="stat-item">
-                            <div class="stat-number" id="earned-from-referrals">0</div>
-                            <div class="stat-label">Заработано звёзд</div>
+                        <div class="referral-stats">
+                            <div class="stat-item">
+                                <div class="stat-number" id="invited-count">0</div>
+                                <div class="stat-label">Приглашено</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="earned-from-referrals">0</div>
+                                <div class="stat-label">Заработано звёзд</div>
+                            </div>
                         </div>
                     </div>
+                    
                     <div class="referral-actions">
                         <button class="invite-btn" onclick="inviteFriend()">
+                            <i class="fas fa-user-plus"></i>
                             Пригласить друга
                         </button>
                         <button class="copy-link-btn" onclick="copyReferralLink()">
+                            <i class="fas fa-copy"></i>
                             Скопировать ссылку
                         </button>
                     </div>
+
                     <div class="referral-code-section">
                         <div class="section-subtitle">Ваша реферальная ссылка:</div>
                         <div class="referral-code-container">
-                            <input type="text" id="referral-link" readonly class="referral-input">
-                            <button class="copy-code-btn" onclick="copyReferralLink()"></button>
+                            <input type="text" id="referral-link" class="referral-input" readonly>
+                            <button class="copy-code-btn" onclick="copyReferralLink()">
+                                <i class="fas fa-copy"></i>
+                            </button>
                         </div>
                     </div>
+
                     <div class="partner-info">
                         <div class="partner-text">Хотите стать партнёром и зарабатывать TON?</div>
                         <button class="partner-btn" onclick="showTerms()">Условия</button>
                     </div>
-                    <h3 class="section-title" style="font-size: 18px;">Приглашенные друзья (<span id="friends-count">0</span>)</h3>
-                    <div id="friends-list"></div>
+
+                    <div class="friends-list-section">
+                        <h3 class="section-subtitle">Приглашенные друзья <span id="friends-count">(0)</span></h3>
+                        <div id="friends-list" class="friends-list"></div>
+                    </div>
                 </div>
             </div>
 
@@ -242,13 +253,13 @@
             <div class="purchase-content">
                 <div class="purchase-title">Купить звёзды</div>
                 <div class="purchase-options">
-                    50 звёзд
-                    100 звёзд
-                    200 звёзд
-                    500 звёзд
-                    1000 звёзд
-                    2000 звёзд
-                    5000 звёзд
+                    <button class="purchase-btn" onclick="purchaseStars(50)">50 звёзд</button>
+                    <button class="purchase-btn" onclick="purchaseStars(100)">100 звёзд</button>
+                    <button class="purchase-btn" onclick="purchaseStars(200)">200 звёзд</button>
+                    <button class="purchase-btn" onclick="purchaseStars(500)">500 звёзд</button>
+                    <button class="purchase-btn" onclick="purchaseStars(1000)">1000 звёзд</button>
+                    <button class="purchase-btn" onclick="purchaseStars(2000)">2000 звёзд</button>
+                    <button class="purchase-btn" onclick="purchaseStars(5000)">5000 звёзд</button>
                 </div>
                 <div class="close-purchase" onclick="closePurchaseMenu()">Закрыть</div>
             </div>
