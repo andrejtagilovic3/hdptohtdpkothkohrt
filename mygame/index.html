@@ -18,6 +18,7 @@
                 <div class="user-name" id="user-name">Игрок</div>
             </div>
             <div class="currency-info">
+                <button class="rules-btn" onclick="showRules()">📖</button>
                 <div class="currency-item">
                     <i class="fas fa-star" style="color: #ffd700;"></i>
                     <span id="star-count">0</span>
@@ -43,9 +44,7 @@
                 <div class="main-content">
                     <h2 class="section-title">Коллекция</h2>
                     <div id="collection-grid" class="nft-grid"></div>
-                    <button class="play-btn" onclick="openShop()" style="margin-top: 20px;">
-                        Купить NFT
-                    </button>
+                    <button class="play-btn" onclick="openShop()" style="margin-top: 20px;">Купить NFT</button>
                 </div>
             </div>
 
@@ -82,9 +81,7 @@
                         <div id="battle-log" class="battle-log">Подготовка к дуэли...</div>
                         <div id="battle-result" class="battle-result" style="display: none;"></div>
                         <div id="reward-info" class="reward-info" style="display: none;"></div>
-                        <button id="back-to-menu-btn" class="back-btn" onclick="backToMainFromBattle()" style="display: none; width: 100%;">
-                            Вернуться в меню
-                        </button>
+                        <button id="back-to-menu-btn" class="back-btn" onclick="backToMainFromBattle()" style="display: none; width: 100%;">Вернуться в меню</button>
                     </div>
                 </div>
             </div>
@@ -102,9 +99,7 @@
                             </div>
                         </div>
                     </div>
-                    <button class="play-btn" onclick="showBattleHistory()" style="margin-bottom: 15px; font-size: 16px;">
-                        История дуэлей
-                    </button>
+                    <button class="play-btn" onclick="showBattleHistory()" style="margin-bottom: 15px; font-size: 16px;">История дуэлей</button>
                     <h3 class="section-title" style="font-size: 18px;">Моя коллекция</h3>
                     <div id="profile-collection" class="nft-grid"></div>
                 </div>
@@ -113,44 +108,36 @@
             <div id="battle-history-screen" class="screen">
                 <div class="main-content">
                     <h2 class="section-title">История дуэлей</h2>
-                    <div id="battle-history-list">
-                    </div>
-                    <button class="play-btn" onclick="backToProfile()" style="margin-top: 20px;">
-                        Назад в профиль
-                    </button>
+                    <div id="battle-history-list"></div>
+                    <button class="play-btn" onclick="backToProfile()" style="margin-top: 20px;">Назад в профиль</button>
                 </div>
             </div>
 
             <div id="friends-screen" class="screen">
                 <div class="main-content">
                     <h2 class="section-title">Пригласи друзей - Получай Награды!</h2>
-                    <div class="referral-info">
-                        <div class="reward-card">
-                            <div class="reward-text">Каждый приглашенный друг = <span class="reward-amount">1 <i class="fas fa-star" style="color: #ffd700;"></i></span> звезда</div>
+                    <div class="reward-card">
+                        <div class="reward-text">Каждый приглашенный друг =</div>
+                        <div class="reward-amount">1 звезда</div>
+                    </div>
+                    <div class="referral-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="invited-count">0</div>
+                            <div class="stat-label">Приглашено</div>
                         </div>
-                        <div class="referral-stats">
-                            <div class="stat-item">
-                                <div class="stat-number" id="invited-count">0</div>
-                                <div class="stat-label">Приглашено</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-number" id="earned-from-referrals">0</div>
-                                <div class="stat-label">Заработано звёзд</div>
-                            </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="earned-from-referrals">0</div>
+                            <div class="stat-label">Заработано звёзд</div>
                         </div>
                     </div>
-                    
                     <div class="referral-actions">
                         <button class="invite-btn" onclick="inviteFriend()">
-                            <i class="fas fa-user-plus"></i>
-                            Пригласить друга
+                            <i class="fas fa-user-plus"></i> Пригласить друга
                         </button>
                         <button class="copy-link-btn" onclick="copyReferralLink()">
-                            <i class="fas fa-copy"></i>
-                            Скопировать ссылку
+                            <i class="fas fa-link"></i> Скопировать ссылку
                         </button>
                     </div>
-
                     <div class="referral-code-section">
                         <div class="section-subtitle">Ваша реферальная ссылка:</div>
                         <div class="referral-code-container">
@@ -160,15 +147,13 @@
                             </button>
                         </div>
                     </div>
-
                     <div class="partner-info">
                         <div class="partner-text">Хотите стать партнёром и зарабатывать TON?</div>
                         <button class="partner-btn" onclick="showTerms()">Условия</button>
                     </div>
-
                     <div class="friends-list-section">
-                        <h3 class="section-subtitle">Приглашенные друзья <span id="friends-count">(0)</span></h3>
-                        <div id="friends-list" class="friends-list"></div>
+                        <h3 class="section-title" style="font-size: 18px;">Приглашенные друзья <span id="friends-count">(0)</span></h3>
+                        <div id="friends-list"></div>
                     </div>
                 </div>
             </div>
@@ -249,7 +234,7 @@
             <div id="coin-result-text" class="searching-text"></div>
         </div>
 
-        <div id="purchase-overlay" class="purchase-overlay">
+        <div id="purchase-overlay" class="purchase-overlay" style="display: none;">
             <div class="purchase-content">
                 <div class="purchase-title">Купить звёзды</div>
                 <div class="purchase-options">
