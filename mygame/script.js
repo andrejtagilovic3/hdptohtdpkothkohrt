@@ -27,9 +27,15 @@ let activeBattleNft = null;
 let totalStarsEarned = 0;
 let battleHistory = [];
 
+// Реферальная система
+let referralCode = null;
+let referredFriends = [];
+let starsFromReferrals = 0;
+
 const tgUser = Telegram.WebApp.initDataUnsafe?.user;
 let userName = tgUser?.first_name || 'Игрок';
 let userAvatar = tgUser?.photo_url || '👤';
+let userId = tgUser?.id || Math.random().toString(36).substr(2, 9);
 
 let playerHP = 100;
 let botHP = 100;
@@ -40,6 +46,7 @@ let currentScreen = 'main';
 init();
 
 async function init() {
+    generateReferralCode();
     await loadData();
     updateUI();
     renderCenterArea();
@@ -47,22 +54,29 @@ async function init() {
     renderShop();
     renderProfile();
     updateUserInfo();
+    updateReferralInfo();
 }
 
 async function loadData() {
     try {
-        const [starsStr, collectionStr, activeNftStr, totalEarnedStr, historyStr] = await Promise.all([
+        const [starsStr, collectionStr, activeNftStr, totalEarnedStr, historyStr, referralCodeStr, friendsStr, refStarsStr] = await Promise.all([
             getCloudItem('stars'),
             getCloudItem('collection'),
             getCloudItem('activeBattleNft'),
             getCloudItem('totalStarsEarned'),
-            getCloudItem('battleHistory')
+            getCloudItem('battleHistory'),
+            getCloudItem('referralCode'),
+            getCloudItem('referredFriends'),
+            getCloudItem('starsFromReferrals')
         ]);
         stars = parseInt(starsStr) || 100;
         collection = JSON.parse(collectionStr) || [];
         activeBattleNft = JSON.parse(activeNftStr) || null;
         totalStarsEarned = parseInt(totalEarnedStr) || 0;
         battleHistory = JSON.parse(historyStr) || [];
+        referralCode = referralCodeStr || null;
+        referredFriends = JSON.parse(friendsStr) || [];
+        starsFromReferrals = parseInt(refStarsStr) || 0;
     } catch (error) {
         console.error('Error loading data:', error);
     }
@@ -75,7 +89,10 @@ async function saveData() {
             setCloudItem('collection', JSON.stringify(collection)),
             setCloudItem('activeBattleNft', JSON.stringify(activeBattleNft)),
             setCloudItem('totalStarsEarned', totalStarsEarned.toString()),
-            setCloudItem('battleHistory', JSON.stringify(battleHistory))
+            setCloudItem('battleHistory', JSON.stringify(battleHistory)),
+            setCloudItem('referralCode', referralCode || ''),
+            setCloudItem('referredFriends', JSON.stringify(referredFriends)),
+            setCloudItem('starsFromReferrals', starsFromReferrals.toString())
         ]);
     } catch (error) {
         console.error('Error saving data:', error);
@@ -495,6 +512,7 @@ function switchScreen(screen) {
         renderProfile();
     } else if (screen === 'friends') {
         document.getElementById('friends-screen').classList.add('active');
+        renderFriends();
     }
     
     currentScreen = screen;
@@ -718,14 +736,26 @@ function renderBattleHistory() {
 // Реферальная система
 function generateReferralCode() {
     if (!referralCode) {
-        referralCode = 'ref_' + Math.random().toString(36).substr(2, 8);
+        referralCode = 'ref_' + userId;
         saveData();
     }
 }
 
+function updateReferralInfo() {
+    if (referralCode) {
+        const referralLink = `https://t.me/dfgijrfjirfgjieh_bot?start=${referralCode}`;
+        document.getElementById('referral-link').value = referralLink;
+    }
+    
+    document.getElementById('invited-count').textContent = referredFriends.length;
+    document.getElementById('earned-from-referrals').textContent = starsFromReferrals;
+    document.getElementById('friends-count').textContent = `(${referredFriends.length})`;
+}
+
 function inviteFriend() {
-    const botUrl = `https://t.me/your_bot_name?start=${referralCode}`;
-    const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(botUrl)}&text=${encodeURIComponent('Присоединяйся к NFT игре! 🎮')}`;
+    const botUrl = `https://t.me/dfgijrfjirfgjieh_bot?start=${referralCode}`;
+    const shareText = 'Присоединяйся к NFT игре! 🎮 Покупай, сражайся и побеждай!';
+    const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(botUrl)}&text=${encodeURIComponent(shareText)}`;
     
     if (Telegram.WebApp.openTelegramLink) {
         Telegram.WebApp.openTelegramLink(shareUrl);
@@ -735,20 +765,17 @@ function inviteFriend() {
 }
 
 function copyReferralLink() {
-    const botUrl = `https://t.me/your_bot_name?start=${referralCode}`;
+    const referralLink = document.getElementById('referral-link');
     
     if (navigator.clipboard) {
-        navigator.clipboard.writeText(botUrl).then(() => {
+        navigator.clipboard.writeText(referralLink.value).then(() => {
             showToast('Ссылка скопирована!');
         });
     } else {
         // Fallback для старых браузеров
-        const textArea = document.createElement('textarea');
-        textArea.value = botUrl;
-        document.body.appendChild(textArea);
-        textArea.select();
+        referralLink.select();
+        referralLink.setSelectionRange(0, 99999);
         document.execCommand('copy');
-        document.body.removeChild(textArea);
         showToast('Ссылка скопирована!');
     }
 }
@@ -767,29 +794,38 @@ function showToast(message) {
         border-radius: 8px;
         z-index: 10000;
         font-size: 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     `;
     toast.textContent = message;
     document.body.appendChild(toast);
     
     setTimeout(() => {
-        document.body.removeChild(toast);
+        if (document.body.contains(toast)) {
+            document.body.removeChild(toast);
+        }
     }, 2000);
 }
 
 function showTerms() {
-    alert('Условия партнёрства:\n\n• Пригласите 50+ активных игроков\n• Свяжитесь с поддержкой для получения статуса партнёра\n• Получайте % от покупок ваших рефералов');
+    const termsText = `Условия партнёрства:
+
+• Пригласите 50+ активных игроков
+• Свяжитесь с поддержкой для получения статуса партнёра  
+• Получайте % от покупок ваших рефералов
+• Дополнительные бонусы за активность
+
+Для получения статуса партнёра обратитесь в поддержку!`;
+    
+    alert(termsText);
 }
 
 function renderFriends() {
     const friendsList = document.getElementById('friends-list');
-    const friendsCount = document.getElementById('friends-count');
-    
-    friendsCount.textContent = `(${referredFriends.length})`;
     
     if (referredFriends.length === 0) {
         friendsList.innerHTML = `
             <div class="no-friends">
-                Друг должен зайти в приложение по вашей<br>ссылке, чтобы вы получили звёзды.
+                <p>Друг должен зайти в приложение по вашей ссылке, чтобы вы получили звёзды.</p>
             </div>
         `;
     } else {
@@ -799,40 +835,41 @@ function renderFriends() {
             friendItem.className = 'friend-item';
             friendItem.innerHTML = `
                 <div class="friend-info">
-                    <div class="friend-avatar">${friend.name.charAt(0).toUpperCase()}</div>
-                    <div class="friend-name">${friend.name}</div>
+                    <div class="friend-avatar">${friend.name ? friend.name.charAt(0).toUpperCase() : '?'}</div>
+                    <div class="friend-details">
+                        <div class="friend-name">${friend.name || 'Аноним'}</div>
+                        <div class="friend-date">${friend.joinDate || 'Недавно'}</div>
+                    </div>
                 </div>
                 <div class="friend-reward">
-                    <i class="fas fa-star"></i>
-                    10 звёзд
+                    <i class="fas fa-star" style="color: #ffd700;"></i>
+                    1 звезда
                 </div>
             `;
             friendsList.appendChild(friendItem);
         });
     }
+    
+    updateReferralInfo();
 }
 
-function switchScreen(screen) {
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    event.target.closest('.nav-item').classList.add('active');
+// Функция для добавления нового друга (вызывается при переходе по реферальной ссылке)
+function addReferredFriend(friendData) {
+    const newFriend = {
+        id: friendData.id || Math.random().toString(36).substr(2, 9),
+        name: friendData.name || 'Новый игрок',
+        joinDate: new Date().toLocaleDateString('ru-RU')
+    };
     
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    
-    if (screen === 'main') {
-        document.getElementById('main-screen').classList.add('active');
-        renderCenterArea();
-    } else if (screen === 'collection') {
-        document.getElementById('collection-screen').classList.add('active');
-        renderCollection();
-    } else if (screen === 'upgrade') {
-        document.getElementById('upgrade-screen').classList.add('active');
-    } else if (screen === 'profile') {
-        document.getElementById('profile-screen').classList.add('active');
-        renderProfile();
-    } else if (screen === 'friends') {
-        document.getElementById('friends-screen').classList.add('active');
-        renderFriends(); // Добавляем рендеринг друзей
+    // Проверяем, что друг еще не добавлен
+    if (!referredFriends.find(friend => friend.id === newFriend.id)) {
+        referredFriends.push(newFriend);
+        stars += 1; // Даем 1 звезду за реферала
+        starsFromReferrals += 1;
+        totalStarsEarned += 1;
+        
+        updateUI();
+        updateReferralInfo();
+        showToast(`+1 звезда за друга ${newFriend.name}!`);
     }
-    
-    currentScreen = screen;
 }
