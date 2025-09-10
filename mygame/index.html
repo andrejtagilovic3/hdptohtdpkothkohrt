@@ -18,6 +18,7 @@
                 <div class="user-name" id="user-name">Игрок</div>
             </div>
             <div class="currency-info">
+                <button class="rules-btn" onclick="showRules()">📖</button>
                 <div class="currency-item">
                     <i class="fas fa-star" style="color: #ffd700;"></i>
                     <span id="star-count">0</span>
@@ -29,9 +30,6 @@
         <div class="content-area">
             <div id="main-screen" class="screen active">
                 <div class="main-content">
-                    <div class="how-to-play-container">
-                        <button class="how-to-play-btn" onclick="showRules()">? Как играть</button>
-                    </div>
                     <div id="center-area" class="center-area">
                         <div id="center-content"></div>
                     </div>
@@ -123,52 +121,9 @@
 
             <div id="friends-screen" class="screen">
                 <div class="main-content">
-                    <h2 class="section-title">Пригласи друзей - Получай Награды!</h2>
-                    <div class="referral-info">
-                        <div class="reward-card">
-                            <div class="reward-text">Каждый приглашенный друг = <span class="reward-amount">1 <i class="fas fa-star" style="color: #ffd700;"></i></span> звезда</div>
-                        </div>
-                        <div class="referral-stats">
-                            <div class="stat-item">
-                                <div class="stat-number" id="invited-count">0</div>
-                                <div class="stat-label">Приглашено</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-number" id="earned-from-referrals">0</div>
-                                <div class="stat-label">Заработано звёзд</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="referral-actions">
-                        <button class="invite-btn" onclick="inviteFriend()">
-                            <i class="fas fa-user-plus"></i>
-                            Пригласить друга
-                        </button>
-                        <button class="copy-link-btn" onclick="copyReferralLink()">
-                            <i class="fas fa-copy"></i>
-                            Скопировать ссылку
-                        </button>
-                    </div>
-
-                    <div class="referral-code-section">
-                        <div class="section-subtitle">Ваша реферальная ссылка:</div>
-                        <div class="referral-code-container">
-                            <input type="text" id="referral-link" class="referral-input" readonly>
-                            <button class="copy-code-btn" onclick="copyReferralLink()">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="partner-info">
-                        <div class="partner-text">Хотите стать партнёром и зарабатывать TON?</div>
-                        <button class="partner-btn" onclick="showTerms()">Условия</button>
-                    </div>
-
-                    <div class="friends-list-section">
-                        <h3 class="section-subtitle">Приглашенные друзья <span id="friends-count">(0)</span></h3>
-                        <div id="friends-list" class="friends-list"></div>
+                    <div class="friends-placeholder">
+                        <h2>Hello World</h2>
+                        <p style="margin-top: 20px; color: #666;">Раздел в разработке</p>
                     </div>
                 </div>
             </div>
