@@ -295,6 +295,7 @@ body {
     border-radius: 16px;
     padding: 20px;
     margin: 20px 0;
+    overflow: hidden; /* Fixed overflow */
 }
 
 .battle-participants {
@@ -302,11 +303,13 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
+    flex-wrap: nowrap; /* Prevent wrapping */
 }
 
 .participant {
     text-align: center;
-    flex: 1;
+    flex: 1 0 40%; /* Adjusted flex to prevent overflow */
+    max-width: 40%;
 }
 
 .participant-img {
@@ -871,7 +874,7 @@ body {
     padding: 15px;
     background: #1a1a1a;
     border-radius: 12px;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     border: 1px solid #333333;
 }
 
@@ -890,8 +893,7 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 16px;
-    font-weight: 700;
-    color: #ffffff;
+    color: #888888;
 }
 
 .friend-details {
@@ -902,8 +904,6 @@ body {
 .friend-name {
     font-size: 16px;
     font-weight: 600;
-    color: #ffffff;
-    margin-bottom: 2px;
 }
 
 .friend-date {
