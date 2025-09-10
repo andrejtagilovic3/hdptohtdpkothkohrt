@@ -197,9 +197,12 @@
 
             <div id="upgrade-screen" class="screen">
                 <div class="main-content">
-                    <h2 class="section-title">Апгрейд</h2>
-                    <div class="friends-placeholder">
-                        <p style="margin-top: 20px; color: #666;">Раздел в разработке</p>
+                    <h2 class="section-title">Апгрейд NFT</h2>
+                    <div id="upgrade-content">
+                        <div class="upgrade-instruction">
+                            <p>Выберите NFT для апгрейда:</p>
+                        </div>
+                        <div id="upgradable-nft-grid" class="nft-grid"></div>
                     </div>
                 </div>
             </div>
@@ -286,8 +289,44 @@
                 <div class="close-purchase" onclick="closePurchaseMenu()">Закрыть</div>
             </div>
         </div>
+
+        <div id="upgrade-selection-overlay" class="upgrade-overlay" style="display: none;">
+            <div class="upgrade-modal">
+                <div class="upgrade-header">
+                    <h3 id="upgrade-nft-name">NFT Name</h3>
+                    <button class="upgrade-close-btn" onclick="closeUpgradeModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="upgrade-nft-preview">
+                    <img id="upgrade-nft-img" src="" alt="NFT">
+                </div>
+                <div class="upgrade-types">
+                    <h4>Выберите тип апгрейда:</h4>
+                    <div id="upgrade-options" class="upgrade-options-grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="upgrade-animation-overlay" class="upgrade-overlay" style="display: none;">
+            <div class="upgrade-animation-container">
+                <div class="gift-box" id="gift-box">
+                    <div class="gift-box-top"></div>
+                    <div class="gift-box-bottom"></div>
+                    <div class="gift-ribbon"></div>
+                </div>
+                <div class="upgrade-instruction-text">Нажимайте на подарок!</div>
+                <div class="tap-counter">Осталось нажатий: <span id="taps-remaining">5</span></div>
+                <div id="upgrade-result" class="upgrade-result" style="display: none;">
+                    <div class="result-icon"></div>
+                    <div class="result-text"></div>
+                    <button class="result-close-btn" onclick="closeUpgradeAnimation()">Забрать</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
+    <script src="upgrade-system.js"></script>
 </body>
 </html>
