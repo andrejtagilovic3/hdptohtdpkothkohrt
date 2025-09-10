@@ -21,6 +21,9 @@ const nftTemplates = [
 
 const nftPrices = [100, 150, 200, 250, 440, 350, 240, 85, 200, 300, 700, 500, 220, 450];
 
+// Assign random popularity scores (0-100) for demonstration
+const nftPopularity = nftTemplates.map(() => Math.floor(Math.random() * 101));
+
 // Основные переменные игры
 let stars = 100;
 let collection = [];
@@ -56,6 +59,7 @@ async function init() {
     updateUI();
     renderCenterArea();
     renderCollection();
+    sortShop('price-low-to-high'); // Initial sort by price low to high
     renderShop();
     renderProfile();
     updateUserInfo();
@@ -67,7 +71,6 @@ async function loadData() {
     try {
         console.log('Loading data from cloud storage...');
        
-        // Загружаем данные последовательно для избежания конфликтов
         const starsStr = await getCloudItem('stars');
         const collectionStr = await getCloudItem('collection');
         const activeNftStr = await getCloudItem('activeBattleNft');
@@ -77,7 +80,6 @@ async function loadData() {
         const friendsStr = await getCloudItem('referredFriends');
         const refStarsStr = await getCloudItem('starsFromReferrals');
        
-        // Устанавливаем значения с проверками
         stars = starsStr ? parseInt(starsStr) : 100;
         collection = collectionStr ? JSON.parse(collectionStr) : [];
         activeBattleNft = activeNftStr ? JSON.parse(activeNftStr) : null;
@@ -98,7 +100,6 @@ async function loadData() {
        
     } catch (error) {
         console.error('Error loading data:', error);
-        // При ошибке загрузки используем значения по умолчанию
         stars = 100;
         collection = [];
         activeBattleNft = null;
@@ -127,7 +128,6 @@ async function saveData() {
             friendsCount: referredFriends.length
         });
        
-        // Сохраняем данные последовательно
         await setCloudItem('stars', stars.toString());
         await setCloudItem('collection', JSON.stringify(collection));
         await setCloudItem('activeBattleNft', JSON.stringify(activeBattleNft));
@@ -151,7 +151,7 @@ function getCloudItem(key) {
         cloudStorage.getItem(key, (error, value) => {
             if (error) {
                 console.error(`Error getting ${key}:`, error);
-                resolve(null); // Возвращаем null вместо reject
+                resolve(null);
             } else {
                 resolve(value);
             }
@@ -189,7 +189,6 @@ function updateUI() {
     document.getElementById('profile-battles-count').textContent = battleHistory.length;
     updatePlayButton();
    
-    // Сохраняем данные после обновления UI, но с задержкой
     setTimeout(() => saveData(), 100);
 }
 
@@ -481,7 +480,6 @@ function endBattle() {
     let result;
     let reward;
    
-    // Создаем копию данных NFT для истории до их изменения
     const battlePlayerNft = activeBattleNft ? { ...activeBattleNft } : null;
     const battleBotNft = { ...botNft };
    
@@ -517,7 +515,6 @@ function endBattle() {
         result = 'lose';
     }
    
-    // Добавляем в историю с сохраненными данными
     battleHistory.push({
         date: new Date().toLocaleDateString('ru-RU'),
         result: result,
@@ -575,10 +572,9 @@ function switchScreen(screen) {
     currentScreen = screen;
 }
 
-// Функция для перехода в коллекцию из главного экрана
 function goToCollection() {
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    document.querySelectorAll('.nav-item')[1].classList.add('active'); // коллекция - второй элемент
+    document.querySelectorAll('.nav-item')[1].classList.add('active');
    
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('collection-screen').classList.add('active');
@@ -596,7 +592,7 @@ function openShop() {
 function backToCollection() {
     document.getElementById('shop-screen').classList.remove('active');
     document.getElementById('collection-screen').classList.add('active');
-    renderCollection(); // Автоматически рендерим коллекцию при возврате
+    renderCollection();
 }
 
 function renderCenterArea() {
@@ -690,7 +686,6 @@ function buyNft(templateIndex, price) {
         alert(`Куплен ${nft.name}!`);
         renderShop();
        
-        // Переходим в коллекцию после покупки
         setTimeout(() => {
             backToCollection();
         }, 500);
@@ -704,7 +699,6 @@ function sellNft(index) {
     const sellPrice = Math.floor(nft.buyPrice * 0.8);
     stars += sellPrice;
    
-    // Проверяем более точно активный NFT
     if (activeBattleNft && activeBattleNft.name === nft.name && activeBattleNft.img === nft.img && activeBattleNft.buyPrice === nft.buyPrice) {
         activeBattleNft = null;
     }
@@ -728,7 +722,7 @@ function backToMainFromRules() {
 }
 
 function setToBattle(index) {
-    activeBattleNft = { ...collection[index] }; // Создаем копию объекта
+    activeBattleNft = { ...collection[index] };
     renderCollection();
     renderCenterArea();
     updateUI();
@@ -791,7 +785,6 @@ function renderBattleHistory() {
     });
 }
 
-// Реферальная система
 function generateReferralCode() {
     if (!referralCode) {
         referralCode = 'ref_' + userId;
@@ -876,12 +869,10 @@ function showToast(message) {
 
 function showTerms() {
     const termsText = `Условия партнёрства:
-
 • Пригласите 50+ активных игроков
-• Свяжитесь с поддержкой для получения статуса партнёра  
+• Свяжитесь с поддержкой для получения статуса партнёра
 • Получайте % от покупок ваших рефералов
 • Дополнительные бонусы за активность
-
 Для получения статуса партнёра обратитесь в поддержку!`;
     
     alert(termsText);
@@ -890,7 +881,7 @@ function showTerms() {
 function renderFriends() {
     const friendsList = document.getElementById('friends-list');
     if (!friendsList) return;
-    
+   
     if (referredFriends.length === 0) {
         friendsList.innerHTML = `
             <div class="no-friends">
@@ -918,11 +909,10 @@ function renderFriends() {
             friendsList.appendChild(friendItem);
         });
     }
-    
+   
     updateReferralInfo();
 }
 
-// Функция для добавления нового друга (вызывается при переходе по реферальной ссылке)
 function addReferredFriend(friendData) {
     const newFriend = {
         id: friendData.id || Math.random().toString(36).substr(2, 9),
@@ -930,10 +920,9 @@ function addReferredFriend(friendData) {
         joinDate: new Date().toLocaleDateString('ru-RU')
     };
    
-    // Проверяем, что друг еще не добавлен
     if (!referredFriends.find(friend => friend.id === newFriend.id)) {
         referredFriends.push(newFriend);
-        stars += 1; // Даем 1 звезду за реферала
+        stars += 1;
         starsFromReferrals += 1;
         totalStarsEarned += 1;
        
@@ -941,18 +930,16 @@ function addReferredFriend(friendData) {
        
         updateUI();
         updateReferralInfo();
-        saveData(); // Сохраняем при добавлении реферала
+        saveData();
         showToast(`+1 звезда за друга ${newFriend.name}!`);
     }
 }
 
-// Сохранение при закрытии приложения
 window.addEventListener('beforeunload', () => {
     console.log('App closing, saving data...');
     saveData();
 });
 
-// Сохранение при потере фокуса
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
         console.log('App hidden, saving data...');
@@ -963,7 +950,6 @@ document.addEventListener('visibilitychange', () => {
             updateUI();
             updateReferralInfo();
             renderCenterArea();
-            // Обновляем текущий экран
             if (currentScreen === 'collection') renderCollection();
             if (currentScreen === 'friends') renderFriends();
             if (currentScreen === 'profile') renderProfile();
@@ -971,8 +957,45 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 
-// Автосохранение каждые 30 секунд
 setInterval(() => {
     console.log('Auto-saving data...');
     saveData();
 }, 30000);
+
+// Filter functionality
+document.getElementById('filter-btn').addEventListener('click', () => {
+    const dropdown = document.getElementById('filter-dropdown');
+    dropdown.classList.toggle('active');
+});
+
+function sortShop(sortType) {
+    const dropdown = document.getElementById('filter-dropdown');
+    dropdown.classList.remove('active');
+
+    let sortedTemplates = [...nftTemplates];
+    let sortedPrices = [...nftPrices];
+
+    if (sortType === 'price-low-to-high') {
+        [sortedTemplates, sortedPrices] = sortedTemplates
+            .map((template, index) => ({ template, price: nftPrices[index] }))
+            .sort((a, b) => a.price - b.price)
+            .reduce(([templates, prices], { template, price }) => [[...templates, template], [...prices, price]], [[], []]);
+    } else if (sortType === 'price-high-to-low') {
+        [sortedTemplates, sortedPrices] = sortedTemplates
+            .map((template, index) => ({ template, price: nftPrices[index] }))
+            .sort((a, b) => b.price - a.price)
+            .reduce(([templates, prices], { template, price }) => [[...templates, template], [...prices, price]], [[], []]);
+    } else if (sortType === 'popularity') {
+        [sortedTemplates, sortedPrices] = sortedTemplates
+            .map((template, index) => ({ template, popularity: nftPopularity[index], price: nftPrices[index] }))
+            .sort((a, b) => b.popularity - a.popularity)
+            .reduce(([templates, prices], { template, price }) => [[...templates, template], [...prices, price]], [[], []]);
+    }
+
+    nftTemplates.length = 0;
+    nftPrices.length = 0;
+    nftTemplates.push(...sortedTemplates);
+    nftPrices.push(...sortedPrices);
+
+    renderShop();
+}
