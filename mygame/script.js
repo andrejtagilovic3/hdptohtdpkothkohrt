@@ -16,7 +16,7 @@ const nftTemplates = [
     { name: 'Swag Bag', img: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/imgg/Swag_Bag.gif', tier: 'basic' },
     { name: 'Vintage Cigar', img: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/imgg/VintageCigar.gif', tier: 'basic' },
     { name: 'West Side', img: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/imgg/WestSide.gif', tier: 'premium' },
-    { name: 'Bday candle 2v', img: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/imgg/1.gif', tier: 'premium' }
+    { name: 'Bday candle 2v', img: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/imgg/1.tgs', tier: 'premium' }
 ];
 
 const nftPrices = [100, 150, 200, 250, 440, 350, 240, 85, 200, 300, 700, 500, 220, 450];
@@ -29,8 +29,8 @@ let totalStarsEarned = 0;
 let battleHistory = [];
 
 // Фильтр магазина
-let currentFilter = 'price_asc'; // по умолчанию сортировка от маленькой к большой цены
-const popularityOrder = [0, 3, 9, 12, 6, 13, 11, 2, 5, 1, 8, 4, 7, 10]; // рандомный порядок популярности
+let currentFilter = 'price_asc';
+const popularityOrder = [0, 3, 9, 12, 6, 13, 11, 2, 5, 1, 8, 4, 7, 10];
 
 function toggleFilter() {
     const dropdown = document.getElementById('filter-dropdown');
@@ -40,7 +40,6 @@ function toggleFilter() {
         dropdown.style.display = 'block';
         filterBtn.classList.add('active');
         
-        // Закрытие при клике вне фильтра
         setTimeout(() => {
             document.addEventListener('click', closeFilterOnOutsideClick);
         }, 0);
@@ -63,18 +62,15 @@ function closeFilterOnOutsideClick(event) {
 function setFilter(filterType) {
     currentFilter = filterType;
     
-    // Обновляем активный элемент
     document.querySelectorAll('.filter-option').forEach(option => {
         option.classList.remove('active');
     });
     event.target.closest('.filter-option').classList.add('active');
     
-    // Закрываем dropdown
     document.getElementById('filter-dropdown').style.display = 'none';
     document.getElementById('filter-btn').classList.remove('active');
     document.removeEventListener('click', closeFilterOnOutsideClick);
     
-    // Обновляем иконку в кнопке фильтра
     const filterBtn = document.getElementById('filter-btn');
     const iconElement = filterBtn.querySelector('i:first-child');
     
@@ -90,7 +86,6 @@ function setFilter(filterType) {
             break;
     }
     
-    // Перерендериваем магазин с новым фильтром
     renderShop();
 }
 
@@ -119,6 +114,7 @@ async function init() {
     console.log('Initializing game...');
     generateReferralCode();
     await loadData();
+    initializeUpgrades(); // Добавлено: инициализация апгрейдов
     updateUI();
     renderCenterArea();
     renderCollection();
@@ -133,7 +129,6 @@ async function loadData() {
     try {
         console.log('Loading data from cloud storage...');
        
-        // Загружаем данные последовательно для избежания конфликтов
         const starsStr = await getCloudItem('stars');
         const collectionStr = await getCloudItem('collection');
         const activeNftStr = await getCloudItem('activeBattleNft');
@@ -142,8 +137,8 @@ async function loadData() {
         const referralCodeStr = await getCloudItem('referralCode');
         const friendsStr = await getCloudItem('referredFriends');
         const refStarsStr = await getCloudItem('starsFromReferrals');
+        const upgradesStr = await getCloudItem('nftUpgrades'); // Добавлено: загрузка апгрейдов
        
-        // Устанавливаем значения с проверками
         stars = starsStr ? parseInt(starsStr) : 100;
         collection = collectionStr ? JSON.parse(collectionStr) : [];
         activeBattleNft = activeNftStr ? JSON.parse(activeNftStr) : null;
@@ -152,6 +147,10 @@ async function loadData() {
         referralCode = referralCodeStr || '';
         referredFriends = friendsStr ? JSON.parse(friendsStr) : [];
         starsFromReferrals = refStarsStr ? parseInt(refStarsStr) : 0;
+        if (upgradesStr) { // Добавлено: восстановление апгрейдов
+            const parsed = JSON.parse(upgradesStr);
+            collection.forEach((nft, i) => nft.upgrades = parsed[i] || []);
+        }
        
         console.log('Data loaded:', {
             stars,
@@ -164,7 +163,6 @@ async function loadData() {
        
     } catch (error) {
         console.error('Error loading data:', error);
-        // При ошибке загрузки используем значения по умолчанию
         stars = 100;
         collection = [];
         activeBattleNft = null;
@@ -193,7 +191,6 @@ async function saveData() {
             friendsCount: referredFriends.length
         });
        
-        // Сохраняем данные последовательно
         await setCloudItem('stars', stars.toString());
         await setCloudItem('collection', JSON.stringify(collection));
         await setCloudItem('activeBattleNft', JSON.stringify(activeBattleNft));
@@ -202,6 +199,7 @@ async function saveData() {
         await setCloudItem('referralCode', referralCode);
         await setCloudItem('referredFriends', JSON.stringify(referredFriends));
         await setCloudItem('starsFromReferrals', starsFromReferrals.toString());
+        await setCloudItem('nftUpgrades', JSON.stringify(collection.map(nft => nft.upgrades))); // Добавлено: сохранение апгрейдов
        
         console.log('Data saved successfully');
        
@@ -217,7 +215,7 @@ function getCloudItem(key) {
         cloudStorage.getItem(key, (error, value) => {
             if (error) {
                 console.error(`Error getting ${key}:`, error);
-                resolve(null); // Возвращаем null вместо reject
+                resolve(null);
             } else {
                 resolve(value);
             }
@@ -255,7 +253,6 @@ function updateUI() {
     document.getElementById('profile-battles-count').textContent = battleHistory.length;
     updatePlayButton();
    
-    // Сохраняем данные после обновления UI, но с задержкой
     setTimeout(() => saveData(), 100);
 }
 
@@ -325,22 +322,7 @@ function startBattleSearch() {
 function startBattle() {
     document.getElementById('searching-overlay').style.display = 'none';
    
-    const playerPrice = activeBattleNft.buyPrice;
-    let suitableNfts = [];
-   
-    nftTemplates.forEach((template, index) => {
-        if (nftPrices[index] <= playerPrice + 50) {
-            suitableNfts.push({ ...template, price: nftPrices[index] });
-        }
-    });
-   
-    if (suitableNfts.length === 0) {
-        const randomIndex = Math.floor(Math.random() * nftTemplates.length);
-        botNft = { ...nftTemplates[randomIndex], price: nftPrices[randomIndex] };
-    } else {
-        const randomIndex = Math.floor(Math.random() * suitableNfts.length);
-        botNft = suitableNfts[randomIndex];
-    }
+    botNft = selectBotNft(activeBattleNft); // Изменено: используем новый матчмейкинг
    
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('battle-screen').classList.add('active');
@@ -370,8 +352,8 @@ function startBattle() {
 }
 
 function initializeBattle(playerFirst) {
-    playerHP = 100;
-    botHP = 100;
+    playerHP = activeBattleNft.stats.health; // Изменено: используем stats
+    botHP = botNft.stats.health; // Изменено: используем stats
     battleInProgress = true;
    
     document.getElementById('player-img').src = activeBattleNft.img;
@@ -421,204 +403,190 @@ function initializeBattle(playerFirst) {
         vsText.style.transition = 'opacity 0.5s ease';
         vsText.style.opacity = 1;
         vsText.classList.add('fade-in');
-    }, 2100 + 500);
-   
-    setTimeout(() => {
         playerHpContainer.style.transition = 'opacity 0.5s ease';
         botHpContainer.style.transition = 'opacity 0.5s ease';
-        playerHpContainer.style.opacity = 1;
-        botHpContainer.style.opacity = 1;
         playerHpText.style.transition = 'opacity 0.5s ease';
         botHpText.style.transition = 'opacity 0.5s ease';
-        playerHpText.style.opacity = 1;
-        botHpText.style.opacity = 1;
-        updateHPBars();
-    }, 2100 + 500 + 500);
-   
-    setTimeout(() => {
         playerName.style.transition = 'opacity 0.5s ease';
         botName.style.transition = 'opacity 0.5s ease';
+        playerHpContainer.style.opacity = 1;
+        botHpContainer.style.opacity = 1;
+        playerHpText.style.opacity = 1;
+        botHpText.style.opacity = 1;
         playerName.style.opacity = 1;
         botName.style.opacity = 1;
-    }, 2100 + 500 + 500 + 500);
+    }, 1100);
+   
+    playerName.textContent = userName;
+    botName.textContent = botNft.name;
+    updateBattleUI();
    
     setTimeout(() => {
-        const log = document.getElementById('battle-log');
-        if (playerFirst) {
-            log.textContent = 'Вы атакуете первыми! Приготовьтесь...';
-            setTimeout(() => performAttack(true), 2000);
-        } else {
-            log.textContent = 'Оппонент атакует первым! Защищайтесь...';
-            setTimeout(() => performAttack(false), 2000);
-        }
-    }, 2100 + 500 + 500 + 500 + 500);
+        performBattle(playerFirst);
+    }, 2500);
 }
 
-function performAttack(isPlayerTurn) {
-    if (!battleInProgress) return;
+function updateBattleUI() {
+    const playerHpBar = document.getElementById('player-hp-bar');
+    const botHpBar = document.getElementById('bot-hp-bar');
+    const playerHpText = document.getElementById('player-hp-text');
+    const botHpText = document.getElementById('bot-hp-text');
    
-    let damage;
-    const isLowHP = (isPlayerTurn ? botHP : playerHP) <= 25;
-    const isCritical = Math.random() < (isLowHP ? 0.3 : 0.15);
+    playerHpBar.style.width = `${(playerHP / activeBattleNft.stats.health) * 100}%`;
+    botHpBar.style.width = `${(botHP / botNft.stats.health) * 100}%`;
+    playerHpText.textContent = `${Math.max(0, Math.floor(playerHP))}/${activeBattleNft.stats.health} HP`;
+    botHpText.textContent = `${Math.max(0, Math.floor(botHP))}/${botNft.stats.health} HP`;
    
-    if (isCritical) {
-        damage = Math.floor(Math.random() * 30) + 45;
-    } else {
-        damage = Math.floor(Math.random() * 35) + 8;
-    }
-   
-    const isMiss = Math.random() < 0.08;
-    const log = document.getElementById('battle-log');
-    let targetImg;
-   
-    if (isPlayerTurn) {
-        targetImg = document.getElementById('bot-img');
-    } else {
-        targetImg = document.getElementById('player-img');
-    }
-   
-    if (isMiss) {
-        if (isPlayerTurn) {
-            log.textContent = 'Промах! Ваша атака не попала в цель!';
-        } else {
-            log.textContent = 'Уклонение! Вы избежали атаки оппонента!';
-        }
-    } else {
-        if (isPlayerTurn) {
-            botHP = Math.max(0, botHP - damage);
-            if (isCritical) {
-                log.textContent = `КРИТИЧЕСКИЙ УДАР! Вы наносите ${damage} урона оппоненту!`;
-            } else {
-                log.textContent = `Вы наносите ${damage} урона оппоненту!`;
-            }
-        } else {
-            playerHP = Math.max(0, playerHP - damage);
-            if (isCritical) {
-                log.textContent = `КРИТИЧЕСКАЯ АТАКА ОППОНЕНТА! Вы получаете ${damage} урона!`;
-            } else {
-                log.textContent = `Оппонент наносит вам ${damage} урона!`;
-            }
-        }
-        targetImg.classList.add('shake');
-        setTimeout(() => targetImg.classList.remove('shake'), 500);
-    }
-   
-    updateHPBars();
-   
-    if ((playerHP <= 15 || botHP <= 15) && playerHP > 0 && botHP > 0) {
-        setTimeout(() => {
-            log.textContent = 'Критическое состояние! Следующий удар может быть решающим!';
-        }, 1000);
-    }
-   
-    if (playerHP <= 0 || botHP <= 0) {
-        setTimeout(() => endBattle(), 2000);
-    } else {
-        const delay = Math.random() * 1000 + 1500;
-        setTimeout(() => performAttack(!isPlayerTurn), delay);
-    }
+    if (playerHP < 30) playerHpBar.classList.add('low');
+    else playerHpBar.classList.remove('low');
+    if (botHP < 30) botHpBar.classList.add('low');
+    else botHpBar.classList.remove('low');
 }
 
-function updateHPBars() {
-    const playerBar = document.getElementById('player-hp-bar');
-    const botBar = document.getElementById('bot-hp-bar');
-    const playerText = document.getElementById('player-hp-text');
-    const botText = document.getElementById('bot-hp-text');
+function performBattle(playerFirst) {
+    let currentTurn = playerFirst ? 'player' : 'bot';
+    const battleLog = document.getElementById('battle-log');
+    battleLog.innerHTML = '';
    
-    playerBar.style.width = `${playerHP}%`;
-    botBar.style.width = `${botHP}%`;
+    const battleInterval = setInterval(() => {
+        if (!battleInProgress) {
+            clearInterval(battleInterval);
+            return;
+        }
    
-    if (playerHP <= 20) playerBar.classList.add('low');
-    else playerBar.classList.remove('low');
+        const logEntry = document.createElement('div');
+        logEntry.className = 'battle-log-entry';
+        let damage = 0;
+        let isCrit = false;
+        let isMiss = false;
    
-    if (botHP <= 20) botBar.classList.add('low');
-    else botBar.classList.remove('low');
+        if (currentTurn === 'player') {
+            damage = applyBuffsToAttack(activeBattleNft.stats, Math.floor(Math.random() * 20) + 5, isCrit, isMiss); // Изменено: учет апгрейдов
+            if (isMiss) {
+                logEntry.textContent = `${userName} промахнулся!`;
+                battleLog.appendChild(logEntry);
+            } else {
+                if (isCrit) {
+                    damage *= 2;
+                    logEntry.textContent = `${userName} наносит критический удар на ${damage} урона!`;
+                    document.querySelector('.participant.right').classList.add('shake');
+                    setTimeout(() => document.querySelector('.participant.right').classList.remove('shake'), 500);
+                } else {
+                    logEntry.textContent = `${userName} наносит ${damage} урона!`;
+                    document.querySelector('.participant.right').classList.add('shake');
+                    setTimeout(() => document.querySelector('.participant.right').classList.remove('shake'), 500);
+                }
+                botHP -= damage;
+            }
+            currentTurn = 'bot';
+        } else {
+            damage = applyBuffsToAttack(botNft.stats, Math.floor(Math.random() * 20) + 5, isCrit, isMiss); // Изменено: учет апгрейдов
+            if (isMiss) {
+                logEntry.textContent = `${botNft.name} промахнулся!`;
+                battleLog.appendChild(logEntry);
+            } else {
+                if (isCrit) {
+                    damage *= 2;
+                    logEntry.textContent = `${botNft.name} наносит критический удар на ${damage} урона!`;
+                    document.querySelector('.participant.left').classList.add('shake');
+                    setTimeout(() => document.querySelector('.participant.left').classList.remove('shake'), 500);
+                } else {
+                    logEntry.textContent = `${botNft.name} наносит ${damage} урона!`;
+                    document.querySelector('.participant.left').classList.add('shake');
+                    setTimeout(() => document.querySelector('.participant.left').classList.remove('shake'), 500);
+                }
+                playerHP -= damage;
+            }
+            currentTurn = 'player';
+        }
    
-    playerText.textContent = `${playerHP}/100 HP`;
-    botText.textContent = `${botHP}/100 HP`;
+        battleLog.appendChild(logEntry);
+        battleLog.scrollTop = battleLog.scrollHeight;
+        updateBattleUI();
+   
+        if (playerHP <= 0 || botHP <= 0) {
+            battleInProgress = false;
+            clearInterval(battleInterval);
+            endBattle();
+        }
+    }, 1500);
 }
 
 function endBattle() {
-    battleInProgress = false;
-    const resultDiv = document.getElementById('battle-result');
-    const rewardDiv = document.getElementById('reward-info');
-    const log = document.getElementById('battle-log');
+    const battleResult = document.getElementById('battle-result');
+    const rewardInfo = document.getElementById('reward-info');
+    const backBtn = document.getElementById('back-to-menu-btn');
+    let rewardText = '';
    
-    let result;
-    let reward;
+    battleResult.style.display = 'block';
+    rewardInfo.style.display = 'block';
+    backBtn.style.display = 'block';
    
-    // Создаем копию данных NFT для истории до их изменения
-    const battlePlayerNft = activeBattleNft ? { ...activeBattleNft } : null;
-    const battleBotNft = { ...botNft };
+    const date = new Date().toLocaleString('ru-RU');
    
-    if (playerHP > 0) {
-        resultDiv.textContent = 'ПОБЕДА!';
-        resultDiv.className = 'battle-result win';
-        log.textContent = 'Невероятная победа! Вы оказались сильнее!';
-       
-        const rewardNft = { ...botNft, buyPrice: botNft.price };
-        collection.push(rewardNft);
-        rewardDiv.innerHTML = `Вы получили NFT: ${botNft.name}!`;
-        rewardDiv.classList.add('win');
-        rewardDiv.classList.remove('lose');
-       
-        result = 'win';
-        reward = botNft.name;
+    if (playerHP <= 0 && botHP <= 0) {
+        battleResult.textContent = 'НИЧЬЯ!';
+        battleResult.className = 'battle-result';
+        rewardInfo.textContent = 'Оба участника пали в бою!';
+        rewardInfo.className = 'reward-info';
+        battleHistory.push({
+            result: 'draw',
+            date,
+            playerNft: activeBattleNft,
+            botNft,
+            reward: 'Ничья'
+        });
+    } else if (playerHP <= 0) {
+        battleResult.textContent = 'ПОРАЖЕНИЕ!';
+        battleResult.className = 'battle-result lose';
+        rewardInfo.textContent = `Вы потеряли ${activeBattleNft.name}!`;
+        rewardInfo.className = 'reward-info lose';
+        collection = collection.filter(nft => 
+            !(nft.name === activeBattleNft.name && nft.img === activeBattleNft.img && nft.buyPrice === activeBattleNft.buyPrice)
+        );
+        activeBattleNft = null;
+        battleHistory.push({
+            result: 'lose',
+            date,
+            playerNft: activeBattleNft,
+            botNft,
+            reward: `Потерян ${activeBattleNft.name}`
+        });
     } else {
-        resultDiv.textContent = 'ПОРАЖЕНИЕ!';
-        resultDiv.className = 'battle-result lose';
-        log.textContent = 'Вы потерпели поражение...';
-       
-        if (activeBattleNft) {
-            collection = collection.filter(nft =>
-                nft.name !== activeBattleNft.name || nft.img !== activeBattleNft.img || nft.buyPrice !== activeBattleNft.buyPrice
-            );
-            reward = `Потерян: ${activeBattleNft.name}`;
-            activeBattleNft = null;
-            rewardDiv.innerHTML = `Ваш NFT захвачен противником!`;
-            rewardDiv.classList.add('lose');
-            rewardDiv.classList.remove('win');
-        }
-       
-        result = 'lose';
+        battleResult.textContent = 'ПОБЕДА!';
+        battleResult.className = 'battle-result win';
+        const rewardStars = Math.floor(botNft.price * 0.5);
+        stars += rewardStars;
+        totalStarsEarned += rewardStars;
+        collection.push({ ...botNft, buyPrice: botNft.price });
+        rewardText = `Вы выиграли ${botNft.name} и ${rewardStars} звёзд!`;
+        rewardInfo.textContent = rewardText;
+        rewardInfo.className = 'reward-info win';
+        battleHistory.push({
+            result: 'win',
+            date,
+            playerNft: activeBattleNft,
+            botNft,
+            reward: rewardText
+        });
     }
    
-    // Добавляем в историю с сохраненными данными
-    battleHistory.push({
-        date: new Date().toLocaleDateString('ru-RU'),
-        result: result,
-        playerNft: {
-            name: battlePlayerNft ? battlePlayerNft.name : 'Неизвестно',
-            img: battlePlayerNft ? battlePlayerNft.img : 'https://via.placeholder.com/60x60?text=?'
-        },
-        botNft: {
-            name: battleBotNft.name,
-            img: battleBotNft.img
-        },
-        reward: reward
+    updateUI();
+}
+
+function showScreen(screen) {
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach((item, index) => {
+        if (
+            (screen === 'main' && index === 0) ||
+            (screen === 'collection' && index === 1) ||
+            (screen === 'upgrade' && index === 2) ||
+            (screen === 'profile' && index === 3) ||
+            (screen === 'friends' && index === 4)
+        ) {
+            item.classList.add('active');
+        }
     });
-   
-    resultDiv.style.display = 'block';
-    rewardDiv.style.display = 'block';
-    document.getElementById('back-to-menu-btn').style.display = 'block';
-    updateUI();
-}
-
-function backToMainFromBattle() {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('main-screen').classList.add('active');
-   
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    document.querySelectorAll('.nav-item')[0].classList.add('active');
-   
-    updateUI();
-    renderCenterArea();
-    currentScreen = 'main';
-}
-
-function switchScreen(screen) {
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    event.target.closest('.nav-item').classList.add('active');
    
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
    
@@ -630,6 +598,7 @@ function switchScreen(screen) {
         renderCollection();
     } else if (screen === 'upgrade') {
         document.getElementById('upgrade-screen').classList.add('active');
+        renderUpgradeScreen(); // Изменено: рендер апгрейда
     } else if (screen === 'profile') {
         document.getElementById('profile-screen').classList.add('active');
         renderProfile();
@@ -641,10 +610,9 @@ function switchScreen(screen) {
     currentScreen = screen;
 }
 
-// Функция для перехода в коллекцию из главного экрана
 function goToCollection() {
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    document.querySelectorAll('.nav-item')[1].classList.add('active'); // коллекция - второй элемент
+    document.querySelectorAll('.nav-item')[1].classList.add('active');
    
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('collection-screen').classList.add('active');
@@ -662,7 +630,7 @@ function openShop() {
 function backToCollection() {
     document.getElementById('shop-screen').classList.remove('active');
     document.getElementById('collection-screen').classList.add('active');
-    renderCollection(); // Автоматически рендерим коллекцию при возврате
+    renderCollection();
 }
 
 function renderCenterArea() {
@@ -710,14 +678,12 @@ function renderShop() {
     const grid = document.getElementById('shop-grid');
     grid.innerHTML = '';
     
-    // Создаем массив NFT с индексами для сортировки
     let nftItems = nftTemplates.map((template, index) => ({
         template,
         price: nftPrices[index],
         originalIndex: index
     }));
     
-    // Применяем фильтр
     switch(currentFilter) {
         case 'price_asc':
             nftItems.sort((a, b) => a.price - b.price);
@@ -769,13 +735,12 @@ function renderProfile() {
 function buyNft(templateIndex, price) {
     if (stars >= price) {
         stars -= price;
-        const nft = { ...nftTemplates[templateIndex], buyPrice: price };
+        const nft = { ...nftTemplates[templateIndex], buyPrice: price, stats: { health: 100, attack: 10, evasion: 0, critChance: 15, missChance: 8 }, upgrades: [] }; // Изменено: добавляем stats и upgrades
         collection.push(nft);
         updateUI();
         alert(`Куплен ${nft.name}!`);
         renderShop();
        
-        // Переходим в коллекцию после покупки
         setTimeout(() => {
             backToCollection();
         }, 500);
@@ -789,7 +754,6 @@ function sellNft(index) {
     const sellPrice = Math.floor(nft.buyPrice * 0.8);
     stars += sellPrice;
    
-    // Проверяем более точно активный NFT
     if (activeBattleNft && activeBattleNft.name === nft.name && activeBattleNft.img === nft.img && activeBattleNft.buyPrice === nft.buyPrice) {
         activeBattleNft = null;
     }
@@ -813,7 +777,7 @@ function backToMainFromRules() {
 }
 
 function setToBattle(index) {
-    activeBattleNft = { ...collection[index] }; // Создаем копию объекта
+    activeBattleNft = { ...collection[index] };
     renderCollection();
     renderCenterArea();
     updateUI();
@@ -876,7 +840,6 @@ function renderBattleHistory() {
     });
 }
 
-// Реферальная система
 function generateReferralCode() {
     if (!referralCode) {
         referralCode = 'ref_' + userId;
@@ -1007,7 +970,6 @@ function renderFriends() {
     updateReferralInfo();
 }
 
-// Функция для добавления нового друга (вызывается при переходе по реферальной ссылке)
 function addReferredFriend(friendData) {
     const newFriend = {
         id: friendData.id || Math.random().toString(36).substr(2, 9),
@@ -1015,10 +977,9 @@ function addReferredFriend(friendData) {
         joinDate: new Date().toLocaleDateString('ru-RU')
     };
    
-    // Проверяем, что друг еще не добавлен
     if (!referredFriends.find(friend => friend.id === newFriend.id)) {
         referredFriends.push(newFriend);
-        stars += 1; // Даем 1 звезду за реферала
+        stars += 1;
         starsFromReferrals += 1;
         totalStarsEarned += 1;
        
@@ -1026,18 +987,16 @@ function addReferredFriend(friendData) {
        
         updateUI();
         updateReferralInfo();
-        saveData(); // Сохраняем при добавлении реферала
+        saveData();
         showToast(`+1 звезда за друга ${newFriend.name}!`);
     }
 }
 
-// Сохранение при закрытии приложения
 window.addEventListener('beforeunload', () => {
     console.log('App closing, saving data...');
     saveData();
 });
 
-// Сохранение при потере фокуса
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
         console.log('App hidden, saving data...');
@@ -1048,15 +1007,14 @@ document.addEventListener('visibilitychange', () => {
             updateUI();
             updateReferralInfo();
             renderCenterArea();
-            // Обновляем текущий экран
             if (currentScreen === 'collection') renderCollection();
             if (currentScreen === 'friends') renderFriends();
             if (currentScreen === 'profile') renderProfile();
+            if (currentScreen === 'upgrade') renderUpgradeScreen();
         });
     }
 });
 
-// Автосохранение каждые 30 секунд
 setInterval(() => {
     console.log('Auto-saving data...');
     saveData();
