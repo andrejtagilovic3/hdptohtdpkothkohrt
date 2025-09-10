@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>My NFT Game</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
-    <title>NFT Game</title>
 </head>
 <body>
     <div class="app-container">
@@ -24,55 +27,65 @@
         </div>
 
         <div class="content-area">
-            <div class="main-content">
-                <div id="main-screen" class="screen active">
+            <div id="main-screen" class="screen active">
+                <div class="main-content">
                     <div class="how-to-play-container">
                         <button class="how-to-play-btn" onclick="showRules()">? Как играть</button>
                     </div>
-                    <div id="center-content" class="center-area"></div>
-                    <button id="play-button" class="play-btn" onclick="startBattleSearch()">ДУЭЛЬ</button>
+                    <div id="center-area" class="center-area">
+                        <div id="center-content"></div>
+                    </div>
+                    <button class="play-btn" id="play-button" onclick="startBattleSearch()">ДУЭЛЬ</button>
                 </div>
+            </div>
 
-                <div id="collection-screen" class="screen">
-                    <div class="section-title">Коллекция</div>
-                    <button class="nft-card-btn" onclick="openShop()">Купить NFT</button>
+            <div id="collection-screen" class="screen">
+                <div class="main-content">
+                    <h2 class="section-title">Коллекция</h2>
                     <div id="collection-grid" class="nft-grid"></div>
+                    <button class="play-btn" onclick="openShop()" style="margin-top: 20px;">
+                        Купить NFT
+                    </button>
                 </div>
+            </div>
 
-                <div id="shop-screen" class="screen">
+            <div id="shop-screen" class="screen">
+                <div class="main-content">
                     <div class="shop-header">
-                        <div class="section-title">Магазин NFT</div>
+                        <h2 class="section-title">Магазин NFT</h2>
                         <div class="filter-container">
-                            <button id="filter-btn" class="filter-btn" onclick="toggleFilter()">
+                            <button class="filter-btn" id="filter-btn" onclick="toggleFilter()">
                                 <i class="fas fa-dollar-sign"></i>
-                                <span>Фильтр</span>
                                 <i class="fas fa-chevron-down"></i>
                             </button>
-                            <div id="filter-dropdown" class="filter-dropdown" style="display: none;">
+                            <div class="filter-dropdown" id="filter-dropdown" style="display: none;">
                                 <div class="filter-option active" onclick="setFilter('price_asc')">
-                                    <i class="fas fa-dollar-sign"></i>
-                                    Цена: по возрастанию
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>Цена: по возрастанию</span>
                                 </div>
                                 <div class="filter-option" onclick="setFilter('price_desc')">
-                                    <i class="fas fa-dollar-sign"></i>
-                                    Цена: по убыванию
+                                    <i class="fas fa-arrow-down"></i>
+                                    <span>Цена: по убыванию</span>
                                 </div>
                                 <div class="filter-option" onclick="setFilter('popularity')">
                                     <i class="fas fa-fire"></i>
-                                    По популярности
+                                    <span>По популярности</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div id="shop-grid" class="nft-grid"></div>
                 </div>
+            </div>
 
-                <div id="battle-screen" class="screen">
+            <div id="battle-screen" class="screen">
+                <div class="main-content">
+                    <h2 class="section-title">Дуэль</h2>
                     <div class="battle-arena">
                         <div class="battle-participants">
                             <div class="participant left">
-                                <div class="participant-name">Вы</div>
                                 <img id="player-img" class="participant-img" src="" alt="Player NFT">
+                                <div class="participant-name">Вы</div>
                                 <div class="hp-container">
                                     <div id="player-hp-bar" class="hp-bar"></div>
                                 </div>
@@ -80,8 +93,8 @@
                             </div>
                             <div class="vs-text">VS</div>
                             <div class="participant right">
-                                <div class="participant-name">Оппонент</div>
                                 <img id="bot-img" class="participant-img" src="" alt="Bot NFT">
+                                <div class="participant-name">Оппонент</div>
                                 <div class="hp-container">
                                     <div id="bot-hp-bar" class="hp-bar"></div>
                                 </div>
@@ -91,11 +104,15 @@
                         <div id="battle-log" class="battle-log">Подготовка к дуэли...</div>
                         <div id="battle-result" class="battle-result" style="display: none;"></div>
                         <div id="reward-info" class="reward-info" style="display: none;"></div>
-                        <button id="back-to-menu-btn" class="back-btn" onclick="showScreen('main')" style="display: none;">Вернуться в меню</button>
+                        <button id="back-to-menu-btn" class="back-btn" onclick="backToMainFromBattle()" style="display: none; width: 100%;">
+                            Вернуться в меню
+                        </button>
                     </div>
                 </div>
+            </div>
 
-                <div id="profile-screen" class="screen">
+            <div id="profile-screen" class="screen">
+                <div class="main-content">
                     <div class="profile-header">
                         <div class="profile-avatar" id="profile-avatar">👤</div>
                         <div class="profile-info">
@@ -107,22 +124,31 @@
                             </div>
                         </div>
                     </div>
-                    <button class="nft-card-btn" onclick="showBattleHistory()">История дуэлей</button>
-                    <div class="section-title">Моя коллекция</div>
+                    <button class="play-btn" onclick="showBattleHistory()" style="margin-bottom: 15px; font-size: 16px;">
+                        История дуэлей
+                    </button>
+                    <h3 class="section-title" style="font-size: 18px;">Моя коллекция</h3>
                     <div id="profile-collection" class="nft-grid"></div>
                 </div>
+            </div>
 
-                <div id="battle-history-screen" class="screen">
-                    <div class="section-title">История дуэлей</div>
-                    <div id="battle-history-list"></div>
-                    <button class="back-btn" onclick="backToProfile()">Назад в профиль</button>
+            <div id="battle-history-screen" class="screen">
+                <div class="main-content">
+                    <h2 class="section-title">История дуэлей</h2>
+                    <div id="battle-history-list">
+                    </div>
+                    <button class="play-btn" onclick="backToProfile()" style="margin-top: 20px;">
+                        Назад в профиль
+                    </button>
                 </div>
+            </div>
 
-                <div id="friends-screen" class="screen">
-                    <div class="section-title">Пригласи друзей - Получай Награды!</div>
+            <div id="friends-screen" class="screen">
+                <div class="main-content">
+                    <h2 class="section-title">Пригласи друзей - Получай Награды!</h2>
                     <div class="referral-info">
                         <div class="reward-card">
-                            <div class="reward-text">Каждый приглашенный друг = 1 звезда</div>
+                            <div class="reward-text">Каждый приглашенный друг = <span class="reward-amount">1 <i class="fas fa-star" style="color: #ffd700;"></i></span> звезда</div>
                         </div>
                         <div class="referral-stats">
                             <div class="stat-item">
@@ -135,88 +161,111 @@
                             </div>
                         </div>
                     </div>
+                    
                     <div class="referral-actions">
                         <button class="invite-btn" onclick="inviteFriend()">
-                            <i class="fas fa-user-plus"></i> Пригласить друга
+                            <i class="fas fa-user-plus"></i>
+                            Пригласить друга
                         </button>
                         <button class="copy-link-btn" onclick="copyReferralLink()">
-                            <i class="fas fa-copy"></i> Скопировать ссылку
+                            <i class="fas fa-copy"></i>
+                            Скопировать ссылку
                         </button>
                     </div>
+
                     <div class="referral-code-section">
                         <div class="section-subtitle">Ваша реферальная ссылка:</div>
                         <div class="referral-code-container">
-                            <input id="referral-link" class="referral-input" type="text" readonly>
+                            <input type="text" id="referral-link" class="referral-input" readonly>
                             <button class="copy-code-btn" onclick="copyReferralLink()">
                                 <i class="fas fa-copy"></i>
                             </button>
                         </div>
                     </div>
+
                     <div class="partner-info">
                         <div class="partner-text">Хотите стать партнёром и зарабатывать TON?</div>
                         <button class="partner-btn" onclick="showTerms()">Условия</button>
                     </div>
+
                     <div class="friends-list-section">
-                        <div class="section-title">Приглашенные друзья <span id="friends-count">(0)</span></div>
+                        <h3 class="section-subtitle">Приглашенные друзья <span id="friends-count">(0)</span></h3>
                         <div id="friends-list" class="friends-list"></div>
                     </div>
                 </div>
+            </div>
 
-                <div id="upgrade-screen" class="screen">
-                    <div id="upgrade-content" class="upgrade-container">
-                        <!-- Здесь рендерится подарок -->
+            <div id="upgrade-screen" class="screen">
+                <div class="main-content">
+                    <h2 class="section-title">Апгрейд</h2>
+                    <div class="friends-placeholder">
+                        <p style="margin-top: 20px; color: #666;">Раздел в разработке</p>
                     </div>
                 </div>
+            </div>
 
-                <div id="rules-screen" class="screen">
-                    <div class="section-title">Правила дуэлей</div>
-                    <div class="rules-content">
-                        <div class="rule-section">
-                            <div class="section-subtitle">🎯 Как играть:</div>
-                            <p>1. Купи NFT в магазине<br>2. Выбери NFT для дуэли в коллекции<br>3. Нажми "ДУЭЛЬ" на главном экране<br>4. Сражайся и побеждай!</p>
+            <div id="rules-screen" class="screen">
+                <div class="main-content">
+                    <h2 class="section-title">Правила дуэлей</h2>
+                    <div style="background: #1a1a1a; border-radius: 16px; padding: 20px; margin-bottom: 20px;">
+                        <div style="margin-bottom: 15px;">
+                            <h3 style="color: #ffd700; margin-bottom: 8px;">🎯 Как играть:</h3>
+                            <p style="color: #cccccc; line-height: 1.5;">1. Купи NFT в магазине<br>2. Выбери NFT для дуэли в коллекции<br>3. Нажми "ДУЭЛЬ" на главном экране<br>4. Сражайся и побеждай!</p>
                         </div>
-                        <div class="rule-section">
-                            <div class="section-subtitle">🎲 Механика:</div>
-                            <p>• Всё происходит случайно<br>• Шанс критического удара: 15%<br>• Шанс промаха: 8%<br>• При низком HP шанс крита увеличивается</p>
+                        <div style="margin-bottom: 15px;">
+                            <h3 style="color: #ffd700; margin-bottom: 8px;">🎲 Механика:</h3>
+                            <p style="color: #cccccc; line-height: 1.5;">• Всё происходит случайно<br>• Шанс критического удара: 15%<br>• Шанс промаха: 8%<br>• При низком HP шанс крита увеличивается</p>
                         </div>
-                        <div class="rule-section">
-                            <div class="section-subtitle">🏆 Награды:</div>
-                            <p>• За победу получаешь NFT противника<br>• За поражение теряешь свой NFT<br>• Участие в дуэли стоит 10 звёзд</p>
+                        <div>
+                            <h3 style="color: #ffd700; margin-bottom: 8px;">🏆 Награды:</h3>
+                            <p style="color: #cccccc; line-height: 1.5;">• За победу получаешь NFT противника<br>• За поражение теряешь свой NFT<br>• Участие в дуэли стоит 10 звёзд</p>
                         </div>
                     </div>
-                    <button class="back-btn" onclick="backToMainFromRules()">Назад</button>
+                    <button class="play-btn" onclick="backToMainFromRules()">Назад</button>
                 </div>
             </div>
         </div>
 
         <div class="bottom-nav">
-            <button class="nav-item active" onclick="showScreen('main')">
-                <i class="fas fa-home"></i> Главная
+            <button class="nav-item active" onclick="switchScreen('main')">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
             </button>
-            <button class="nav-item" onclick="showScreen('collection')">
-                <i class="fas fa-th"></i> Коллекция
+            <button class="nav-item" onclick="switchScreen('collection')">
+                <i class="fas fa-box-open"></i>
+                <span>Коллекция</span>
             </button>
-            <button class="nav-item" onclick="showScreen('upgrade')">
-                <i class="fas fa-arrow-up"></i> Апгрейд
+            <button class="nav-item" onclick="switchScreen('upgrade')">
+                <i class="fas fa-arrow-up"></i>
+                <span>Апгрейд</span>
             </button>
-            <button class="nav-item" onclick="showScreen('profile')">
-                <i class="fas fa-user"></i> Профиль
+            <button class="nav-item" onclick="switchScreen('profile')">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
             </button>
-            <button class="nav-item" onclick="showScreen('friends')">
-                <i class="fas fa-users"></i> Друзья
+            <button class="nav-item" onclick="switchScreen('friends')">
+                <i class="fas fa-users"></i>
+                <span>Друзья</span>
             </button>
         </div>
 
         <div id="searching-overlay" class="searching-overlay" style="display: none;">
             <div class="searching-animation"></div>
-            <div id="search-status" class="searching-text">Поиск оппонента...</div>
+            <div class="searching-text">
+                Поиск оппонента...<br>
+                <span id="search-status">Подключение к серверу</span>
+            </div>
         </div>
 
         <div id="coin-toss-overlay" class="coin-toss-overlay" style="display: none;">
             <div class="coin-container">
                 <div id="coin" class="coin">
-                    <div class="front"><img id="coin-front" src="" alt="Player NFT"></div>
-                    <div class="back"><img id="coin-back" src="" alt="Bot NFT"></div>
+                    <div class="front">
+                        <img id="coin-front" src="" alt="Player">
+                    </div>
+                    <div class="back">
+                        <img id="coin-back" src="" alt="Bot">
+                    </div>
                 </div>
             </div>
             <div id="coin-result-text" class="searching-text"></div>
@@ -240,7 +289,5 @@
     </div>
 
     <script src="script.js"></script>
-    <script src="upgrades.js"></script>
-    <script src="upgradeMechanics.js"></script>
 </body>
 </html>
