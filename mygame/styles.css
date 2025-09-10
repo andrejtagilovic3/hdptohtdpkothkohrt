@@ -919,3 +919,73 @@ body {
     color: #cccccc;
     font-weight: 600;
 }
+
+.filter-btn {
+    background: transparent;
+    border: 1px solid #333333;
+    color: #666666;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 10px;
+}
+
+.filter-btn:hover {
+    background: rgba(255, 255, 255, 0.03);
+    color: #888888;
+    opacity: 1;
+    border-color: #444444;
+}
+
+.filter-btn .arrow {
+    font-size: 10px;
+}
+
+.filter-dropdown {
+    display: none;
+    position: absolute;
+    background: #1a1a1a;
+    border: 1px solid #333333;
+    border-radius: 8px;
+    padding: 8px 0;
+    min-width: 200px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    right: 20px;
+    top: 60px;
+}
+
+.filter-dropdown.active {
+    display: block;
+}
+
+.filter-option {
+    padding: 8px 16px;
+    color: #cccccc;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.filter-option:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+}
+
+/* Ensure existing styles remain compatible */
+.section-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #ffffff;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
