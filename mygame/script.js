@@ -872,6 +872,7 @@ function addReferredFriend(friendData) {
         
         updateUI();
         updateReferralInfo();
+        saveData(); // Сохраняем при добавлении реферала
         showToast(`+1 звезда за друга ${newFriend.name}!`);
     }
 }
