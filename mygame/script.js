@@ -28,6 +28,72 @@ let activeBattleNft = null;
 let totalStarsEarned = 0;
 let battleHistory = [];
 
+// Фильтр магазина
+let currentFilter = 'price_asc'; // по умолчанию сортировка от маленькой к большой цены
+const popularityOrder = [0, 3, 9, 12, 6, 13, 11, 2, 5, 1, 8, 4, 7, 10]; // рандомный порядок популярности
+
+function toggleFilter() {
+    const dropdown = document.getElementById('filter-dropdown');
+    const filterBtn = document.getElementById('filter-btn');
+    
+    if (dropdown.style.display === 'none') {
+        dropdown.style.display = 'block';
+        filterBtn.classList.add('active');
+        
+        // Закрытие при клике вне фильтра
+        setTimeout(() => {
+            document.addEventListener('click', closeFilterOnOutsideClick);
+        }, 0);
+    } else {
+        dropdown.style.display = 'none';
+        filterBtn.classList.remove('active');
+        document.removeEventListener('click', closeFilterOnOutsideClick);
+    }
+}
+
+function closeFilterOnOutsideClick(event) {
+    const filterContainer = document.querySelector('.filter-container');
+    if (!filterContainer.contains(event.target)) {
+        document.getElementById('filter-dropdown').style.display = 'none';
+        document.getElementById('filter-btn').classList.remove('active');
+        document.removeEventListener('click', closeFilterOnOutsideClick);
+    }
+}
+
+function setFilter(filterType) {
+    currentFilter = filterType;
+    
+    // Обновляем активный элемент
+    document.querySelectorAll('.filter-option').forEach(option => {
+        option.classList.remove('active');
+    });
+    event.target.closest('.filter-option').classList.add('active');
+    
+    // Закрываем dropdown
+    document.getElementById('filter-dropdown').style.display = 'none';
+    document.getElementById('filter-btn').classList.remove('active');
+    document.removeEventListener('click', closeFilterOnOutsideClick);
+    
+    // Обновляем иконку в кнопке фильтра
+    const filterBtn = document.getElementById('filter-btn');
+    const iconElement = filterBtn.querySelector('i:first-child');
+    
+    switch(filterType) {
+        case 'price_asc':
+            iconElement.className = 'fas fa-dollar-sign';
+            break;
+        case 'price_desc':
+            iconElement.className = 'fas fa-dollar-sign';
+            break;
+        case 'popularity':
+            iconElement.className = 'fas fa-fire';
+            break;
+    }
+    
+    // Перерендериваем магазин с новым фильтром
+    renderShop();
+}
+
 // Реферальная система
 let referralCode = '';
 let referredFriends = [];
@@ -643,16 +709,35 @@ function renderCollection() {
 function renderShop() {
     const grid = document.getElementById('shop-grid');
     grid.innerHTML = '';
-   
-    nftTemplates.forEach((template, index) => {
-        const price = nftPrices[index];
+    
+    // Создаем массив NFT с индексами для сортировки
+    let nftItems = nftTemplates.map((template, index) => ({
+        template,
+        price: nftPrices[index],
+        originalIndex: index
+    }));
+    
+    // Применяем фильтр
+    switch(currentFilter) {
+        case 'price_asc':
+            nftItems.sort((a, b) => a.price - b.price);
+            break;
+        case 'price_desc':
+            nftItems.sort((a, b) => b.price - a.price);
+            break;
+        case 'popularity':
+            nftItems.sort((a, b) => popularityOrder.indexOf(a.originalIndex) - popularityOrder.indexOf(b.originalIndex));
+            break;
+    }
+    
+    nftItems.forEach(({template, price, originalIndex}) => {
         const card = document.createElement('div');
         card.className = 'nft-card';
         card.innerHTML = `
             <img src="${template.img}" class="nft-card-img" alt="${template.name}">
             <div class="nft-card-name">${template.name}</div>
             <div class="nft-card-price">${price} звёзд</div>
-            <button class="nft-card-btn" onclick="buyNft(${index}, ${price})" ${stars < price ? 'disabled' : ''}>
+            <button class="nft-card-btn" onclick="buyNft(${originalIndex}, ${price})" ${stars < price ? 'disabled' : ''}>
                 ${stars < price ? 'Недостаточно звёзд' : 'Купить'}
             </button>
         `;
