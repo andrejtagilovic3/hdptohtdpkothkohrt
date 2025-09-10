@@ -250,6 +250,11 @@ body {
     border: 1px solid #333333;
 }
 
+.nft-card.upgrade-card {
+    border: 2px solid #444444;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+}
+
 .nft-card-img {
     width: 100%;
     aspect-ratio: 1;
@@ -288,6 +293,29 @@ body {
     background: #333333;
     color: #ffffff;
     margin-bottom: 0;
+}
+
+.nft-card-btn.upgrade-btn {
+    background: #ff9800;
+    color: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.nft-upgrades {
+    margin-bottom: 8px;
+}
+
+.upgrade-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    margin: 2px;
+    font-weight: 600;
 }
 
 .battle-arena {
@@ -680,7 +708,6 @@ body {
     cursor: pointer;
 }
 
-/* Реферальная система */
 .referral-info {
     margin-bottom: 30px;
 }
@@ -920,7 +947,6 @@ body {
     font-weight: 600;
 }
 
-/* Заголовок магазина с фильтром */
 .shop-header {
     display: flex;
     justify-content: space-between;
@@ -1018,4 +1044,319 @@ body {
 
 .filter-option.active i {
     color: #ffffff;
+}
+
+.upgrade-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.upgrade-modal {
+    background: #1a1a1a;
+    border-radius: 16px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+    border: 1px solid #333333;
+}
+
+.upgrade-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.upgrade-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.upgrade-close-btn {
+    background: none;
+    border: none;
+    color: #888888;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.2s ease;
+}
+
+.upgrade-close-btn:hover {
+    color: #ffffff;
+}
+
+.upgrade-nft-preview {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.upgrade-nft-preview img {
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 2px solid #333333;
+}
+
+.upgrade-types h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #cccccc;
+}
+
+.upgrade-options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.upgrade-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #333333;
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.upgrade-option:hover {
+    background: #444444;
+    border-color: #555555;
+}
+
+.upgrade-option.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #2a2a2a;
+}
+
+.upgrade-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #555555;
+}
+
+.upgrade-info {
+    flex: 1;
+}
+
+.upgrade-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 2px;
+}
+
+.upgrade-desc {
+    font-size: 12px;
+    color: #cccccc;
+    margin-bottom: 4px;
+}
+
+.upgrade-cost {
+    font-size: 12px;
+    color: #ffd700;
+    font-weight: 600;
+}
+
+.upgrade-animation-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    text-align: center;
+}
+
+.gift-box {
+    width: 120px;
+    height: 120px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.gift-box:hover {
+    transform: scale(1.05);
+}
+
+.gift-box-bottom {
+    width: 120px;
+    height: 80px;
+    background: #8B4513;
+    border-radius: 8px;
+    position: absolute;
+    bottom: 0;
+    border: 3px solid #654321;
+}
+
+.gift-box-top {
+    width: 120px;
+    height: 40px;
+    background: #A0522D;
+    border-radius: 8px 8px 4px 4px;
+    position: absolute;
+    top: 0;
+    border: 3px solid #654321;
+    border-bottom: none;
+}
+
+.gift-ribbon {
+    width: 20px;
+    height: 120px;
+    background: #FF6B6B;
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    border-radius: 10px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.gift-box.crack-1::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 40px;
+    background: #4caf50;
+    left: 30%;
+    top: 20px;
+    animation: crackGlow 0.5s ease;
+    box-shadow: 0 0 10px #4caf50;
+}
+
+.gift-box.crack-2::before {
+    content: '';
+    position: absolute;
+    width: 30px;
+    height: 2px;
+    background: #2196f3;
+    left: 20%;
+    top: 50px;
+    animation: crackGlow 0.5s ease;
+    box-shadow: 0 0 10px #2196f3;
+}
+
+.gift-box.crack-3::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 50px;
+    background: #ff9800;
+    right: 25%;
+    top: 30px;
+    animation: crackGlow 0.5s ease;
+    box-shadow: 0 0 15px #ff9800;
+}
+
+.gift-box.crack-4::before {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 2px;
+    background: #e91e63;
+    left: 15%;
+    bottom: 20px;
+    animation: crackGlow 0.5s ease;
+    box-shadow: 0 0 15px #e91e63;
+}
+
+.gift-box.crack-5 {
+    animation: explode 0.5s ease;
+}
+
+@keyframes crackGlow {
+    0% { opacity: 0; transform: scale(0); }
+    50% { opacity: 1; transform: scale(1.2); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes explode {
+    0% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.2) rotate(5deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+.upgrade-instruction-text {
+    font-size: 18px;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.tap-counter {
+    font-size: 16px;
+    color: #cccccc;
+    background: #333333;
+    padding: 8px 16px;
+    border-radius: 20px;
+}
+
+.upgrade-result {
+    background: #1a1a1a;
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    border: 2px solid #444444;
+    max-width: 300px;
+}
+
+.result-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: #ffffff;
+}
+
+.result-text {
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.result-close-btn {
+    background: #ffffff;
+    color: #000000;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.result-close-btn:hover {
+    background: #eeeeee;
+}
+
+.upgrade-instruction {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.upgrade-instruction p {
+    font-size: 16px;
+    color: #cccccc;
 }
