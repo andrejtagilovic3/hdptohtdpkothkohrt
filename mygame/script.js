@@ -868,8 +868,41 @@ function addReferredFriend(friendData) {
         starsFromReferrals += 1;
         totalStarsEarned += 1;
         
+        console.log(`Added new referral: ${newFriend.name}, earned 1 star`);
+        
         updateUI();
         updateReferralInfo();
         showToast(`+1 звезда за друга ${newFriend.name}!`);
     }
 }
+
+// Автосохранение каждые 10 секунд
+setInterval(() => {
+    console.log('Auto-saving data...');
+    saveData();
+}, 10000);
+
+// Сохранение при закрытии приложения
+window.addEventListener('beforeunload', () => {
+    console.log('App closing, saving data...');
+    saveData();
+});
+
+// Сохранение при потере фокуса
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        console.log('App hidden, saving data...');
+        saveData();
+    } else {
+        console.log('App visible again, loading data...');
+        loadData().then(() => {
+            updateUI();
+            updateReferralInfo();
+            renderCenterArea();
+            // Обновляем текущий экран
+            if (currentScreen === 'collection') renderCollection();
+            if (currentScreen === 'friends') renderFriends();
+            if (currentScreen === 'profile') renderProfile();
+        });
+    }
+});
