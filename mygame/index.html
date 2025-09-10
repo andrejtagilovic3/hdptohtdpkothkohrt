@@ -1,271 +1,213 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>My NFT Game</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="app-container">
         <div class="top-bar">
             <div class="user-info">
-                <div class="user-avatar" id="user-avatar">👤</div>
-                <div class="user-name" id="user-name">Игрок</div>
+                <div id="user-avatar" class="user-avatar">👤</div>
+                <div id="user-name" class="user-name">Игрок</div>
             </div>
             <div class="currency-info">
                 <div class="currency-item">
-                    <i class="fas fa-star" style="color: #ffd700;"></i>
-                    <span id="star-count">0</span>
+                    <span id="star-count">0</span> <span>★</span>
                 </div>
                 <button class="plus-btn" onclick="showPurchaseMenu()">+</button>
             </div>
         </div>
-
         <div class="content-area">
             <div id="main-screen" class="screen active">
-                <div class="main-content">
-                    <div class="how-to-play-container">
-                        <button class="how-to-play-btn" onclick="showRules()">? Как играть</button>
-                    </div>
-                    <div id="center-area" class="center-area">
-                        <div id="center-content"></div>
-                    </div>
-                    <button class="play-btn" id="play-button" onclick="startBattleSearch()">ДУЭЛЬ</button>
+                <div class="how-to-play-container">
+                    <button class="how-to-play-btn" onclick="showRules()">? Как играть</button>
                 </div>
+                <div class="center-area" id="center-content">
+                    <div class="center-logo">//</div>
+                    <div class="center-message">У вас не выбран NFT для дуэли, выберите его в <span class="clickable-link" onclick="goToCollection()">коллекции</span></div>
+                </div>
+                <button id="play-button" class="play-btn" onclick="startBattleSearch()" disabled>Выберите NFT для дуэли</button>
             </div>
-
             <div id="collection-screen" class="screen">
-                <div class="main-content">
-                    <h2 class="section-title">Коллекция</h2>
-                    <div id="collection-grid" class="nft-grid"></div>
-                    <button class="play-btn" onclick="openShop()" style="margin-top: 20px;">
-                        Купить NFT
-                    </button>
-                </div>
+                <div class="section-title">Коллекция</div>
+                <div class="nft-grid" id="collection-grid"></div>
+                <button class="play-btn" onclick="openShop()">Купить NFT</button>
             </div>
-
             <div id="shop-screen" class="screen">
-                <div class="main-content">
-                    <h2 class="section-title">Магазин NFT</h2>
-                    <div id="shop-grid" class="nft-grid"></div>
-                </div>
-            </div>
-
-            <div id="battle-screen" class="screen">
-                <div class="main-content">
-                    <h2 class="section-title">Дуэль</h2>
-                    <div class="battle-arena">
-                        <div class="battle-participants">
-                            <div class="participant left">
-                                <img id="player-img" class="participant-img" src="" alt="Player NFT">
-                                <div class="participant-name">Вы</div>
-                                <div class="hp-container">
-                                    <div id="player-hp-bar" class="hp-bar"></div>
-                                </div>
-                                <div id="player-hp-text" class="hp-text">100/100 HP</div>
-                            </div>
-                            <div class="vs-text">VS</div>
-                            <div class="participant right">
-                                <img id="bot-img" class="participant-img" src="" alt="Bot NFT">
-                                <div class="participant-name">Оппонент</div>
-                                <div class="hp-container">
-                                    <div id="bot-hp-bar" class="hp-bar"></div>
-                                </div>
-                                <div id="bot-hp-text" class="hp-text">100/100 HP</div>
-                            </div>
-                        </div>
-                        <div id="battle-log" class="battle-log">Подготовка к дуэли...</div>
-                        <div id="battle-result" class="battle-result" style="display: none;"></div>
-                        <div id="reward-info" class="reward-info" style="display: none;"></div>
-                        <button id="back-to-menu-btn" class="back-btn" onclick="backToMainFromBattle()" style="display: none; width: 100%;">
-                            Вернуться в меню
-                        </button>
+                <div class="section-title">Магазин NFT
+                    <button id="filter-btn" class="filter-btn">
+                        <span>★</span><span class="arrow">▼</span>
+                    </button>
+                    <div id="filter-dropdown" class="filter-dropdown">
+                        <div class="filter-option" onclick="sortShop('price-low-to-high')">Цена: низкая → высокая</div>
+                        <div class="filter-option" onclick="sortShop('price-high-to-low')">Цена: высокая → низкая</div>
+                        <div class="filter-option" onclick="sortShop('popularity')">Популярность</div>
                     </div>
                 </div>
+                <div class="nft-grid" id="shop-grid"></div>
             </div>
-
+            <div id="upgrade-screen" class="screen">
+                <div class="center-area">
+                    <div class="center-message">Раздел в разработке</div>
+                </div>
+            </div>
             <div id="profile-screen" class="screen">
-                <div class="main-content">
-                    <div class="profile-header">
-                        <div class="profile-avatar" id="profile-avatar">👤</div>
-                        <div class="profile-info">
-                            <h2 id="profile-name">Игрок</h2>
-                            <div class="profile-stats">
-                                <div>NFT в коллекции: <span id="profile-nft-count">0</span></div>
-                                <div>Звёзд заработано: <span id="profile-stars-earned">0</span></div>
-                                <div>Дуэли проведено: <span id="profile-battles-count">0</span></div>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="play-btn" onclick="showBattleHistory()" style="margin-bottom: 15px; font-size: 16px;">
-                        История дуэлей
-                    </button>
-                    <h3 class="section-title" style="font-size: 18px;">Моя коллекция</h3>
-                    <div id="profile-collection" class="nft-grid"></div>
+                <div class="section-title">Профиль</div>
+                <div class="user-info">
+                    <div id="profile-avatar" class="user-avatar">👤</div>
+                    <div id="profile-name" class="user-name">Игрок</div>
                 </div>
-            </div>
-
-            <div id="battle-history-screen" class="screen">
-                <div class="main-content">
-                    <h2 class="section-title">История дуэлей</h2>
-                    <div id="battle-history-list">
-                    </div>
-                    <button class="play-btn" onclick="backToProfile()" style="margin-top: 20px;">
-                        Назад в профиль
-                    </button>
+                <div class="profile-stats">
+                    <div>NFT в коллекции: <span id="profile-nft-count">0</span></div>
+                    <div>Звёзд заработано: <span id="profile-stars-earned">0</span></div>
+                    <div>Дуэли проведено: <span id="profile-battles-count">0</span></div>
                 </div>
+                <div class="nft-grid" id="profile-collection"></div>
+                <button class="play-btn" onclick="showBattleHistory()">История дуэлей</button>
             </div>
-
             <div id="friends-screen" class="screen">
-                <div class="main-content">
-                    <h2 class="section-title">Пригласи друзей - Получай Награды!</h2>
+                <div class="section-title">Друзья</div>
+                <div class="friends-list-section">
                     <div class="referral-info">
                         <div class="reward-card">
-                            <div class="reward-text">Каждый приглашенный друг = <span class="reward-amount">1 <i class="fas fa-star" style="color: #ffd700;"></i></span> звезда</div>
-                        </div>
-                        <div class="referral-stats">
-                            <div class="stat-item">
-                                <div class="stat-number" id="invited-count">0</div>
-                                <div class="stat-label">Приглашено</div>
+                            <div class="reward-text">Каждый приглашенный друг = 1 звезда</div>
+                            <div class="referral-stats">
+                                <div class="stat-item">
+                                    <div class="stat-number" id="invited-count">0</div>
+                                    <div class="stat-label">Приглашено</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number" id="earned-from-referrals">0</div>
+                                    <div class="stat-label">Заработано звёзд</div>
+                                </div>
                             </div>
-                            <div class="stat-item">
-                                <div class="stat-number" id="earned-from-referrals">0</div>
-                                <div class="stat-label">Заработано звёзд</div>
+                            <div class="referral-actions">
+                                <button class="invite-btn" onclick="inviteFriend()">Пригласить друга</button>
+                                <button class="copy-link-btn" onclick="copyReferralLink()">Скопировать ссылку</button>
                             </div>
+                            <div class="referral-code-section">
+                                <div class="section-subtitle">Ваша реферальная ссылка:</div>
+                                <div class="referral-code-container">
+                                    <input type="text" id="referral-link" class="referral-input" readonly>
+                                    <button class="copy-code-btn" onclick="copyReferralLink()">Копировать</button>
+                                </div>
+                            </div>
+                            <div class="partner-info">
+                                <div class="partner-text">Хотите стать партнёром и зарабатывать TON?</div>
+                                <button class="partner-btn" onclick="showTerms()">Условия</button>
+                            </div>
+                            <div class="section-subtitle">Приглашенные друзья (<span id="friends-count">0</span>)</div>
                         </div>
                     </div>
-                    
-                    <div class="referral-actions">
-                        <button class="invite-btn" onclick="inviteFriend()">
-                            <i class="fas fa-user-plus"></i>
-                            Пригласить друга
-                        </button>
-                        <button class="copy-link-btn" onclick="copyReferralLink()">
-                            <i class="fas fa-copy"></i>
-                            Скопировать ссылку
-                        </button>
-                    </div>
-
-                    <div class="referral-code-section">
-                        <div class="section-subtitle">Ваша реферальная ссылка:</div>
-                        <div class="referral-code-container">
-                            <input type="text" id="referral-link" class="referral-input" readonly>
-                            <button class="copy-code-btn" onclick="copyReferralLink()">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="partner-info">
-                        <div class="partner-text">Хотите стать партнёром и зарабатывать TON?</div>
-                        <button class="partner-btn" onclick="showTerms()">Условия</button>
-                    </div>
-
-                    <div class="friends-list-section">
-                        <h3 class="section-subtitle">Приглашенные друзья <span id="friends-count">(0)</span></h3>
-                        <div id="friends-list" class="friends-list"></div>
-                    </div>
+                    <div class="friends-list" id="friends-list"></div>
                 </div>
             </div>
-
-            <div id="upgrade-screen" class="screen">
-                <div class="main-content">
-                    <h2 class="section-title">Апгрейд</h2>
-                    <div class="friends-placeholder">
-                        <p style="margin-top: 20px; color: #666;">Раздел в разработке</p>
+            <div id="battle-screen" class="screen">
+                <div class="battle-arena">
+                    <div class="participant left">
+                        <div class="participant-name">Вы</div>
+                        <img id="player-img" class="battle-nft-img" src="" alt="Your NFT">
+                        <div class="hp-container">
+                            <div id="player-hp-bar" class="hp-bar"></div>
+                        </div>
+                        <div id="player-hp-text" class="hp-text">100/100 HP</div>
                     </div>
+                    <div class="vs-text">VS</div>
+                    <div class="participant right">
+                        <div class="participant-name">Оппонент</div>
+                        <img id="bot-img" class="battle-nft-img" src="" alt="Opponent NFT">
+                        <div class="hp-container">
+                            <div id="bot-hp-bar" class="hp-bar"></div>
+                        </div>
+                        <div id="bot-hp-text" class="hp-text">100/100 HP</div>
+                    </div>
+                    <div id="battle-log" class="battle-log">Подготовка к дуэли...</div>
+                    <div id="battle-result" class="battle-result" style="display: none;"></div>
+                    <div id="reward-info" style="display: none;"></div>
+                    <button id="back-to-menu-btn" class="play-btn" style="display: none;" onclick="backToMainFromBattle()">Вернуться в меню</button>
                 </div>
             </div>
-
             <div id="rules-screen" class="screen">
-                <div class="main-content">
-                    <h2 class="section-title">Правила дуэлей</h2>
-                    <div style="background: #1a1a1a; border-radius: 16px; padding: 20px; margin-bottom: 20px;">
-                        <div style="margin-bottom: 15px;">
-                            <h3 style="color: #ffd700; margin-bottom: 8px;">🎯 Как играть:</h3>
-                            <p style="color: #cccccc; line-height: 1.5;">1. Купи NFT в магазине<br>2. Выбери NFT для дуэли в коллекции<br>3. Нажми "ДУЭЛЬ" на главном экране<br>4. Сражайся и побеждай!</p>
-                        </div>
-                        <div style="margin-bottom: 15px;">
-                            <h3 style="color: #ffd700; margin-bottom: 8px;">🎲 Механика:</h3>
-                            <p style="color: #cccccc; line-height: 1.5;">• Всё происходит случайно<br>• Шанс критического удара: 15%<br>• Шанс промаха: 8%<br>• При низком HP шанс крита увеличивается</p>
-                        </div>
-                        <div>
-                            <h3 style="color: #ffd700; margin-bottom: 8px;">🏆 Награды:</h3>
-                            <p style="color: #cccccc; line-height: 1.5;">• За победу получаешь NFT противника<br>• За поражение теряешь свой NFT<br>• Участие в дуэли стоит 10 звёзд</p>
-                        </div>
+                <div class="section-title">Правила дуэлей</div>
+                <div class="rules-content">
+                    <div class="rules-section">
+                        <h3>🎯 Как играть:</h3>
+                        <ol>
+                            <li>Купи NFT в магазине</li>
+                            <li>Выбери NFT для дуэли в коллекции</li>
+                            <li>Нажми "ДУЭЛЬ" на главном экране</li>
+                            <li>Сражайся и побеждай!</li>
+                        </ol>
                     </div>
-                    <button class="play-btn" onclick="backToMainFromRules()">Назад</button>
+                    <div class="rules-section">
+                        <h3>🎲 Механика:</h3>
+                        <ul>
+                            <li>Всё происходит случайно</li>
+                            <li>Шанс критического удара: 15%</li>
+                            <li>Шанс промаха: 8%</li>
+                            <li>При низком HP шанс крита увеличивается</li>
+                        </ul>
+                    </div>
+                    <div class="rules-section">
+                        <h3>🏆 Награды:</h3>
+                        <ul>
+                            <li>За победу получаешь NFT противника</li>
+                            <li>За поражение теряешь свой NFT</li>
+                            <li>Участие в дуэли стоит 10 звёзд</li>
+                        </ul>
+                    </div>
                 </div>
+                <button class="play-btn" onclick="backToMainFromRules()">Назад</button>
+            </div>
+            <div id="battle-history-screen" class="screen">
+                <div class="section-title">История дуэлей</div>
+                <div id="battle-history-list" class="battle-history-list"></div>
+                <button class="play-btn" onclick="backToProfile()">Назад в профиль</button>
             </div>
         </div>
-
         <div class="bottom-nav">
             <button class="nav-item active" onclick="switchScreen('main')">
-                <i class="fas fa-home"></i>
-                <span>Главная</span>
+                <i class="fas fa-home"></i>Главная
             </button>
             <button class="nav-item" onclick="switchScreen('collection')">
-                <i class="fas fa-box-open"></i>
-                <span>Коллекция</span>
+                <i class="fas fa-folder"></i>Коллекция
             </button>
             <button class="nav-item" onclick="switchScreen('upgrade')">
-                <i class="fas fa-arrow-up"></i>
-                <span>Апгрейд</span>
+                <i class="fas fa-tools"></i>Апгрейд
             </button>
             <button class="nav-item" onclick="switchScreen('profile')">
-                <i class="fas fa-user"></i>
-                <span>Профиль</span>
+                <i class="fas fa-user"></i>Профиль
             </button>
             <button class="nav-item" onclick="switchScreen('friends')">
-                <i class="fas fa-users"></i>
-                <span>Друзья</span>
+                <i class="fas fa-users"></i>Друзья
             </button>
         </div>
-
-        <div id="searching-overlay" class="searching-overlay" style="display: none;">
-            <div class="searching-animation"></div>
-            <div class="searching-text">
-                Поиск оппонента...<br>
-                <span id="search-status">Подключение к серверу</span>
-            </div>
-        </div>
-
-        <div id="coin-toss-overlay" class="coin-toss-overlay" style="display: none;">
-            <div class="coin-container">
-                <div id="coin" class="coin">
-                    <div class="front">
-                        <img id="coin-front" src="" alt="Player">
-                    </div>
-                    <div class="back">
-                        <img id="coin-back" src="" alt="Bot">
-                    </div>
-                </div>
-            </div>
-            <div id="coin-result-text" class="searching-text"></div>
-        </div>
-
-        <div id="purchase-overlay" class="purchase-overlay">
-            <div class="purchase-content">
-                <div class="purchase-title">Купить звёзды</div>
-                <div class="purchase-options">
-                    <button class="purchase-btn" onclick="purchaseStars(50)">50 звёзд</button>
-                    <button class="purchase-btn" onclick="purchaseStars(100)">100 звёзд</button>
-                    <button class="purchase-btn" onclick="purchaseStars(200)">200 звёзд</button>
-                    <button class="purchase-btn" onclick="purchaseStars(500)">500 звёзд</button>
-                    <button class="purchase-btn" onclick="purchaseStars(1000)">1000 звёзд</button>
-                    <button class="purchase-btn" onclick="purchaseStars(2000)">2000 звёзд</button>
-                    <button class="purchase-btn" onclick="purchaseStars(5000)">5000 звёзд</button>
-                </div>
+        <div id="purchase-overlay" class="overlay">
+            <div class="purchase-options">
+                <button class="purchase-btn" onclick="purchaseStars(50)">50 звёзд</button>
+                <button class="purchase-btn" onclick="purchaseStars(100)">100 звёзд</button>
+                <button class="purchase-btn" onclick="purchaseStars(200)">200 звёзд</button>
+                <button class="purchase-btn" onclick="purchaseStars(500)">500 звёзд</button>
+                <button class="purchase-btn" onclick="purchaseStars(1000)">1000 звёзд</button>
+                <button class="purchase-btn" onclick="purchaseStars(2000)">2000 звёзд</button>
+                <button class="purchase-btn" onclick="purchaseStars(5000)">5000 звёзд</button>
                 <div class="close-purchase" onclick="closePurchaseMenu()">Закрыть</div>
             </div>
         </div>
+        <div id="searching-overlay" class="overlay">
+            <div class="center-area">
+                <div id="search-status">Поиск оппонента...</div>
+            </div>
+        </div>
+        <div id="coin-toss-overlay" class="overlay">
+            <div class="coin-toss-container">
+                <img id="coin-front" class="coin-image" src="" alt="Coin Front">
+                <img id="coin-back" class="coin-image" src="" alt="Coin Back">
+                <div id="coin-result-text" class="coin-result-text"></div>
+            </div>
+        </div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
