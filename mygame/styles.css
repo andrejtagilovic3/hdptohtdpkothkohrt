@@ -82,21 +82,6 @@ body {
     font-size: 16px;
 }
 
-.rules-btn {
-    background: #333333;
-    border: none;
-    border-radius: 20px;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
-    cursor: pointer;
-    font-size: 14px;
-    margin-right: 10px;
-}
-
 .content-area {
     flex: 1;
     display: flex;
@@ -108,6 +93,32 @@ body {
 .main-content {
     flex: 1;
     padding: 20px;
+}
+
+.how-to-play-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.how-to-play-btn {
+    background: transparent;
+    border: 1px solid #333333;
+    color: #666666;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+    font-weight: 400;
+}
+
+.how-to-play-btn:hover {
+    background: rgba(255, 255, 255, 0.03);
+    color: #888888;
+    opacity: 1;
+    border-color: #444444;
 }
 
 .center-area {
@@ -667,4 +678,244 @@ body {
     color: #ffd700;
     text-decoration: underline;
     cursor: pointer;
+}
+
+/* Реферальная система */
+.referral-info {
+    margin-bottom: 30px;
+}
+
+.reward-card {
+    background: #1a1a1a;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    border: 1px solid #333333;
+}
+
+.reward-text {
+    font-size: 16px;
+    color: #cccccc;
+}
+
+.reward-amount {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.referral-stats {
+    display: flex;
+    gap: 15px;
+    justify-content: space-around;
+}
+
+.stat-item {
+    text-align: center;
+    flex: 1;
+}
+
+.stat-number {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #888888;
+}
+
+.referral-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.invite-btn, .copy-link-btn {
+    flex: 1;
+    background: #ffffff;
+    color: #000000;
+    border: none;
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.copy-link-btn {
+    background: #333333;
+    color: #ffffff;
+}
+
+.invite-btn:hover {
+    background: #eeeeee;
+}
+
+.copy-link-btn:hover {
+    background: #444444;
+}
+
+.referral-code-section {
+    margin-bottom: 25px;
+}
+
+.section-subtitle {
+    font-size: 16px;
+    color: #cccccc;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.referral-code-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.referral-input {
+    flex: 1;
+    background: #1a1a1a;
+    border: 1px solid #333333;
+    border-radius: 8px;
+    padding: 12px;
+    color: #ffffff;
+    font-size: 14px;
+    font-family: monospace;
+}
+
+.referral-input:focus {
+    outline: none;
+    border-color: #555555;
+}
+
+.copy-code-btn {
+    background: #333333;
+    color: #ffffff;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.copy-code-btn:hover {
+    background: #444444;
+}
+
+.partner-info {
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    margin-bottom: 25px;
+    border: 1px solid #333333;
+}
+
+.partner-text {
+    font-size: 14px;
+    color: #cccccc;
+    margin-bottom: 12px;
+}
+
+.partner-btn {
+    background: transparent;
+    color: #ffffff;
+    border: 1px solid #666666;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.partner-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: #888888;
+}
+
+.friends-list-section {
+    margin-top: 25px;
+}
+
+.friends-list {
+    margin-top: 15px;
+}
+
+.no-friends {
+    text-align: center;
+    padding: 40px 20px;
+    color: #888888;
+    background: #1a1a1a;
+    border-radius: 12px;
+    border: 1px solid #333333;
+}
+
+.no-friends p {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.friend-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #1a1a1a;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    border: 1px solid #333333;
+}
+
+.friend-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.friend-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    background: #333333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.friend-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.friend-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 2px;
+}
+
+.friend-date {
+    font-size: 12px;
+    color: #888888;
+}
+
+.friend-reward {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    color: #cccccc;
+    font-weight: 600;
 }
