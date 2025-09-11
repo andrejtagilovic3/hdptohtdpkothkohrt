@@ -1106,3 +1106,42 @@ function renderUpgradeScreen() {
         grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888888;">Система апгрейдов загружается...</div>';
     }
 }
+
+// Добавьте эту функцию в конец файла script.js
+
+function backToMainFromBattle() {
+    // Сбрасываем состояние битвы
+    battleInProgress = false;
+    playerHP = 100;
+    botHP = 100;
+    botNft = null;
+    
+    // Убираем обводки с изображений
+    const playerImg = document.getElementById('player-img');
+    const botImg = document.getElementById('bot-img');
+    if (playerImg) {
+        playerImg.style.border = '';
+        playerImg.style.boxShadow = '';
+    }
+    if (botImg) {
+        botImg.style.border = '';
+        botImg.style.boxShadow = '';
+    }
+    
+    // Переходим на главный экран
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('main-screen').classList.add('active');
+    
+    // Обновляем навигацию
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    document.querySelectorAll('.nav-item')[0].classList.add('active');
+    
+    // Обновляем центральную область
+    renderCenterArea();
+    
+    // Обновляем UI
+    updateUI();
+    
+    // Устанавливаем текущий экран
+    currentScreen = 'main';
+}
