@@ -631,7 +631,12 @@ function endBattle() {
         });
     }
 
-    // Показываем результат
+// Показываем результат (удаляем старый, если есть)
+    let existingResult = document.querySelector('.battle-result');
+    if (existingResult) {
+        existingResult.remove();
+    }
+
     const resultDiv = document.createElement('div');
     resultDiv.className = `battle-result ${won ? 'win' : 'lose'}`;
     resultDiv.textContent = won ? 'ПОБЕДА!' : 'ПОРАЖЕНИЕ!';
@@ -1109,6 +1114,8 @@ function renderUpgradeScreen() {
 
 // Добавьте эту функцию в конец файла script.js
 
+// Добавьте эту функцию в конец файла script.js
+
 function backToMainFromBattle() {
     // Сбрасываем состояние битвы
     battleInProgress = false;
@@ -1126,6 +1133,15 @@ function backToMainFromBattle() {
     if (botImg) {
         botImg.style.border = '';
         botImg.style.boxShadow = '';
+    }
+    // Убираем результаты битвы
+    const existingResults = document.querySelectorAll('.battle-result');
+    existingResults.forEach(result => result.remove());
+    
+    // Скрываем кнопку возврата
+    const backButton = document.getElementById('back-to-menu-btn');
+    if (backButton) {
+        backButton.style.display = 'none';
     }
     
     // Переходим на главный экран
