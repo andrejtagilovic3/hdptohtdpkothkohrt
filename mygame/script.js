@@ -525,17 +525,19 @@ function performAttack(isPlayerTurn) {
     } else {
         if (isPlayerTurn) {
             botHP = Math.max(0, botHP - damage);
+            const roundedDamage = Math.round(damage);
             if (isCritical) {
-                log.textContent = `КРИТИЧЕСКИЙ УДАР! Вы наносите ${damage} урона оппоненту!`;
+                log.textContent = `КРИТИЧЕСКИЙ УДАР! Вы наносите ${roundedDamage} урона оппоненту!`;
             } else {
-                log.textContent = `Вы наносите ${damage} урона оппоненту!`;
+                log.textContent = `Вы наносите ${roundedDamage} урона оппоненту!`;
             }
         } else {
             playerHP = Math.max(0, playerHP - damage);
+            const roundedDamage = Math.round(damage);
             if (isCritical) {
-                log.textContent = `КРИТИЧЕСКАЯ АТАКА ОППОНЕНТА! Вы получаете ${damage} урона!`;
+                log.textContent = `КРИТИЧЕСКАЯ АТАКА ОППОНЕНТА! Вы получаете ${roundedDamage} урона!`;
             } else {
-                log.textContent = `Оппонент наносит вам ${damage} урона!`;
+                log.textContent = `Оппонент наносит вам ${roundedDamage} урона!`;
             }
         }
         targetImg.classList.add('shake');
@@ -550,13 +552,16 @@ function performAttack(isPlayerTurn) {
         }, 1000);
     }
 
-    if (playerHP <= 0 || botHP <= 0) {
+
+    const roundedPlayerHP = Math.floor(playerHP);
+    const roundedBotHP = Math.ceil(botHP);
+    
+    if (roundedPlayerHP <= 0 || roundedBotHP <= 0) {
         setTimeout(() => endBattle(), 2000);
     } else {
         const delay = Math.random() * 1000 + 1500;
         setTimeout(() => performAttack(!isPlayerTurn), delay);
     }
-}
 
 function updateHPBars() {
     const playerHPBar = document.querySelector('#player-hp-bar');
@@ -564,18 +569,22 @@ function updateHPBars() {
     const playerHPText = document.querySelector('#player-hp-text');
     const botHPText = document.querySelector('#bot-hp-text');
 
-    playerHPBar.style.width = `${playerHP}%`;
-    botHPBar.style.width = `${botHP}%`;
-    playerHPText.textContent = `${playerHP}/100 HP`;
-    botHPText.textContent = `${botHP}/100 HP`;
+    // Округляем HP: игрок в меньшую сторону, бот в большую
+    const roundedPlayerHP = Math.floor(playerHP); // Округляем вниз (хуже для игрока)
+    const roundedBotHP = Math.ceil(botHP);         // Округляем вверх (лучше для бота)
 
-    if (playerHP <= 25) {
+    playerHPBar.style.width = `${roundedPlayerHP}%`;
+    botHPBar.style.width = `${roundedBotHP}%`;
+    playerHPText.textContent = `${roundedPlayerHP}/100 HP`;
+    botHPText.textContent = `${roundedBotHP}/100 HP`;
+
+    if (roundedPlayerHP <= 25) {
         playerHPBar.classList.add('low');
     } else {
         playerHPBar.classList.remove('low');
     }
 
-    if (botHP <= 25) {
+    if (roundedBotHP <= 25) {
         botHPBar.classList.add('low');
     } else {
         botHPBar.classList.remove('low');
@@ -590,7 +599,10 @@ function endBattle() {
     const battleNftForHistory = activeBattleNft ? { ...activeBattleNft } : null;
 
     let won = false;
-    if (playerHP > 0 && botHP <= 0) {
+    const roundedPlayerHP = Math.floor(playerHP);
+    const roundedBotHP = Math.ceil(botHP);
+    
+    if (roundedPlayerHP > 0 && roundedBotHP <= 0) {
         won = true;
         collection.push({ ...botNft, buyPrice: botNft.price });
         log.textContent = `Вы победили и получили ${botNft.name}!`;
