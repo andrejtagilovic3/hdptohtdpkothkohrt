@@ -119,7 +119,7 @@ function showUpgradeModal(index) {
         return;
     }
     
-    selectedNftForUpgrade = {nft, index};
+    selectedNftForUpgrade = {nft: {...nft}, index}; // ИСПРАВЛЕНИЕ: копируем NFT
     
     // Снимаем звёзды сразу
     stars -= 50;
@@ -215,21 +215,18 @@ function showUpgradeResult() {
     const rarityBonus = multiplier.min + Math.random() * (multiplier.max - multiplier.min);
     
     const upgrade = upgradeTypes[currentUpgradeType];
-    const nft = selectedNftForUpgrade.nft;
     
-    // Применяем апгрейд
-    if (!nft.upgrades) nft.upgrades = {};
-    nft.upgrades[currentUpgradeType] = rarityBonus;
-    
-    // Обновляем коллекцию
-    collection[selectedNftForUpgrade.index] = nft;
+    // ИСПРАВЛЕНИЕ: Правильно применяем апгрейд к NFT
+    const nftToUpgrade = collection[selectedNftForUpgrade.index];
+    if (!nftToUpgrade.upgrades) nftToUpgrade.upgrades = {};
+    nftToUpgrade.upgrades[currentUpgradeType] = rarityBonus;
     
     // Обновляем активный NFT если это он
     if (activeBattleNft && 
-        activeBattleNft.name === nft.name && 
-        activeBattleNft.img === nft.img && 
-        activeBattleNft.buyPrice === nft.buyPrice) {
-        activeBattleNft = {...nft};
+        activeBattleNft.name === nftToUpgrade.name && 
+        activeBattleNft.img === nftToUpgrade.img && 
+        activeBattleNft.buyPrice === nftToUpgrade.buyPrice) {
+        activeBattleNft = {...nftToUpgrade};
     }
     
     const rarityColor = rarityColors[wonRarity];
@@ -253,6 +250,8 @@ function showUpgradeResult() {
     `;
     
     result.style.display = 'block';
+    
+    // ВАЖНО: Сохраняем данные
     updateUI();
     saveData();
 }
