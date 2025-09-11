@@ -766,7 +766,7 @@ function renderCollection() {
                 <div class="nft-card-price">Куплено за ${nft.buyPrice} звёзд</div>
                 ${upgradeInfo}
                 <button class="nft-card-btn" onclick="setToBattle(${index})" ${isActive ? 'disabled' : ''}>
-                    ${isActive ? 'Готов к дуэли' : 'К дуэли'}
+                    ${isActive ? 'Готов к дуэли' : 'Выбрать'}
                 </button>
                 <button class="nft-card-btn secondary" onclick="sellNft(${index})">
                     Продать ${Math.floor(nft.buyPrice * 0.8)} звёзд
