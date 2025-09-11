@@ -332,8 +332,7 @@ function startBattle() {
         if (nftPrice >= priceMin && nftPrice <= priceMax) {
             suitableNfts.push({ 
                 ...template, 
-                price: nftPrice,
-                shouldHaveUpgrade: false 
+                price: nftPrice
             });
         }
     });
@@ -348,44 +347,14 @@ function startBattle() {
 
     // ЛОГИКА АПГРЕЙДОВ ДЛЯ БОТА
     if (playerHasUpgrades) {
-        // Если у игрока есть апгрейд, у бота 70% шанс тоже получить
         if (Math.random() < 0.7) {
             generateBotUpgrades(true);
         }
     } else {
-        // Если у игрока нет апгрейда, у бота только 15% шанс получить
         if (Math.random() < 0.15) {
             generateBotUpgrades(false);
         }
     }
-
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('battle-screen').classList.add('active');
-
-    // ... остальной код с монеткой остается как есть
-}
-
-function startBattle() {
-    document.getElementById('searching-overlay').style.display = 'none';
-
-    const playerPrice = activeBattleNft.buyPrice;
-    let suitableNfts = [];
-
-    nftTemplates.forEach((template, index) => {
-        if (nftPrices[index] <= playerPrice + 50) {
-            suitableNfts.push({ ...template, price: nftPrices[index] });
-        }
-    });
-
-    if (suitableNfts.length === 0) {
-        const randomIndex = Math.floor(Math.random() * nftTemplates.length);
-        botNft = { ...nftTemplates[randomIndex], price: nftPrices[randomIndex] };
-    } else {
-        const randomIndex = Math.floor(Math.random() * suitableNfts.length);
-        botNft = suitableNfts[randomIndex];
-    }
-
-    applyUpgradesInBattle();
 
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('battle-screen').classList.add('active');
@@ -412,6 +381,39 @@ function startBattle() {
             }, 2000);
         }, { once: true });
     }, 1000);
+}
+
+function startBattleSearch() {
+    if (!activeBattleNft || stars < 10) return;
+
+    stars -= 10;
+    updateUI();
+
+    document.getElementById('searching-overlay').style.display = 'flex';
+
+    const searchStatuses = [
+        'Подключение к серверу...',
+        'Поиск игроков...',
+        'Проверка совместимости...',
+        'Оппонент найден!'
+    ];
+
+    let statusIndex = 0;
+    const statusElement = document.getElementById('search-status');
+
+    const updateStatus = () => {
+        if (statusIndex < searchStatuses.length) {
+            statusElement.textContent = searchStatuses[statusIndex];
+            statusIndex++;
+            if (statusIndex < searchStatuses.length) {
+                setTimeout(updateStatus, 800);
+            } else {
+                setTimeout(startBattle, 500);
+            }
+        }
+    };
+
+    updateStatus();
 }
 
 function initializeBattle(playerFirst) {
@@ -648,35 +650,6 @@ function backToMainFromBattle() {
     
     // Переключаемся на главный экран
     switchScreen('main');
-}
-
-function applyUpgradesInBattle() {
-    if (activeBattleNft && activeBattleNft.upgrades) {
-        playerUpgrades = activeBattleNft.upgrades;
-    } else {
-        playerUpgrades = {};
-    }
-
-    if (Math.random() < 0.3) {
-        const randomUpgrades = {};
-        const upgradeTypeKeys = ['damage', 'dodge', 'crit'];
-        const numUpgrades = Math.floor(Math.random() * 2) + 1;
-
-        for (let i = 0; i < numUpgrades; i++) {
-            const randomType = upgradeTypeKeys[Math.floor(Math.random() * upgradeTypeKeys.length)];
-            const randomLevel = 0.8 + Math.random() * 0.4;
-            randomUpgrades[randomType] = randomLevel;
-        }
-
-        botUpgrades = randomUpgrades;
-    } else {
-        botUpgrades = {};
-    }
-}
-
-function getUpgradedStats(nft, statType) {
-    if (!nft.upgrades || !nft.upgrades[statType]) return 1;
-    return nft.upgrades[statType];
 }
 
 function switchScreen(screen) {
