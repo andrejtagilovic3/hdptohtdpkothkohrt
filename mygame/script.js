@@ -245,6 +245,30 @@ function closeFilterOnOutsideClick(event) {
     }
 }
 
+function generateBotUpgrades(matchPlayerLevel) {
+    if (!botNft.upgrades) botNft.upgrades = {};
+    
+    const upgradeTypes = ['damage', 'dodge', 'crit'];
+    const numUpgrades = Math.floor(Math.random() * 2) + 1; // 1-2 апгрейда
+    
+    for (let i = 0; i < numUpgrades; i++) {
+        const randomType = upgradeTypes[Math.floor(Math.random() * upgradeTypes.length)];
+        
+        let upgradeValue;
+        if (matchPlayerLevel && activeBattleNft.upgrades) {
+            // Похожий уровень на игрока ±10%
+            const playerUpgradeValues = Object.values(activeBattleNft.upgrades);
+            const avgPlayerUpgrade = playerUpgradeValues.reduce((a, b) => a + b, 0) / playerUpgradeValues.length;
+            upgradeValue = avgPlayerUpgrade * (0.9 + Math.random() * 0.2);
+        } else {
+            // Случайный слабый апгрейд
+            upgradeValue = 1.05 + Math.random() * 0.1; // 5-15%
+        }
+        
+        botNft.upgrades[randomType] = upgradeValue;
+    }
+}
+
 function setFilter(filterType) {
     currentFilter = filterType;
 
@@ -291,37 +315,54 @@ function purchaseStars(amount) {
     closePurchaseMenu();
 }
 
-function startBattleSearch() {
-    if (!activeBattleNft || stars < 10) return;
+function startBattle() {
+    document.getElementById('searching-overlay').style.display = 'none';
 
-    stars -= 10;
-    updateUI();
+    const playerPrice = activeBattleNft.buyPrice;
+    const playerHasUpgrades = activeBattleNft.upgrades && Object.keys(activeBattleNft.upgrades).length > 0;
+    let suitableNfts = [];
 
-    document.getElementById('searching-overlay').style.display = 'flex';
-
-    const searchStatuses = [
-        'Подключение к серверу...',
-        'Поиск игроков...',
-        'Проверка совместимости...',
-        'Оппонент найден!'
-    ];
-
-    let statusIndex = 0;
-    const statusElement = document.getElementById('search-status');
-
-    const updateStatus = () => {
-        if (statusIndex < searchStatuses.length) {
-            statusElement.textContent = searchStatuses[statusIndex];
-            statusIndex++;
-            if (statusIndex < searchStatuses.length) {
-                setTimeout(updateStatus, 800);
-            } else {
-                setTimeout(startBattle, 500);
-            }
+    nftTemplates.forEach((template, index) => {
+        const nftPrice = nftPrices[index];
+        
+        // Подбор по цене (±30% от цены игрока)
+        const priceMin = playerPrice * 0.7;
+        const priceMax = playerPrice * 1.3;
+        
+        if (nftPrice >= priceMin && nftPrice <= priceMax) {
+            suitableNfts.push({ 
+                ...template, 
+                price: nftPrice,
+                shouldHaveUpgrade: false 
+            });
         }
-    };
+    });
 
-    updateStatus();
+    if (suitableNfts.length === 0) {
+        const randomIndex = Math.floor(Math.random() * nftTemplates.length);
+        botNft = { ...nftTemplates[randomIndex], price: nftPrices[randomIndex] };
+    } else {
+        const randomIndex = Math.floor(Math.random() * suitableNfts.length);
+        botNft = suitableNfts[randomIndex];
+    }
+
+    // ЛОГИКА АПГРЕЙДОВ ДЛЯ БОТА
+    if (playerHasUpgrades) {
+        // Если у игрока есть апгрейд, у бота 70% шанс тоже получить
+        if (Math.random() < 0.7) {
+            generateBotUpgrades(true);
+        }
+    } else {
+        // Если у игрока нет апгрейда, у бота только 15% шанс получить
+        if (Math.random() < 0.15) {
+            generateBotUpgrades(false);
+        }
+    }
+
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('battle-screen').classList.add('active');
+
+    // ... остальной код с монеткой остается как есть
 }
 
 function startBattle() {
@@ -381,6 +422,29 @@ function initializeBattle(playerFirst) {
     document.getElementById('player-img').src = activeBattleNft.img;
     document.getElementById('bot-img').src = botNft.img;
     document.getElementById('battle-log').textContent = 'Бой начался!';
+    // Добавляем обводку для апгрейженных NFT
+    const playerImg = document.getElementById('player-img');
+    const botImg = document.getElementById('bot-img');
+
+    if (activeBattleNft.upgrades && Object.keys(activeBattleNft.upgrades).length > 0) {
+        const playerUpgradeLevel = Math.max(...Object.values(activeBattleNft.upgrades));
+        let playerColor = '#4caf50'; // зеленый для обычных
+        if (playerUpgradeLevel >= 1.35) playerColor = '#ff9800'; // оранжевый для редких
+        else if (playerUpgradeLevel >= 1.20) playerColor = '#2196f3'; // синий для необычных
+    
+        playerImg.style.border = `3px solid ${playerColor}`;
+        playerImg.style.boxShadow = `0 0 15px ${playerColor}60`;
+    }
+
+    if (botNft.upgrades && Object.keys(botNft.upgrades).length > 0) {
+        const botUpgradeLevel = Math.max(...Object.values(botNft.upgrades));
+        let botColor = '#4caf50';
+        if (botUpgradeLevel >= 1.35) botColor = '#ff9800';
+        else if (botUpgradeLevel >= 1.20) botColor = '#2196f3';
+    
+        botImg.style.border = `3px solid ${botColor}`;
+        botImg.style.boxShadow = `0 0 15px ${botColor}60`;
+    }
     
     // Скрываем кнопку возврата
     document.getElementById('back-to-menu-btn').style.display = 'none';
@@ -398,20 +462,22 @@ function performAttack(isPlayerTurn) {
     let critChance = isLowHP ? 0.3 : 0.15;
     let dodgeChance = 0.08;
 
-    if (isPlayerTurn) {
-        if (playerUpgrades.crit) {
-            critChance *= getUpgradedStats(activeBattleNft, 'crit');
+    // ПРИМЕНЯЕМ АПГРЕЙДЫ
+    if (isPlayerTurn && activeBattleNft && activeBattleNft.upgrades) {
+        if (activeBattleNft.upgrades.crit) {
+            critChance *= activeBattleNft.upgrades.crit;
         }
-        if (botUpgrades.dodge) {
-            dodgeChance *= getUpgradedStats(botNft, 'dodge');
+    } else if (!isPlayerTurn && botNft && botNft.upgrades) {
+        if (botNft.upgrades.crit) {
+            critChance *= botNft.upgrades.crit;
         }
-    } else {
-        if (botUpgrades.crit) {
-            critChance *= (botUpgrades.crit || 1);
-        }
-        if (playerUpgrades.dodge) {
-            dodgeChance *= getUpgradedStats(activeBattleNft, 'dodge');
-        }
+    }
+
+    // ПРИМЕНЯЕМ УКЛОНЕНИЯ
+    if (!isPlayerTurn && activeBattleNft && activeBattleNft.upgrades && activeBattleNft.upgrades.dodge) {
+        dodgeChance *= activeBattleNft.upgrades.dodge;
+    } else if (isPlayerTurn && botNft && botNft.upgrades && botNft.upgrades.dodge) {
+        dodgeChance *= botNft.upgrades.dodge;
     }
 
     const isCritical = Math.random() < critChance;
@@ -423,13 +489,21 @@ function performAttack(isPlayerTurn) {
         damage = Math.floor(Math.random() * 35) + 8;
     }
 
-    if (isPlayerTurn && playerUpgrades.damage) {
-        damage *= getUpgradedStats(activeBattleNft, 'damage');
-    } else if (!isPlayerTurn && botUpgrades.damage) {
-        damage *= (botUpgrades.damage || 1);
+    // ПРИМЕНЯЕМ УРОН
+    if (isPlayerTurn && activeBattleNft && activeBattleNft.upgrades && activeBattleNft.upgrades.damage) {
+        damage *= activeBattleNft.upgrades.damage;
+    } else if (!isPlayerTurn && botNft && botNft.upgrades && botNft.upgrades.damage) {
+        damage *= botNft.upgrades.damage;
     }
 
     damage = Math.floor(damage);
+
+    // БАЛАНС: БОТ ПОЛУЧАЕТ +15% К УРОНУ И -10% К ПОЛУЧАЕМОМУ УРОНУ
+    if (!isPlayerTurn) {
+        damage *= 1.15; // Бот наносит больше урона
+    } else {
+        damage *= 0.90; // Игрок наносит меньше урона
+    }
 
     const log = document.getElementById('battle-log');
     let targetImg;
@@ -967,6 +1041,11 @@ function setToBattle(index) {
     renderCollection();
     renderCenterArea();
     alert(`${activeBattleNft.name} выбран для дуэли!`);
+    
+    // Переходим в главное меню
+    setTimeout(() => {
+        switchScreen('main');
+    }, 1000);
 }
 
 function showRules() {
