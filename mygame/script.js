@@ -371,6 +371,10 @@ function initializeBattle(playerFirst) {
     document.getElementById('player-img').src = activeBattleNft.img;
     document.getElementById('bot-img').src = botNft.img;
     document.getElementById('battle-log').textContent = 'Бой начался!';
+    
+    // Скрываем кнопку возврата
+    document.getElementById('back-to-menu-btn').style.display = 'none';
+    
     updateHPBars();
 
     setTimeout(() => performAttack(playerFirst), 1500);
@@ -495,41 +499,71 @@ function updateHPBars() {
 function endBattle() {
     battleInProgress = false;
     const log = document.getElementById('battle-log');
-    const result = document.createElement('div');
-    result.className = 'battle-result';
+    
+    // Сохраняем текущий activeBattleNft для истории ПЕРЕД изменениями
+    const battleNftForHistory = activeBattleNft ? { ...activeBattleNft } : null;
 
     let won = false;
     if (playerHP > 0 && botHP <= 0) {
         won = true;
-        result.classList.add('win');
-        result.textContent = 'Победа!';
         collection.push({ ...botNft, buyPrice: botNft.price });
         log.textContent = `Вы победили и получили ${botNft.name}!`;
     } else {
-        result.classList.add('lose');
-        result.textContent = 'Поражение!';
-        const index = collection.findIndex(nft =>
-            nft.name === activeBattleNft.name &&
-            nft.img === activeBattleNft.img &&
-            nft.buyPrice === activeBattleNft.buyPrice
-        );
-        if (index !== -1) {
-            collection.splice(index, 1);
-            activeBattleNft = null;
+        if (battleNftForHistory) {
+            // Находим и удаляем проигранный NFT из коллекции
+            const index = collection.findIndex(nft =>
+                nft.name === battleNftForHistory.name &&
+                nft.img === battleNftForHistory.img &&
+                nft.buyPrice === battleNftForHistory.buyPrice
+            );
+            
+            if (index !== -1) {
+                collection.splice(index, 1);
+                activeBattleNft = null;
+            }
+            log.textContent = `Вы проиграли и потеряли ${battleNftForHistory.name}!`;
         }
-        log.textContent = `Вы проиграли и потеряли ${activeBattleNft.name}!`;
     }
 
-    battleHistory.push({
-        playerNft: { ...activeBattleNft },
-        opponentNft: { ...botNft },
-        won,
-        timestamp: new Date().toISOString()
-    });
+    // Добавляем в историю с сохраненными данными
+    if (battleNftForHistory) {
+        battleHistory.push({
+            playerNft: battleNftForHistory,
+            opponentNft: { ...botNft },
+            won,
+            timestamp: new Date().toISOString()
+        });
+    }
 
-    document.getElementById('battle-log').insertAdjacentElement('beforebegin', result);
+    // Показываем результат
+    const resultDiv = document.createElement('div');
+    resultDiv.className = `battle-result ${won ? 'win' : 'lose'}`;
+    resultDiv.textContent = won ? 'ПОБЕДА!' : 'ПОРАЖЕНИЕ!';
+    document.getElementById('battle-log').insertAdjacentElement('afterend', resultDiv);
+    
+    // Показываем кнопку возврата через небольшую задержку
+    setTimeout(() => {
+        const backButton = document.getElementById('back-to-menu-btn');
+        backButton.style.display = 'block';
+        backButton.style.animation = 'fadeIn 0.3s ease';
+    }, 1000);
+    
     updateUI();
     renderCenterArea();
+    renderCollection();
+    saveData();
+}
+
+function backToMainFromBattle() {
+    // Очищаем экран битвы
+    const existingResults = document.querySelectorAll('.battle-result');
+    existingResults.forEach(result => result.remove());
+    
+    // Скрываем кнопку возврата
+    document.getElementById('back-to-menu-btn').style.display = 'none';
+    
+    // Переключаемся на главный экран
+    switchScreen('main');
 }
 
 function applyUpgradesInBattle() {
@@ -541,7 +575,7 @@ function applyUpgradesInBattle() {
 
     if (Math.random() < 0.3) {
         const randomUpgrades = {};
-        const upgradeTypeKeys = Object.keys(upgradeTypes);
+        const upgradeTypeKeys = ['damage', 'dodge', 'crit'];
         const numUpgrades = Math.floor(Math.random() * 2) + 1;
 
         for (let i = 0; i < numUpgrades; i++) {
@@ -613,11 +647,55 @@ function backToCollection() {
 function renderCenterArea() {
     const centerDiv = document.getElementById('center-content');
     centerDiv.innerHTML = '';
+    
     if (activeBattleNft) {
+        let upgradeGlow = '';
+        let nameStyle = '';
+        let upgradeInfo = '';
+        
+        // Проверяем наличие апгрейдов
+        if (activeBattleNft.upgrades && Object.keys(activeBattleNft.upgrades).length > 0) {
+            const upgradeValues = Object.values(activeBattleNft.upgrades);
+            const maxUpgrade = Math.max(...upgradeValues);
+            
+            let rarity = 'common';
+            if (maxUpgrade >= 1.35) rarity = 'rare';
+            else if (maxUpgrade >= 1.20) rarity = 'uncommon';
+            
+            const rarityColors = {
+                common: '#4caf50',
+                uncommon: '#2196f3',
+                rare: '#ff9800'
+            };
+            
+            const rarityColor = rarityColors[rarity];
+            upgradeGlow = `box-shadow: 0 0 20px ${rarityColor}60; border: 3px solid ${rarityColor};`;
+            nameStyle = `color: ${rarityColor}; text-shadow: 0 0 10px ${rarityColor}60;`;
+            
+            const upgradeTypes = {
+                damage: { name: 'Увеличение урона', icon: '⚔️' },
+                dodge: { name: 'Уклонение', icon: '🛡️' },
+                crit: { name: 'Критический удар', icon: '💥' }
+            };
+            
+            const upgradesList = Object.entries(activeBattleNft.upgrades)
+                .map(([type, level]) => {
+                    const upgrade = upgradeTypes[type];
+                    if (upgrade) {
+                        return `<div style="display: inline-block; background: ${rarityColor}20; color: ${rarityColor}; border: 1px solid ${rarityColor}; padding: 4px 8px; border-radius: 6px; margin: 2px; font-size: 12px; font-weight: 600;">
+                            ${upgrade.icon} +${Math.round((level - 1) * 100)}%
+                        </div>`;
+                    }
+                    return '';
+                }).filter(Boolean).join('');
+            upgradeInfo = `<div style="margin-top: 12px;">${upgradesList}</div>`;
+        }
+        
         centerDiv.innerHTML = `
-            <img src="${activeBattleNft.img}" class="center-nft-img" alt="${activeBattleNft.name}">
-            <div class="center-nft-name">${activeBattleNft.name}</div>
+            <img src="${activeBattleNft.img}" class="center-nft-img" alt="${activeBattleNft.name}" style="${upgradeGlow}">
+            <div class="center-nft-name" style="${nameStyle}">${activeBattleNft.name}</div>
             <div class="center-nft-status">Готов к дуэли</div>
+            ${upgradeInfo}
         `;
     } else {
         centerDiv.innerHTML = '<div class="center-logo">//</div><div class="center-message">У вас не выбран NFT для дуэли, выберите его в <span class="clickable-link" onclick="goToCollection()">коллекции</span></div>';
@@ -633,12 +711,60 @@ function renderCollection() {
     } else {
         collection.forEach((nft, index) => {
             const isActive = activeBattleNft && activeBattleNft.name === nft.name && activeBattleNft.img === nft.img && activeBattleNft.buyPrice === nft.buyPrice;
+            
+            // Определяем стили для апгрейженных NFT
+            let cardStyle = '';
+            let nameStyle = '';
+            let upgradeInfo = '';
+            let isUpgraded = false;
+            
+            if (nft.upgrades && Object.keys(nft.upgrades).length > 0) {
+                isUpgraded = true;
+                const upgradeValues = Object.values(nft.upgrades);
+                const maxUpgrade = Math.max(...upgradeValues);
+                
+                let rarity = 'common';
+                if (maxUpgrade >= 1.35) rarity = 'rare';
+                else if (maxUpgrade >= 1.20) rarity = 'uncommon';
+                
+                const rarityColors = {
+                    common: '#4caf50',
+                    uncommon: '#2196f3',
+                    rare: '#ff9800'
+                };
+                
+                const rarityColor = rarityColors[rarity];
+                cardStyle = `border: 2px solid ${rarityColor}; box-shadow: 0 0 15px ${rarityColor}40;`;
+                nameStyle = `color: ${rarityColor}; font-weight: 700;`;
+                
+                const upgradeTypes = {
+                    damage: { name: 'Урон', icon: '⚔️' },
+                    dodge: { name: 'Уклонение', icon: '🛡️' },
+                    crit: { name: 'Крит', icon: '💥' }
+                };
+                
+                const upgradesList = Object.entries(nft.upgrades)
+                    .map(([type, level]) => {
+                        const upgrade = upgradeTypes[type];
+                        if (upgrade) {
+                            return `<div class="upgrade-badge" style="background: ${rarityColor}20; color: ${rarityColor}; border: 1px solid ${rarityColor};">
+                                ${upgrade.icon} +${Math.round((level - 1) * 100)}%
+                            </div>`;
+                        }
+                        return '';
+                    }).filter(Boolean).join('');
+                upgradeInfo = `<div class="nft-upgrades">${upgradesList}</div>`;
+            }
+            
             const card = document.createElement('div');
             card.className = 'nft-card';
+            card.style.cssText = cardStyle;
+            
             card.innerHTML = `
                 <img src="${nft.img}" class="nft-card-img" alt="${nft.name}">
-                <div class="nft-card-name">${nft.name} ${isActive ? '⚔️' : ''}</div>
+                <div class="nft-card-name" style="${nameStyle}">${nft.name} ${isActive ? '⚔️' : ''}</div>
                 <div class="nft-card-price">Куплено за ${nft.buyPrice} звёзд</div>
+                ${upgradeInfo}
                 <button class="nft-card-btn" onclick="setToBattle(${index})" ${isActive ? 'disabled' : ''}>
                     ${isActive ? 'Готов к дуэли' : 'К дуэли'}
                 </button>
@@ -697,12 +823,58 @@ function renderProfile() {
     } else {
         collection.forEach((nft) => {
             const isActive = activeBattleNft && activeBattleNft.name === nft.name && activeBattleNft.img === nft.img && activeBattleNft.buyPrice === nft.buyPrice;
+            
+            // Определяем стили для апгрейженных NFT
+            let cardStyle = '';
+            let nameStyle = '';
+            let upgradeInfo = '';
+            
+            if (nft.upgrades && Object.keys(nft.upgrades).length > 0) {
+                const upgradeValues = Object.values(nft.upgrades);
+                const maxUpgrade = Math.max(...upgradeValues);
+                
+                let rarity = 'common';
+                if (maxUpgrade >= 1.35) rarity = 'rare';
+                else if (maxUpgrade >= 1.20) rarity = 'uncommon';
+                
+                const rarityColors = {
+                    common: '#4caf50',
+                    uncommon: '#2196f3',
+                    rare: '#ff9800'
+                };
+                
+                const rarityColor = rarityColors[rarity];
+                cardStyle = `border: 2px solid ${rarityColor}; box-shadow: 0 0 15px ${rarityColor}40;`;
+                nameStyle = `color: ${rarityColor}; font-weight: 700;`;
+                
+                const upgradeTypes = {
+                    damage: { name: 'Урон', icon: '⚔️' },
+                    dodge: { name: 'Уклонение', icon: '🛡️' },
+                    crit: { name: 'Крит', icon: '💥' }
+                };
+                
+                const upgradesList = Object.entries(nft.upgrades)
+                    .map(([type, level]) => {
+                        const upgrade = upgradeTypes[type];
+                        if (upgrade) {
+                            return `<div class="upgrade-badge" style="background: ${rarityColor}20; color: ${rarityColor}; border: 1px solid ${rarityColor};">
+                                ${upgrade.icon} +${Math.round((level - 1) * 100)}%
+                            </div>`;
+                        }
+                        return '';
+                    }).filter(Boolean).join('');
+                upgradeInfo = `<div class="nft-upgrades">${upgradesList}</div>`;
+            }
+            
             const card = document.createElement('div');
             card.className = 'nft-card';
+            card.style.cssText = cardStyle;
+            
             card.innerHTML = `
                 <img src="${nft.img}" class="nft-card-img" alt="${nft.name}">
-                <div class="nft-card-name">${nft.name} ${isActive ? '⚔️' : ''}</div>
+                <div class="nft-card-name" style="${nameStyle}">${nft.name} ${isActive ? '⚔️' : ''}</div>
                 <div class="nft-card-price">Стоимость: ${nft.buyPrice} звёзд</div>
+                ${upgradeInfo}
             `;
             grid.appendChild(card);
         });
@@ -737,8 +909,9 @@ function renderFriends() {
         });
     }
 
-    document.getElementById('friends-count').textContent = referredFriends.length;
-    document.getElementById('stars-from-friends').textContent = starsFromReferrals;
+    document.getElementById('friends-count').textContent = `(${referredFriends.length})`;
+    document.getElementById('invited-count').textContent = referredFriends.length;
+    document.getElementById('earned-from-referrals').textContent = starsFromReferrals;
 }
 
 function updateReferralInfo() {
@@ -796,26 +969,20 @@ function backToMainFromRules() {
     document.getElementById('main-screen').classList.add('active');
 }
 
-function goToHistory() {
+function showBattleHistory() {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('history-screen').classList.add('active');
-    renderHistory();
+    document.getElementById('battle-history-screen').classList.add('active');
+    renderBattleHistory();
 }
 
-function backToProfile() {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('profile-screen').classList.add('active');
-    renderProfile();
-}
-
-function renderHistory() {
-    const historyList = document.getElementById('battle-history');
+function renderBattleHistory() {
+    const historyList = document.getElementById('battle-history-list');
     historyList.innerHTML = '';
 
     if (battleHistory.length === 0) {
         historyList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888888;">История дуэлей пуста</div>';
     } else {
-        battleHistory.forEach(battle => {
+        battleHistory.reverse().forEach(battle => {
             const item = document.createElement('div');
             item.className = 'battle-history-item';
             item.innerHTML = `
@@ -840,6 +1007,12 @@ function renderHistory() {
     }
 }
 
+function backToProfile() {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('profile-screen').classList.add('active');
+    renderProfile();
+}
+
 function copyReferralLink() {
     const referralInput = document.getElementById('referral-link');
     referralInput.select();
@@ -848,5 +1021,28 @@ function copyReferralLink() {
 }
 
 function inviteFriend() {
-    Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=https://t.me/YourBot?start=${referralCode}`);
+    const referralLink = `https://t.me/YourBot?start=${referralCode}`;
+    const shareText = `Присоединяйся к игре и получи бонусы! ${referralLink}`;
+    
+    if (Telegram.WebApp.openTelegramLink) {
+        Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`);
+    } else {
+        // Fallback для тестирования
+        copyReferralLink();
+    }
+}
+
+function showTerms() {
+    alert('Условия партнёрства:\n\n- Привлекайте активных игроков\n- Получайте % от их покупок\n- Минимальный порог выплат: 100 TON\n\nДля подключения свяжитесь с администратором.');
+}
+
+// Функция для загрузки апгрейд системы (из upgrade-system.js)
+function renderUpgradeScreen() {
+    if (typeof window.renderUpgradeScreen === 'function') {
+        window.renderUpgradeScreen();
+    } else {
+        // Fallback если upgrade-system.js не загружен
+        const grid = document.getElementById('upgradable-nft-grid');
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888888;">Система апгрейдов загружается...</div>';
+    }
 }
