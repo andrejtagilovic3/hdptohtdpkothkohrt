@@ -26,9 +26,9 @@ const upgradeTypes = {
 };
 
 const upgradeChances = {
-    common: 55,
-    uncommon: 35,
-    rare: 10
+    common: 75,
+    uncommon: 20,
+    rare: 5
 };
 
 const rarityColors = {
