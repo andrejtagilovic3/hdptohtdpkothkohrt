@@ -31,6 +31,13 @@ const upgradeChances = {
     rare: 10
 };
 
+const rarityColors = {
+    common: '#4caf50',
+    uncommon: '#2196f3', 
+    rare: '#ff9800',
+    epic: '#9c27b0'
+};
+
 let selectedNftForUpgrade = null;
 let currentUpgradeType = null;
 let upgradeInProgress = false;
@@ -48,13 +55,31 @@ function renderUpgradeScreen() {
         const card = document.createElement('div');
         card.className = 'nft-card upgrade-card';
         
+        // Определяем цвет рамки и название на основе апгрейда
+        let cardStyle = '';
+        let nameStyle = '';
         let upgradeInfo = '';
-        if (nft.upgrades) {
+        let isUpgraded = false;
+        
+        if (nft.upgrades && Object.keys(nft.upgrades).length > 0) {
+            isUpgraded = true;
+            // Определяем редкость на основе значения апгрейда
+            const upgradeValues = Object.values(nft.upgrades);
+            const maxUpgrade = Math.max(...upgradeValues);
+            
+            let rarity = 'common';
+            if (maxUpgrade >= 1.35) rarity = 'rare';
+            else if (maxUpgrade >= 1.20) rarity = 'uncommon';
+            
+            const rarityColor = rarityColors[rarity];
+            cardStyle = `border: 2px solid ${rarityColor}; box-shadow: 0 0 15px ${rarityColor}40;`;
+            nameStyle = `color: ${rarityColor}; font-weight: 700;`;
+            
             const upgradesList = Object.entries(nft.upgrades)
                 .map(([type, level]) => {
                     const upgrade = upgradeTypes[type];
                     if (upgrade) {
-                        return `<div class="upgrade-badge" style="color: ${upgrade.color}">
+                        return `<div class="upgrade-badge" style="background: ${rarityColor}20; color: ${rarityColor}; border: 1px solid ${rarityColor};">
                             ${upgrade.name.split(' ')[0]} +${Math.round((level - 1) * 100)}%
                         </div>`;
                     }
@@ -63,13 +88,15 @@ function renderUpgradeScreen() {
             upgradeInfo = `<div class="nft-upgrades">${upgradesList}</div>`;
         }
         
+        card.style.cssText = cardStyle;
+        
         card.innerHTML = `
             <img src="${nft.img}" class="nft-card-img" alt="${nft.name}">
-            <div class="nft-card-name">${nft.name}</div>
+            <div class="nft-card-name" style="${nameStyle}">${nft.name}</div>
             <div class="nft-card-price">Базовая цена: ${nft.buyPrice} звёзд</div>
             ${upgradeInfo}
-            <button class="nft-card-btn upgrade-btn" onclick="showUpgradeModal(collection[${index}], ${index})">
-                <i class="fas fa-arrow-up"></i> Апгрейд
+            <button class="nft-card-btn upgrade-btn" onclick="showUpgradeModal(${index})" ${isUpgraded ? 'disabled style="background: #666; color: #999; cursor: not-allowed;"' : ''}>
+                <i class="fas fa-arrow-up"></i> ${isUpgraded ? 'Апгрейд получен' : 'Апгрейд (50 звёзд)'}
             </button>
         `;
         
@@ -77,69 +104,31 @@ function renderUpgradeScreen() {
     });
 }
 
-function showUpgradeModal(nft, index) {
-    selectedNftForUpgrade = {nft, index};
-    const modal = document.getElementById('upgrade-selection-overlay');
-    const nftName = document.getElementById('upgrade-nft-name');
-    const nftImg = document.getElementById('upgrade-nft-img');
-    const optionsGrid = document.getElementById('upgrade-options');
+function showUpgradeModal(index) {
+    const nft = collection[index];
     
-    nftName.textContent = nft.name;
-    nftImg.src = nft.img;
-    
-    optionsGrid.innerHTML = '';
-    Object.entries(upgradeTypes).forEach(([key, upgrade]) => {
-        const currentLevel = (nft.upgrades && nft.upgrades[key]) ? nft.upgrades[key] : 1;
-        const scaledCost = Math.floor(upgrade.cost * Math.pow(1.3, currentLevel - 1));
-        
-        const option = document.createElement('div');
-        option.className = 'upgrade-option';
-        
-        if (stars < scaledCost) {
-            option.classList.add('disabled');
-        }
-        
-        option.innerHTML = `
-            <img src="${upgrade.icon}" alt="${upgrade.name}" class="upgrade-icon" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iOCIgZmlsbD0iIzU1NTU1NSIvPgo8cGF0aCBkPSJNMjAgMTBMMjYgMjZIMTRMMjAgMTBaIiBmaWxsPSIjRkZGRkZGIi8+Cjwvc3ZnPgo='">
-            <div class="upgrade-info">
-                <div class="upgrade-name">${upgrade.name}</div>
-                <div class="upgrade-desc">${upgrade.description} (Уровень ${Math.floor(currentLevel)})</div>
-                <div class="upgrade-cost">${scaledCost} звёзд</div>
-            </div>
-        `;
-        
-        if (stars >= scaledCost) {
-            option.onclick = () => startUpgradeProcess(key);
-        }
-        
-        optionsGrid.appendChild(option);
-    });
-    
-    modal.style.display = 'flex';
-}
-
-function closeUpgradeModal() {
-    document.getElementById('upgrade-selection-overlay').style.display = 'none';
-}
-
-function startUpgradeProcess(upgradeType) {
-    if (upgradeInProgress) return;
-    
-    currentUpgradeType = upgradeType;
-    const upgrade = upgradeTypes[upgradeType];
-    const nft = selectedNftForUpgrade.nft;
-    const currentLevel = (nft.upgrades && nft.upgrades[upgradeType]) ? nft.upgrades[upgradeType] : 1;
-    const scaledCost = Math.floor(upgrade.cost * Math.pow(1.3, currentLevel - 1));
-    
-    if (stars < scaledCost) {
-        alert('Недостаточно звёзд!');
+    // Проверяем, был ли уже апгрейд
+    if (nft.upgrades && Object.keys(nft.upgrades).length > 0) {
+        alert('Этот NFT уже апгрейден!');
         return;
     }
     
-    stars -= scaledCost;
+    // Проверяем наличие звёзд
+    if (stars < 50) {
+        alert('Недостаточно звёзд! Нужно 50 звёзд.');
+        return;
+    }
+    
+    selectedNftForUpgrade = {nft, index};
+    
+    // Снимаем звёзды сразу
+    stars -= 50;
     updateUI();
     
-    closeUpgradeModal();
+    // Случайно выбираем тип апгрейда
+    const upgradeTypeKeys = Object.keys(upgradeTypes);
+    currentUpgradeType = upgradeTypeKeys[Math.floor(Math.random() * upgradeTypeKeys.length)];
+    
     showUpgradeAnimation();
 }
 
@@ -153,6 +142,10 @@ function showUpgradeAnimation() {
     overlay.style.display = 'flex';
     result.style.display = 'none';
     giftBox.className = 'gift-box';
+    giftBox.style.transform = '';
+    giftBox.style.boxShadow = '';
+    giftBox.style.animation = '';
+    giftBox.style.filter = '';
     
     let tapsRemaining = 5;
     tapsCounter.textContent = tapsRemaining;
@@ -162,13 +155,34 @@ function showUpgradeAnimation() {
             tapsRemaining--;
             tapsCounter.textContent = tapsRemaining;
             
-            giftBox.classList.add('crack-' + (5 - tapsRemaining));
+            // Добавляем эффект тряски при каждом клике
+            giftBox.style.animation = 'giftShake 0.3s ease';
             
-            if (tapsRemaining === 0) {
+            // Добавляем визуальные эффекты постепенно
+            if (tapsRemaining === 4) {
+                giftBox.style.boxShadow = '0 0 20px rgba(76, 175, 80, 0.5)';
+            } else if (tapsRemaining === 3) {
+                giftBox.style.boxShadow = '0 0 30px rgba(33, 150, 243, 0.5)';
+                giftBox.style.transform = 'scale(1.05)';
+            } else if (tapsRemaining === 2) {
+                giftBox.style.boxShadow = '0 0 40px rgba(255, 152, 0, 0.5)';
+                giftBox.style.transform = 'scale(1.1)';
+            } else if (tapsRemaining === 1) {
+                giftBox.style.boxShadow = '0 0 50px rgba(156, 39, 176, 0.7)';
+                giftBox.style.transform = 'scale(1.15)';
+            } else if (tapsRemaining === 0) {
+                giftBox.style.animation = 'giftExplode 0.5s ease';
                 setTimeout(() => {
                     showUpgradeResult();
                 }, 500);
             }
+            
+            // Сброс анимации тряски
+            setTimeout(() => {
+                if (tapsRemaining > 0) {
+                    giftBox.style.animation = '';
+                }
+            }, 300);
         }
     };
 }
@@ -178,6 +192,7 @@ function showUpgradeResult() {
     const resultIcon = result.querySelector('.result-icon');
     const resultText = result.querySelector('.result-text');
     
+    // Определяем редкость случайно
     const rand = Math.random() * 100;
     let wonRarity = 'common';
     let cumulativeChance = 0;
@@ -202,14 +217,14 @@ function showUpgradeResult() {
     const upgrade = upgradeTypes[currentUpgradeType];
     const nft = selectedNftForUpgrade.nft;
     
+    // Применяем апгрейд
     if (!nft.upgrades) nft.upgrades = {};
-    if (!nft.upgrades[currentUpgradeType]) nft.upgrades[currentUpgradeType] = 1;
+    nft.upgrades[currentUpgradeType] = rarityBonus;
     
-    const oldLevel = nft.upgrades[currentUpgradeType];
-    nft.upgrades[currentUpgradeType] *= rarityBonus;
-    
+    // Обновляем коллекцию
     collection[selectedNftForUpgrade.index] = nft;
     
+    // Обновляем активный NFT если это он
     if (activeBattleNft && 
         activeBattleNft.name === nft.name && 
         activeBattleNft.img === nft.img && 
@@ -217,8 +232,9 @@ function showUpgradeResult() {
         activeBattleNft = {...nft};
     }
     
-    resultIcon.style.background = upgrade.color;
-    resultIcon.innerHTML = `<i class="fas fa-arrow-up"></i>`;
+    const rarityColor = rarityColors[wonRarity];
+    resultIcon.style.background = rarityColor;
+    resultIcon.innerHTML = `<i class="fas fa-star"></i>`;
     
     const rarityNames = {
         common: { name: 'Обычный', color: '#4caf50' },
@@ -228,21 +244,27 @@ function showUpgradeResult() {
     
     const rarityInfo = rarityNames[wonRarity];
     const bonusPercent = Math.round((rarityBonus - 1) * 100);
-    const totalPercent = Math.round((nft.upgrades[currentUpgradeType] - 1) * 100);
     
     resultText.innerHTML = `
-        <div style="color: ${rarityInfo.color}; font-size: 20px; font-weight: bold;">${rarityInfo.name} апгрейд!</div>
-        <div style="margin-top: 8px;">${upgrade.name}</div>
-        <div style="color: #888; font-size: 14px;">Получен бонус: +${bonusPercent}%</div>
-        <div style="color: #fff; font-size: 14px; margin-top: 4px;">Общий бонус: +${totalPercent}%</div>
+        <div style="color: ${rarityInfo.color}; font-size: 20px; font-weight: bold; margin-bottom: 8px;">${rarityInfo.name} апгрейд!</div>
+        <div style="font-size: 18px; margin-bottom: 8px;">${upgrade.name}</div>
+        <div style="color: ${rarityInfo.color}; font-size: 16px; font-weight: bold;">Бонус: +${bonusPercent}%</div>
+        <div style="color: #ccc; font-size: 14px; margin-top: 8px;">${upgrade.description}</div>
     `;
     
     result.style.display = 'block';
     updateUI();
+    saveData();
 }
 
 function closeUpgradeAnimation() {
     document.getElementById('upgrade-animation-overlay').style.display = 'none';
     upgradeInProgress = false;
     renderUpgradeScreen();
+    renderCenterArea();
+    renderCollection();
+}
+
+function closeUpgradeModal() {
+    document.getElementById('upgrade-selection-overlay').style.display = 'none';
 }
