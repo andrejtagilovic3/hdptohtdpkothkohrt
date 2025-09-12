@@ -436,9 +436,13 @@
         opacity: 0.8;
     }
     100% {
-        transform: rotate(360deg);
+        transform: rotate(0deg); /* ИЗМЕНЕНО: убрали поворот */
         opacity: 0.6;
     }
+}
+
+.center-logo {
+    animation: logoRotate 8s ease-in-out infinite; /* ИЗМЕНЕНО: плавная анимация */
 }
 
 .center-logo {
@@ -528,4 +532,5 @@
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
+
 }
