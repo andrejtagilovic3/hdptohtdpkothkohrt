@@ -30,7 +30,7 @@ const upgradeChances = {
 
 const rarityColors = {
     common: '#4caf50',
-    uncommon: '#2196f3', 
+    uncommon: '#2196f3',
     rare: '#ff9800',
     epic: '#9c27b0'
 };
@@ -52,15 +52,13 @@ function renderUpgradeScreen() {
         const card = document.createElement('div');
         card.className = 'nft-card upgrade-card';
         
-        // Определяем цвет рамки и название на основе апгрейда
-        let cardStyle = '';
+        let cardStyle = 'border: 1px solid #333333;';
         let nameStyle = '';
         let upgradeInfo = '';
         let isUpgraded = false;
         
         if (nft.upgrades && Object.keys(nft.upgrades).length > 0) {
             isUpgraded = true;
-            // Определяем редкость на основе значения апгрейда
             const upgradeValues = Object.values(nft.upgrades);
             const maxUpgrade = Math.max(...upgradeValues);
             
@@ -69,7 +67,7 @@ function renderUpgradeScreen() {
             else if (maxUpgrade >= 1.12) rarity = 'uncommon';
             
             const rarityColor = rarityColors[rarity];
-            cardStyle = `border: 2px solid ${rarityColor}; box-shadow: 0 0 15px ${rarityColor}40;`;
+            cardStyle = `border: 2px solid ${rarityColor};`;
             nameStyle = `color: ${rarityColor}; font-weight: 700;`;
             
             const upgradesList = Object.entries(nft.upgrades)
@@ -104,25 +102,20 @@ function renderUpgradeScreen() {
 function showUpgradeModal(index) {
     const nft = collection[index];
     
-    // Проверяем, был ли уже апгрейд
     if (nft.upgrades && Object.keys(nft.upgrades).length > 0) {
         alert('Этот NFT уже апгрейден!');
         return;
     }
     
-    // Проверяем наличие звёзд
     if (stars < 50) {
         alert('Недостаточно звёзд! Нужно 50 звёзд.');
         return;
     }
     
-    selectedNftForUpgrade = {nft: {...nft}, index}; // ИСПРАВЛЕНИЕ: копируем NFT
-    
-    // Снимаем звёзды сразу
+    selectedNftForUpgrade = {nft: {...nft}, index};
     stars -= 50;
     updateUI();
     
-    // Случайно выбираем тип апгрейда
     const upgradeTypeKeys = Object.keys(upgradeTypes);
     currentUpgradeType = upgradeTypeKeys[Math.floor(Math.random() * upgradeTypeKeys.length)];
     
@@ -152,29 +145,23 @@ function showUpgradeAnimation() {
             tapsRemaining--;
             tapsCounter.textContent = tapsRemaining;
             
-            // Добавляем эффект тряски при каждом клике
             giftBox.style.animation = 'giftShake 0.3s ease';
             
-            // Добавляем визуальные эффекты постепенно
             if (tapsRemaining === 4) {
-                giftBox.style.boxShadow = '0 0 20px rgba(76, 175, 80, 0.5)';
+                giftBox.classList.add('crack-1');
             } else if (tapsRemaining === 3) {
-                giftBox.style.boxShadow = '0 0 30px rgba(33, 150, 243, 0.5)';
-                giftBox.style.transform = 'scale(1.05)';
+                giftBox.classList.add('crack-2');
             } else if (tapsRemaining === 2) {
-                giftBox.style.boxShadow = '0 0 40px rgba(255, 152, 0, 0.5)';
-                giftBox.style.transform = 'scale(1.1)';
+                giftBox.classList.add('crack-3');
             } else if (tapsRemaining === 1) {
-                giftBox.style.boxShadow = '0 0 50px rgba(156, 39, 176, 0.7)';
-                giftBox.style.transform = 'scale(1.15)';
+                giftBox.classList.add('crack-4');
             } else if (tapsRemaining === 0) {
-                giftBox.style.animation = 'giftExplode 0.5s ease';
+                giftBox.classList.add('crack-5');
                 setTimeout(() => {
                     showUpgradeResult();
                 }, 500);
             }
             
-            // Сброс анимации тряски
             setTimeout(() => {
                 if (tapsRemaining > 0) {
                     giftBox.style.animation = '';
@@ -189,7 +176,6 @@ function showUpgradeResult() {
     const resultIcon = result.querySelector('.result-icon');
     const resultText = result.querySelector('.result-text');
     
-    // Определяем редкость случайно
     const rand = Math.random() * 100;
     let wonRarity = 'common';
     let cumulativeChance = 0;
@@ -213,12 +199,10 @@ function showUpgradeResult() {
     
     const upgrade = upgradeTypes[currentUpgradeType];
     
-    // ИСПРАВЛЕНИЕ: Правильно применяем апгрейд к NFT
     const nftToUpgrade = collection[selectedNftForUpgrade.index];
     if (!nftToUpgrade.upgrades) nftToUpgrade.upgrades = {};
     nftToUpgrade.upgrades[currentUpgradeType] = rarityBonus;
     
-    // Обновляем активный NFT если это он
     if (activeBattleNft && 
         activeBattleNft.name === nftToUpgrade.name && 
         activeBattleNft.img === nftToUpgrade.img && 
@@ -247,7 +231,6 @@ function showUpgradeResult() {
     
     result.style.display = 'block';
     
-    // ВАЖНО: Сохраняем данные
     updateUI();
     saveData();
 }
