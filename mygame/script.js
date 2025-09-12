@@ -442,8 +442,8 @@ function initializeBattle(playerFirst) {
     if (activeBattleNft.upgrades && Object.keys(activeBattleNft.upgrades).length > 0) {
         const playerUpgradeLevel = Math.max(...Object.values(activeBattleNft.upgrades));
         let playerColor = '#4caf50'; // зеленый для обычных
-        if (playerUpgradeLevel >= 1.35) playerColor = '#ff9800'; // оранжевый для редких
-        else if (playerUpgradeLevel >= 1.20) playerColor = '#2196f3'; // синий для необычных
+        if (playerUpgradeLevel >= 1.12) playerColor = '#ff9800'; // оранжевый для редких
+        else if (playerUpgradeLevel >= 1.12) playerColor = '#2196f3'; // синий для необычных
     
         playerImg.style.border = `3px solid ${playerColor}`;
         playerImg.style.boxShadow = `0 0 15px ${playerColor}60`;
@@ -452,8 +452,8 @@ function initializeBattle(playerFirst) {
     if (botNft.upgrades && Object.keys(botNft.upgrades).length > 0) {
         const botUpgradeLevel = Math.max(...Object.values(botNft.upgrades));
         let botColor = '#4caf50';
-        if (botUpgradeLevel >= 1.35) botColor = '#ff9800';
-        else if (botUpgradeLevel >= 1.20) botColor = '#2196f3';
+        if (botUpgradeLevel >= 1.12) botColor = '#ff9800';
+        else if (botUpgradeLevel >= 1.12) botColor = '#2196f3';
     
         botImg.style.border = `3px solid ${botColor}`;
         botImg.style.boxShadow = `0 0 15px ${botColor}60`;
@@ -769,9 +769,9 @@ function renderCenterArea() {
             const maxUpgrade = Math.max(...upgradeValues);
     
             let rarity = 'common';
-            if (maxUpgrade >= 1.35) {
+            if (maxUpgrade >= 1.20) {
                 rarity = 'rare';
-            } else if (maxUpgrade >= 1.20) {
+            } else if (maxUpgrade >= 1.12) {
                 rarity = 'uncommon';
             }
 
@@ -844,9 +844,9 @@ function renderCollection() {
                 const maxUpgrade = Math.max(...upgradeValues);
     
                 let rarity = 'common';
-                if (maxUpgrade >= 1.35) {
+                if (maxUpgrade >= 1.20) {
                     rarity = 'rare';
-                } else if (maxUpgrade >= 1.20) {
+                } else if (maxUpgrade >= 1.12) {
                     rarity = 'uncommon';
                 }
     
@@ -963,9 +963,9 @@ function renderProfile() {
                 const maxUpgrade = Math.max(...upgradeValues);
                 
                 let rarity = 'common';
-                if (maxUpgrade >= 1.35) {
+                if (maxUpgrade >= 1.20) {
                     rarity = 'rare';
-                } else if (maxUpgrade >= 1.20) {
+                } else if (maxUpgrade >= 1.12) {
                     rarity = 'uncommon';
                 }
     
