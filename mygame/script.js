@@ -1160,10 +1160,9 @@ function renderUpgradeScreen() {
     if (typeof window.renderUpgradeScreen === 'function') {
         window.renderUpgradeScreen();
     } else {
+        // Fallback если upgrade-system.js не загружен
         const grid = document.getElementById('upgradable-nft-grid');
-        if (grid) {
-            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888888;">Система апгрейдов загружается...</div>';
-        }
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888888;">Система апгрейдов загружается...</div>';
     }
 }
 
