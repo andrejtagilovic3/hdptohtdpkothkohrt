@@ -177,12 +177,30 @@
     animation: starPulse 2s ease-in-out infinite;
 }
 
-@keyframes centerNftGlow {
+@keyframes centerNftGlowGreen {
     0%, 100% {
-        box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
     }
     50% {
-        box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 30px rgba(76, 175, 80, 0.5);
+    }
+}
+
+@keyframes centerNftGlowBlue {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(33, 150, 243, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(33, 150, 243, 0.5);
+    }
+}
+
+@keyframes centerNftGlowOrange {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(255, 152, 0, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(255, 152, 0, 0.5);
     }
 }
 
@@ -534,3 +552,4 @@
     }
 
 }
+
