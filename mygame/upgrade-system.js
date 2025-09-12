@@ -4,7 +4,6 @@ const upgradeTypes = {
         rarity: 'common',
         cost: 50,
         icon: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/img_upd/desc/damage.png',
-        description: 'test'${bonusPercent},
         color: '#4caf50'
     },
     dodge: {
@@ -12,7 +11,6 @@ const upgradeTypes = {
         rarity: 'uncommon',
         cost: 75,
         icon: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/img_upd/desc/dodge.png',
-        description: 'test'${bonusPercent},
         color: '#2196f3'
     },
     crit: {
@@ -20,7 +18,6 @@ const upgradeTypes = {
         rarity: 'rare',
         cost: 100,
         icon: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/img_upd/desc/crit.png',
-        description: 'test+'${bonusPercent},
         color: '#ff9800'
     }
 };
