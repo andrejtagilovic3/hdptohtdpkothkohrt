@@ -246,7 +246,7 @@ function closeFilterOnOutsideClick(event) {
     }
 }
 
-function generateBotUpgrades(matchPlayerLevel) {
+function generateBotUpgrades(botNft, matchPlayerLevel) {
     if (!botNft.upgrades) botNft.upgrades = {};
     
     const upgradeTypes = ['damage', 'dodge', 'crit'];
@@ -316,83 +316,6 @@ function purchaseStars(amount) {
     closePurchaseMenu();
 }
 
-function startBattle() {
-    document.getElementById('searching-overlay').style.display = 'none';
-
-    const playerPrice = activeBattleNft.buyPrice;
-    const playerHasUpgrades = activeBattleNft.upgrades && Object.keys(activeBattleNft.upgrades).length > 0;
-    let suitableNfts = [];
-
-    nftTemplates.forEach((template, index) => {
-        const nftPrice = nftPrices[index];
-        
-        // Подбор по цене (±30% от цены игрока)
-        const priceMin = playerPrice * 0.7;
-        const priceMax = playerPrice * 1.3;
-        
-        if (nftPrice >= priceMin && nftPrice <= priceMax) {
-            suitableNfts.push({ 
-                ...template, 
-                price: nftPrice
-            });
-        }
-    });
-
-    if (suitableNfts.length === 0) {
-        const randomIndex = Math.floor(Math.random() * nftTemplates.length);
-        botNft = { ...nftTemplates[randomIndex], price: nftPrices[randomIndex] };
-    } else {
-        const randomIndex = Math.floor(Math.random() * suitableNfts.length);
-        botNft = suitableNfts[randomIndex];
-    }
-
-    // ЛОГИКА АПГРЕЙДОВ ДЛЯ БОТА
-    if (playerHasUpgrades) {
-        if (Math.random() < 0.7) {
-            generateBotUpgrades(true);
-        }
-    } else {
-        if (Math.random() < 0.15) {
-            generateBotUpgrades(false);
-        }
-    }
-
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('battle-screen').classList.add('active');
-
-// Скрываем содержимое боевого экрана во время подбрасывания монеты
-    const battleArena = document.querySelector('.battle-arena');
-    if (battleArena) {
-        battleArena.style.display = 'none';
-    }
-
-    document.getElementById('coin-toss-overlay').style.display = 'flex';
-    document.getElementById('coin-front').src = activeBattleNft.img;
-    document.getElementById('coin-back').src = botNft.img;
-    document.getElementById('coin-result-text').textContent = '';
-    const coin = document.getElementById('coin');
-    coin.style.animation = 'none';
-
-    setTimeout(() => {
-        const playerFirst = Math.random() < 0.5;
-        const animationName = playerFirst ? 'flipFront' : 'flipBack';
-        coin.style.animation = `${animationName} 3s ease-out forwards`;
-
-        coin.addEventListener('animationend', () => {
-            const text = playerFirst ? 'Вы ходите первым!' : 'Оппонент ходит первым!';
-            document.getElementById('coin-result-text').textContent = text;
-
-            setTimeout(() => {
-                document.getElementById('coin-toss-overlay').style.display = 'none';
-                const battleArena = document.querySelector('.battle-arena');
-                if (battleArena) {
-                    battleArena.style.display = 'block';
-                }
-                initializeBattle(playerFirst);
-            }, 2000);
-        }, { once: true });
-    }, 1000);
-}
 
 function startBattleSearch() {
     if (!activeBattleNft || stars < 10) return;
@@ -419,7 +342,7 @@ function startBattleSearch() {
             if (statusIndex < searchStatuses.length) {
                 setTimeout(updateStatus, 800);
             } else {
-                setTimeout(startBattle, 500);
+                setTimeout(startNewBattle, 500); // ИЗМЕНЕНО: используем новую функцию
             }
         }
     };
@@ -571,100 +494,6 @@ function performAttack(isPlayerTurn) {
     }
 }
 
-function updateHPBars() {
-    const playerHPBar = document.querySelector('#player-hp-bar');
-    const botHPBar = document.querySelector('#bot-hp-bar');
-    const playerHPText = document.querySelector('#player-hp-text');
-    const botHPText = document.querySelector('#bot-hp-text');
-
-    // Округляем HP: игрок в меньшую сторону, бот в большую
-    const roundedPlayerHP = Math.floor(playerHP); // Округляем вниз (хуже для игрока)
-    const roundedBotHP = Math.ceil(botHP);         // Округляем вверх (лучше для бота)
-
-    playerHPBar.style.width = `${Math.max(0, roundedPlayerHP)}%`;
-    botHPBar.style.width = `${Math.max(0, roundedBotHP)}%`;
-    playerHPText.textContent = `${Math.max(0, roundedPlayerHP)}/100 HP`;
-    botHPText.textContent = `${Math.max(0, roundedBotHP)}/100 HP`;
-
-    if (roundedPlayerHP <= 25) {
-        playerHPBar.classList.add('low');
-    } else {
-        playerHPBar.classList.remove('low');
-    }
-
-    if (roundedBotHP <= 25) {
-        botHPBar.classList.add('low');
-    } else {
-        botHPBar.classList.remove('low');
-    }
-}
-
-function endBattle() {
-    battleInProgress = false;
-    const log = document.getElementById('battle-log');
-    
-    // Сохраняем текущий activeBattleNft для истории ПЕРЕД изменениями
-    const battleNftForHistory = activeBattleNft ? { ...activeBattleNft } : null;
-
-    // Округляем HP для определения победителя
-    const roundedPlayerHP = Math.floor(playerHP);
-    const roundedBotHP = Math.ceil(botHP);
-
-    let won = false;
-    if (roundedPlayerHP > 0 && roundedBotHP <= 0) {
-        won = true;
-        collection.push({ ...botNft, buyPrice: botNft.price });
-        log.textContent = `Вы победили и получили ${botNft.name}!`;
-    } else {
-        if (battleNftForHistory) {
-            // Находим и удаляем проигранный NFT из коллекции
-            const index = collection.findIndex(nft =>
-                nft.name === battleNftForHistory.name &&
-                nft.img === battleNftForHistory.img &&
-                nft.buyPrice === battleNftForHistory.buyPrice
-            );
-            
-            if (index !== -1) {
-                collection.splice(index, 1);
-                activeBattleNft = null;
-            }
-            log.textContent = `Вы проиграли и потеряли ${battleNftForHistory.name}!`;
-        }
-    }
-
-    // Добавляем в историю с сохраненными данными
-    if (battleNftForHistory) {
-        battleHistory.push({
-            playerNft: battleNftForHistory,
-            opponentNft: { ...botNft },
-            won,
-            timestamp: new Date().toISOString()
-        });
-    }
-
-// Показываем результат (удаляем старый, если есть)
-    let existingResult = document.querySelector('.battle-result');
-    if (existingResult) {
-        existingResult.remove();
-    }
-
-    const resultDiv = document.createElement('div');
-    resultDiv.className = `battle-result ${won ? 'win' : 'lose'}`;
-    resultDiv.textContent = won ? 'ПОБЕДА!' : 'ПОРАЖЕНИЕ!';
-    document.getElementById('battle-log').insertAdjacentElement('afterend', resultDiv);
-    
-    // Показываем кнопку возврата через небольшую задержку
-    setTimeout(() => {
-        const backButton = document.getElementById('back-to-menu-btn');
-        backButton.style.display = 'block';
-        backButton.style.animation = 'fadeIn 0.3s ease';
-    }, 1000);
-    
-    updateUI();
-    renderCenterArea();
-    renderCollection();
-    saveData();
-}
 
 function switchScreen(screen) {
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
@@ -1194,48 +1023,3 @@ function renderUpgradeScreen() {
 
 // Добавьте эту функцию в конец файла script.js
 
-function backToMainFromBattle() {
-    // Сбрасываем состояние битвы
-    battleInProgress = false;
-    playerHP = 100;
-    botHP = 100;
-    botNft = null;
-    
-    // Убираем обводки с изображений
-    const playerImg = document.getElementById('player-img');
-    const botImg = document.getElementById('bot-img');
-    if (playerImg) {
-        playerImg.style.border = '';
-        playerImg.style.boxShadow = '';
-    }
-    if (botImg) {
-        botImg.style.border = '';
-        botImg.style.boxShadow = '';
-    }
-    // Убираем результаты битвы
-    const existingResults = document.querySelectorAll('.battle-result');
-    existingResults.forEach(result => result.remove());
-    
-    // Скрываем кнопку возврата
-    const backButton = document.getElementById('back-to-menu-btn');
-    if (backButton) {
-        backButton.style.display = 'none';
-    }
-    
-    // Переходим на главный экран
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('main-screen').classList.add('active');
-    
-    // Обновляем навигацию
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    document.querySelectorAll('.nav-item')[0].classList.add('active');
-    
-    // Обновляем центральную область
-    renderCenterArea();
-    
-    // Обновляем UI
-    updateUI();
-    
-    // Устанавливаем текущий экран
-    currentScreen = 'main';
-}
