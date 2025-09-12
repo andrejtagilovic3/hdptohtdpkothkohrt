@@ -793,11 +793,10 @@ function renderCenterArea() {
             
             nameStyle = `color: ${rarityColor}; text-shadow: 0 0 10px ${rarityColor}60;`;
             
-            const upgradeTypes = {
-                damage: { name: 'Увеличение урона', icon: '⚔️' },
-                dodge: { name: 'Уклонение', icon: '🛡️' },
-                crit: { name: 'Критический удар', icon: '💥' }
-            };
+            upgradeGlow = `
+                border: 3px solid ${rarityColor}; 
+                box-shadow: 0 0 20px ${rarityColor}60;
+            `;
             
             const upgradesList = Object.entries(activeBattleNft.upgrades)
                 .map(([type, level]) => {
@@ -859,12 +858,9 @@ function renderCollection() {
                 
                 const rarityColor = rarityColors[rarity];
                 
-                // Используем прямые стили с правильным цветом
                 cardStyle = `
                     border: 2px solid ${rarityColor}; 
                     box-shadow: 0 0 15px ${rarityColor}40;
-                    animation: nftCardCustomGlow 2s ease-in-out infinite;
-                    --glow-color: ${rarityColor};
                 `;
                 
                 nameStyle = `color: ${rarityColor}; font-weight: 700;`;
@@ -984,8 +980,6 @@ function renderProfile() {
                 cardStyle = `
                     border: 2px solid ${rarityColor}; 
                     box-shadow: 0 0 15px ${rarityColor}40;
-                    animation: nftCardCustomGlow 2s ease-in-out infinite;
-                    --glow-color: ${rarityColor};
                 `;
                 
                 nameStyle = `color: ${rarityColor}; font-weight: 700;`;
