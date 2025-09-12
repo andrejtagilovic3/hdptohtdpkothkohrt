@@ -1157,12 +1157,14 @@ function showTerms() {
 
 // Функция для загрузки апгрейд системы (из upgrade-system.js)
 function renderUpgradeScreen() {
+    // Удалить if (typeof window.renderUpgradeScreen...), просто вызвать
+    renderUpgradeScreen();  // Но это рекурсия! Нет, если в upgrade-system.js это глобальная, но лучше:
+    // Сделай в upgrade-system.js: window.renderUpgradeScreen = function() { ... };
+    // Затем в script.js:
     if (typeof window.renderUpgradeScreen === 'function') {
         window.renderUpgradeScreen();
     } else {
-        // Fallback если upgrade-system.js не загружен
-        const grid = document.getElementById('upgradable-nft-grid');
-        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888888;">Система апгрейдов загружается...</div>';
+        // fallback
     }
 }
 
