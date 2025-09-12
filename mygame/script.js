@@ -778,15 +778,22 @@ function renderCenterArea() {
                 animationName = 'centerNftGlowBlue';
             }
     
-            const rarityColors = {
-                common: '#4caf50',
-                uncommon: '#2196f3',
-                rare: '#ff9800'
+            const upgradeTypeColors = {
+                damage: '#4caf50',  // зеленый для урона
+                dodge: '#2196f3',   // синий для уклонения  
+                crit: '#ff9800'     // оранжевый для крита
             };
-    
-        const rarityColor = rarityColors[rarity];
-        upgradeGlow = `box-shadow: 0 0 20px ${rarityColor}60; border: 3px solid ${rarityColor}; animation: ${animationName} 3s ease-in-out infinite;`;
-        nameStyle = `color: ${rarityColor}; text-shadow: 0 0 10px ${rarityColor}60;`;
+
+// Находим тип апгрейда для правильного цвета
+            let upgradeColor = '#4caf50'; // по умолчанию зеленый
+            const upgradeEntries = Object.entries(activeBattleNft.upgrades);
+            if (upgradeEntries.length > 0) {
+                const firstUpgradeType = upgradeEntries[0][0]; // берем тип первого апгрейда
+                upgradeColor = upgradeTypeColors[firstUpgradeType] || '#4caf50';
+            }
+
+upgradeGlow = `box-shadow: 0 0 15px ${upgradeColor}40; border: 3px solid ${upgradeColor}; animation: centerNftGlow 3s ease-in-out infinite;`;
+nameStyle = `color: ${upgradeColor}; text-shadow: 0 0 8px ${upgradeColor}40;`;
             
             const upgradeTypes = {
                 damage: { name: 'Увеличение урона', icon: '⚔️' },
