@@ -1,5 +1,4 @@
-/* === UNDERTALE BATTLE STYLES === */
-/* Строгий черно-белый дизайн в стиле всего приложения с улучшенной мобильной версией */
+/* === UNDERTALE BATTLE STYLES (ОБНОВЛЕННЫЕ) === */
 
 .undertale-battle-container {
     position: fixed;
@@ -175,7 +174,7 @@
     border-radius: 15px;
     background: #1a1a1a;
     padding: 18px;
-    width: 150px;
+    width: 160px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -189,16 +188,29 @@
     border-radius: 10px;
     border: 2px solid #666666;
     object-fit: cover;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .player-name {
     font-size: 14px;
     font-weight: 800;
     color: #ffffff;
-    margin-bottom: 10px;
+    margin-bottom: 4px;
     text-align: center;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* ДОБАВЛЕНО: Название NFT игрока */
+.player-nft-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #cccccc;
+    margin-bottom: 8px;
+    text-align: center;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .player-hp-container {
@@ -435,6 +447,10 @@
         min-height: 50px;
         font-size: 16px;
     }
+    
+    .player-battle-area {
+        width: 140px;
+    }
 }
 
 @media (max-height: 600px) {
@@ -489,6 +505,11 @@
     .player-battle-img {
         width: 60px;
         height: 60px;
+    }
+    
+    .player-nft-name {
+        font-size: 11px;
+        max-width: 100px;
     }
 }
 
@@ -555,5 +576,10 @@
     .battle-result-modal {
         min-width: 280px;
         padding: 25px;
+    }
+    
+    .player-nft-name {
+        font-size: 10px;
+        max-width: 80px;
     }
 }
