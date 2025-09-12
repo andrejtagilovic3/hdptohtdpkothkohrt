@@ -359,6 +359,12 @@ function startBattle() {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('battle-screen').classList.add('active');
 
+// Скрываем содержимое боевого экрана во время подбрасывания монеты
+    const battleArena = document.querySelector('.battle-arena');
+    if (battleArena) {
+        battleArena.style.display = 'none';
+    }
+
     document.getElementById('coin-toss-overlay').style.display = 'flex';
     document.getElementById('coin-front').src = activeBattleNft.img;
     document.getElementById('coin-back').src = botNft.img;
@@ -377,6 +383,10 @@ function startBattle() {
 
             setTimeout(() => {
                 document.getElementById('coin-toss-overlay').style.display = 'none';
+                const battleArena = document.querySelector('.battle-arena');
+                if (battleArena) {
+                    battleArena.style.display = 'block';
+                }
                 initializeBattle(playerFirst);
             }, 2000);
         }, { once: true });
@@ -719,8 +729,8 @@ function renderCenterArea() {
             const maxUpgrade = Math.max(...upgradeValues);
             
             let rarity = 'common';
-            if (maxUpgrade >= 1.35) rarity = 'rare';
-            else if (maxUpgrade >= 1.20) rarity = 'uncommon';
+            if (maxUpgrade >= 1.20) rarity = 'rare';
+            else if (maxUpgrade >= 1.12) rarity = 'uncommon';
             
             const rarityColors = {
                 common: '#4caf50',
@@ -784,8 +794,8 @@ function renderCollection() {
                 const maxUpgrade = Math.max(...upgradeValues);
                 
                 let rarity = 'common';
-                if (maxUpgrade >= 1.35) rarity = 'rare';
-                else if (maxUpgrade >= 1.20) rarity = 'uncommon';
+                if (maxUpgrade >= 1.20) rarity = 'rare';
+                else if (maxUpgrade >= 1.12) rarity = 'uncommon';
                 
                 const rarityColors = {
                     common: '#4caf50',
@@ -894,8 +904,8 @@ function renderProfile() {
                 const maxUpgrade = Math.max(...upgradeValues);
                 
                 let rarity = 'common';
-                if (maxUpgrade >= 1.35) rarity = 'rare';
-                else if (maxUpgrade >= 1.20) rarity = 'uncommon';
+                if (maxUpgrade >= 1.20) rarity = 'rare';
+                else if (maxUpgrade >= 1.12) rarity = 'uncommon';
                 
                 const rarityColors = {
                     common: '#4caf50',
