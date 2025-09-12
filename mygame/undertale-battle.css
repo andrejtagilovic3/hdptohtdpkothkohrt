@@ -1,21 +1,7 @@
 /* === UNDERTALE BATTLE STYLES === */
-/* Строгий черно-белый дизайн в стиле всего приложения */
+/* Строгий черно-белый дизайн в стиле всего приложения с улучшенной мобильной версией */
 
-.hp-bar.critical {
-    background: #888888;
-    animation: criticalFlash 1s ease-in-out infinite;
-}
-
-@keyframes criticalFlash {
-    0%, 100% { 
-        opacity: 1; 
-        background: #ffffff;
-    }
-    50% { 
-        opacity: 0.6; 
-        background: #888888;
-    }
-}undertale-battle-container {
+.undertale-battle-container {
     position: fixed;
     top: 0;
     left: 0;
@@ -28,21 +14,23 @@
     flex-direction: column;
     z-index: 9999;
     font-weight: 600;
+    overflow: hidden;
 }
 
 /* ВЕРХНЯЯ ОБЛАСТЬ - ВРАГ */
 .enemy-battle-area {
     flex: 2;
-    border: 2px solid #333333;
+    border: 3px solid #333333;
     margin: 10px;
-    border-radius: 12px;
+    border-radius: 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     background: #1a1a1a;
     position: relative;
-    padding: 20px;
+    padding: 25px;
+    min-height: 250px;
 }
 
 .escape-btn {
@@ -50,189 +38,184 @@
     top: 15px;
     right: 15px;
     background: #333333;
-    border: 1px solid #666666;
+    border: 2px solid #666666;
     color: #ffffff;
-    padding: 8px 12px;
-    border-radius: 6px;
+    padding: 10px 15px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 700;
     transition: all 0.2s ease;
+    touch-action: manipulation;
 }
 
-.escape-btn:hover {
+.escape-btn:hover, .escape-btn:active {
     background: #444444;
-    border-color: #777777;
+    border-color: #888888;
+    transform: scale(0.95);
 }
 
 /* БОЛЬШОЕ изображение врага */
 .enemy-battle-img {
-    width: 180px;
-    height: 180px;
-    border-radius: 12px;
-    border: 2px solid #666666;
+    width: 200px;
+    height: 200px;
+    border-radius: 15px;
+    border: 3px solid #666666;
     object-fit: cover;
     margin-bottom: 20px;
     transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
 }
 
 .enemy-name {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 22px;
+    font-weight: 800;
     color: #ffffff;
-    margin-bottom: 15px;
+    margin-bottom: 18px;
     text-align: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: 1px;
 }
 
 /* HP бары */
 .hp-container {
     background: #000000;
-    border: 2px solid #666666;
-    border-radius: 8px;
-    width: 220px;
-    height: 20px;
+    border: 3px solid #666666;
+    border-radius: 10px;
+    width: 250px;
+    height: 24px;
     overflow: hidden;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .hp-bar {
     height: 100%;
-    background: #ffffff;
+    background: linear-gradient(90deg, #ffffff 0%, #cccccc 100%);
     width: 100%;
     transition: width 0.8s ease-out;
     position: relative;
 }
 
 .hp-bar.critical {
-    background: #888888;
+    background: linear-gradient(90deg, #888888 0%, #555555 100%);
     animation: criticalFlash 1s ease-in-out infinite;
 }
 
 @keyframes criticalFlash {
     0%, 100% { 
         opacity: 1; 
-        background: #ffffff;
+        background: linear-gradient(90deg, #ffffff 0%, #cccccc 100%);
     }
     50% { 
         opacity: 0.6; 
-        background: #888888;
+        background: linear-gradient(90deg, #888888 0%, #555555 100%);
     }
 }
 
-/* Увеличенные кнопки для мобильных устройств */
-.battle-action-btn:hover:not(:disabled) {
-    background: #444444;
-    border-color: #777777;
-    transform: translateY(-2px);
-}
-
-.battle-action-btn:active:not(:disabled) {
-    transform: translateY(0);
-    background: #2a2a2a;
-}
-
-.battle-action-btn:disabled {
-    background: #1a1a1a;
-    color: #666666;
-    cursor: not-allowed;
-    opacity: 0.5;
-    border-color: #333333;
-}
-
 .hp-text {
-    font-size: 14px;
+    font-size: 16px;
     color: #cccccc;
-    font-weight: 600;
+    font-weight: 700;
     text-align: center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* НИЖНЯЯ ОБЛАСТЬ */
 .battle-bottom-area {
-    height: 300px;
+    height: 320px;
     margin: 0 10px 10px 10px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
 /* ЛОГ БОЯ */
 .battle-log-container {
-    border: 2px solid #333333;
-    border-radius: 12px;
+    border: 3px solid #333333;
+    border-radius: 15px;
     background: #1a1a1a;
-    padding: 15px;
-    height: 100px;
+    padding: 18px;
+    height: 110px;
     overflow-y: auto;
     font-size: 14px;
     color: #cccccc;
-    line-height: 1.4;
+    line-height: 1.5;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .battle-log-container::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
 }
 
 .battle-log-container::-webkit-scrollbar-track {
     background: #000000;
-    border-radius: 3px;
+    border-radius: 4px;
 }
 
 .battle-log-container::-webkit-scrollbar-thumb {
-    background: #333333;
-    border-radius: 3px;
+    background: #444444;
+    border-radius: 4px;
+}
+
+.battle-log-container::-webkit-scrollbar-thumb:hover {
+    background: #555555;
 }
 
 /* ОБЛАСТЬ ДЕЙСТВИЙ */
 .battle-actions-area {
     display: flex;
-    gap: 10px;
-    height: 180px;
+    gap: 12px;
+    height: 190px;
 }
 
 /* ИГРОК (маленькое окно посередине) */
 .player-battle-area {
-    border: 2px solid #333333;
-    border-radius: 12px;
+    border: 3px solid #333333;
+    border-radius: 15px;
     background: #1a1a1a;
-    padding: 15px;
-    width: 140px;
+    padding: 18px;
+    width: 150px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.05);
 }
 
 .player-battle-img {
-    width: 60px;
-    height: 60px;
-    border-radius: 8px;
+    width: 70px;
+    height: 70px;
+    border-radius: 10px;
     border: 2px solid #666666;
     object-fit: cover;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .player-name {
-    font-size: 12px;
-    font-weight: 700;
-    color: #cccccc;
-    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 10px;
     text-align: center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .player-hp-container {
     background: #000000;
     border: 2px solid #666666;
-    border-radius: 6px;
-    width: 100px;
-    height: 16px;
+    border-radius: 8px;
+    width: 110px;
+    height: 18px;
     overflow: hidden;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 .player-hp-text {
-    font-size: 11px;
+    font-size: 12px;
     color: #cccccc;
-    font-weight: 600;
+    font-weight: 700;
     text-align: center;
 }
 
@@ -241,35 +224,41 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
 .battle-action-btn {
     flex: 1;
     background: #333333;
-    border: 2px solid #666666;
+    border: 3px solid #666666;
     color: #ffffff;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 700;
+    border-radius: 15px;
+    font-size: 18px;
+    font-weight: 800;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
     transition: all 0.2s ease;
     font-family: inherit;
+    touch-action: manipulation;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    min-height: 60px;
 }
 
 .battle-action-btn:hover:not(:disabled) {
     background: #444444;
-    border-color: #777777;
-    transform: translateY(-2px);
+    border-color: #888888;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 .battle-action-btn:active:not(:disabled) {
     transform: translateY(0);
     background: #2a2a2a;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .battle-action-btn:disabled {
@@ -278,10 +267,12 @@
     cursor: not-allowed;
     opacity: 0.5;
     border-color: #333333;
+    transform: none;
+    box-shadow: none;
 }
 
 .battle-action-btn i {
-    font-size: 18px;
+    font-size: 20px;
 }
 
 /* РЕЗУЛЬТАТ БИТВЫ */
@@ -296,23 +287,25 @@
     justify-content: center;
     align-items: center;
     z-index: 10000;
+    backdrop-filter: blur(5px);
 }
 
 .battle-result-modal {
     background: #1a1a1a;
-    border: 2px solid #333333;
-    border-radius: 16px;
-    padding: 30px;
+    border: 3px solid #333333;
+    border-radius: 20px;
+    padding: 35px;
     text-align: center;
-    min-width: 300px;
-    max-width: 80%;
-    animation: modalAppear 0.3s ease-out;
+    min-width: 320px;
+    max-width: 85%;
+    animation: modalAppear 0.4s ease-out;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 @keyframes modalAppear {
     from {
         opacity: 0;
-        transform: scale(0.8) translateY(20px);
+        transform: scale(0.7) translateY(30px);
     }
     to {
         opacity: 1;
@@ -321,9 +314,10 @@
 }
 
 .result-title {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 15px;
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 18px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .result-title.win {
@@ -335,9 +329,9 @@
 }
 
 .result-details {
-    font-size: 16px;
-    margin-bottom: 20px;
-    line-height: 1.4;
+    font-size: 18px;
+    margin-bottom: 25px;
+    line-height: 1.5;
     color: #cccccc;
 }
 
@@ -345,18 +339,21 @@
     background: #ffffff;
     color: #000000;
     border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 700;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 800;
     cursor: pointer;
     transition: all 0.2s ease;
     font-family: inherit;
+    touch-action: manipulation;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
 }
 
-.result-back-btn:hover {
+.result-back-btn:hover, .result-back-btn:active {
     background: #eeeeee;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(255, 255, 255, 0.3);
 }
 
 /* ЭФФЕКТЫ УРОНА */
@@ -367,50 +364,83 @@
     transform: translate(-50%, -50%);
     pointer-events: none;
     z-index: 1000;
-    font-size: 18px;
+    font-size: 20px;
     color: #ffffff;
-    font-weight: 700;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-    animation: damageFloat 1.2s ease-out forwards;
+    font-weight: 800;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+    animation: damageFloat 1.4s ease-out forwards;
 }
 
 .damage-effect.crit {
-    font-size: 22px;
+    font-size: 26px;
     color: #ffffff;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
 }
 
 @keyframes damageFloat {
     0% {
         opacity: 0;
-        transform: translate(-50%, -50%) scale(0.5);
+        transform: translate(-50%, -50%) scale(0.3);
     }
-    20% {
+    25% {
         opacity: 1;
-        transform: translate(-50%, -60%) scale(1.1);
+        transform: translate(-50%, -70%) scale(1.2);
     }
     100% {
         opacity: 0;
-        transform: translate(-50%, -100%) scale(0.8);
+        transform: translate(-50%, -120%) scale(0.7);
     }
 }
 
 /* SHAKE эффект при получении урона */
 .battle-shake {
-    animation: battleShake 0.5s ease-in-out;
+    animation: battleShake 0.6s ease-in-out;
 }
 
 @keyframes battleShake {
     0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(6px); }
 }
 
 /* MEDIA QUERIES для адаптивности */
-@media (max-height: 600px) {
+@media (max-height: 700px) {
     .enemy-battle-area {
         flex: 1.5;
+        padding: 20px;
+        min-height: 200px;
+    }
+    
+    .enemy-battle-img {
+        width: 160px;
+        height: 160px;
+    }
+    
+    .battle-bottom-area {
+        height: 280px;
+    }
+    
+    .battle-log-container {
+        height: 90px;
         padding: 15px;
+    }
+    
+    .battle-actions-area {
+        height: 170px;
+    }
+    
+    .battle-action-btn {
+        min-height: 50px;
+        font-size: 16px;
+    }
+}
+
+@media (max-height: 600px) {
+    .enemy-battle-area {
+        padding: 15px;
+        min-height: 160px;
     }
     
     .enemy-battle-img {
@@ -418,39 +448,112 @@
         height: 140px;
     }
     
+    .enemy-name {
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+    
+    .hp-container {
+        width: 200px;
+        height: 20px;
+    }
+    
     .battle-bottom-area {
-        height: 250px;
+        height: 240px;
+        gap: 8px;
     }
     
     .battle-log-container {
-        height: 80px;
+        height: 70px;
+        padding: 12px;
+        font-size: 12px;
     }
     
     .battle-actions-area {
         height: 150px;
+        gap: 8px;
+    }
+    
+    .battle-action-btn {
+        min-height: 45px;
+        font-size: 14px;
+        border-width: 2px;
+        border-radius: 12px;
+    }
+    
+    .player-battle-area {
+        width: 130px;
+        padding: 12px;
+    }
+    
+    .player-battle-img {
+        width: 60px;
+        height: 60px;
     }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 450px) {
+    .undertale-battle-container {
+        margin: 0;
+    }
+    
+    .enemy-battle-area {
+        margin: 5px;
+    }
+    
+    .battle-bottom-area {
+        margin: 0 5px 5px 5px;
+    }
+    
     .enemy-battle-img {
-        width: 160px;
-        height: 160px;
+        width: 130px;
+        height: 130px;
+    }
+    
+    .hp-container {
+        width: 180px;
     }
     
     .battle-actions-area {
         flex-direction: column;
         height: auto;
+        gap: 8px;
     }
     
     .player-battle-area {
         width: 100%;
         flex-direction: row;
         height: 80px;
-        padding: 10px;
+        padding: 12px;
+        order: 2;
     }
     
     .battle-buttons {
         flex-direction: row;
-        height: 60px;
+        height: 50px;
+        gap: 8px;
+    }
+    
+    .battle-buttons:first-child {
+        order: 1;
+    }
+    
+    .battle-buttons:last-child {
+        order: 3;
+    }
+    
+    .battle-action-btn {
+        min-height: 45px;
+        font-size: 13px;
+    }
+    
+    .result-back-btn {
+        padding: 12px 24px;
+        font-size: 16px;
+    }
+    
+    .battle-result-modal {
+        min-width: 280px;
+        padding: 25px;
     }
 }
