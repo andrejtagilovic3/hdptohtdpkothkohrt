@@ -1,5 +1,4 @@
-// ==================== UNDERTALE BATTLE SYSTEM ====================
-// Строгий черно-белый дизайн в стиле приложения
+// ==================== UNDERTALE BATTLE SYSTEM (ИСПРАВЛЕННАЯ ВЕРСИЯ) ====================
 
 class UndertaleBattle {
     constructor() {
@@ -12,7 +11,7 @@ class UndertaleBattle {
         this.playerNft = null;
         this.enemyNft = null;
         this.battleLog = [];
-        this.playerDefending = false;
+        this.playerDodging = false;
     }
 
     init(playerNft, enemyNft) {
@@ -27,7 +26,7 @@ class UndertaleBattle {
         this.battleActive = true;
         this.currentTurn = 'player';
         this.battleLog = [];
-        this.playerDefending = false;
+        this.playerDodging = false;
         
         this.createBattleUI();
         this.updateDisplay();
@@ -73,17 +72,18 @@ class UndertaleBattle {
                                 <i class="fas fa-sword"></i>
                                 АТАКА
                             </button>
-                            <button id="defend-btn" class="battle-action-btn" onclick="battleSystem.playerDefend()">
-                                <i class="fas fa-shield-alt"></i>
-                                БЛОК
+                            <button id="dodge-btn" class="battle-action-btn" onclick="battleSystem.playerDodge()">
+                                <i class="fas fa-running"></i>
+                                УВЕРНУТЬСЯ
                             </button>
                         </div>
 
-                        <!-- ИГРОК В ЦЕНТРЕ (маленькое окно) -->
+                        <!-- ИГРОК В ЦЕНТРЕ -->
                         <div class="player-battle-area">
                             <img id="player-battle-img" class="player-battle-img" alt="Player NFT">
                             <div>
                                 <div class="player-name">ВЫ</div>
+                                <div id="player-nft-name" class="player-nft-name">NFT NAME</div>
                                 <div class="player-hp-container">
                                     <div id="player-hp-bar" class="hp-bar"></div>
                                 </div>
@@ -93,10 +93,9 @@ class UndertaleBattle {
 
                         <!-- КНОПКИ СПРАВА -->
                         <div class="battle-buttons">
-                            <button id="dodge-btn" class="battle-action-btn" onclick="battleSystem.playerDodge()">
-                                <i class="fas fa-running"></i>
-                                УВЕРНУТЬСЯ
-                            </button>
+                            <div style="flex: 1; opacity: 0.3; background: #1a1a1a; border: 2px dashed #333333; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #666666; font-size: 12px;">
+                                Резерв
+                            </div>
                             <div style="flex: 1; opacity: 0.3; background: #1a1a1a; border: 2px dashed #333333; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #666666; font-size: 12px;">
                                 Резерв
                             </div>
@@ -104,7 +103,7 @@ class UndertaleBattle {
                     </div>
                 </div>
 
-                <!-- РЕЗУЛЬТАТ БИТВЫ (скрыт по умолчанию) -->
+                <!-- РЕЗУЛЬТАТ БИТВЫ -->
                 <div id="battle-result-overlay" class="battle-result-overlay" style="display: none;">
                     <div class="battle-result-modal">
                         <div id="result-title" class="result-title"></div>
@@ -122,10 +121,13 @@ class UndertaleBattle {
     }
 
     updateDisplay() {
-        // Обновляем изображения
+        console.log('🔄 Обновление отображения. Игрок HP:', this.playerHP, 'Враг HP:', this.enemyHP);
+        
+        // Обновляем изображения и названия
         const playerImg = document.getElementById('player-battle-img');
         const enemyImg = document.getElementById('enemy-battle-img');
         const enemyName = document.getElementById('enemy-name');
+        const playerNftName = document.getElementById('player-nft-name');
 
         if (playerImg && this.playerNft) {
             playerImg.src = this.playerNft.img;
@@ -136,27 +138,39 @@ class UndertaleBattle {
             enemyImg.alt = this.enemyNft.name;
             enemyName.textContent = this.enemyNft.name.toUpperCase();
         }
+        if (playerNftName && this.playerNft) {
+            playerNftName.textContent = this.playerNft.name;
+        }
 
-        // Обновляем HP
+        // ИСПРАВЛЕНИЕ: правильно обновляем HP бары
         const playerHPPercent = Math.max(0, (this.playerHP / this.playerMaxHP) * 100);
         const enemyHPPercent = Math.max(0, (this.enemyHP / this.enemyMaxHP) * 100);
+
+        console.log('📊 HP проценты - Игрок:', playerHPPercent + '%', 'Враг:', enemyHPPercent + '%');
 
         const playerHPBar = document.getElementById('player-hp-bar');
         const enemyHPBar = document.getElementById('enemy-hp-bar');
         const playerHPText = document.getElementById('player-hp-text');
         const enemyHPText = document.getElementById('enemy-hp-text');
 
+        // ИСПРАВЛЕНИЕ: проверяем что элементы найдены и обновляем их
         if (playerHPBar) {
             playerHPBar.style.width = playerHPPercent + '%';
+            console.log('✅ Обновлен HP бар игрока:', playerHPPercent + '%');
+            
             if (this.playerHP <= 25) {
                 playerHPBar.classList.add('critical');
             } else {
                 playerHPBar.classList.remove('critical');
             }
+        } else {
+            console.error('❌ Не найден элемент player-hp-bar');
         }
 
         if (enemyHPBar) {
             enemyHPBar.style.width = enemyHPPercent + '%';
+            console.log('✅ Обновлен HP бар врага:', enemyHPPercent + '%');
+            
             if (this.enemyHP <= 25) {
                 enemyHPBar.classList.add('critical');
             } else {
@@ -164,11 +178,15 @@ class UndertaleBattle {
             }
         }
 
+        // ИСПРАВЛЕНИЕ: обновляем текстовые счетчики HP
         if (playerHPText) {
-            playerHPText.textContent = `${Math.max(0, Math.round(this.playerHP))}/${this.playerMaxHP}`;
+            const displayPlayerHP = Math.max(0, Math.round(this.playerHP));
+            playerHPText.textContent = `${displayPlayerHP}/${this.playerMaxHP} HP`;
+            console.log('✅ Обновлен текст HP игрока:', displayPlayerHP + '/' + this.playerMaxHP);
         }
         if (enemyHPText) {
-            enemyHPText.textContent = `${Math.max(0, Math.round(this.enemyHP))}/${this.enemyMaxHP}`;
+            const displayEnemyHP = Math.max(0, Math.round(this.enemyHP));
+            enemyHPText.textContent = `${displayEnemyHP}/${this.enemyMaxHP} HP`;
         }
     }
 
@@ -192,18 +210,15 @@ class UndertaleBattle {
 
     showPlayerActions() {
         const attackBtn = document.getElementById('attack-btn');
-        const defendBtn = document.getElementById('defend-btn');
         const dodgeBtn = document.getElementById('dodge-btn');
         
-        if (!attackBtn || !defendBtn || !dodgeBtn) return;
+        if (!attackBtn || !dodgeBtn) return;
         
         if (this.currentTurn !== 'player' || !this.battleActive) {
             attackBtn.disabled = true;
-            defendBtn.disabled = true;
             dodgeBtn.disabled = true;
         } else {
             attackBtn.disabled = false;
-            defendBtn.disabled = false;
             dodgeBtn.disabled = false;
         }
         
@@ -212,23 +227,21 @@ class UndertaleBattle {
 
     playerAttack() {
         if (this.currentTurn !== 'player' || !this.battleActive) {
-            console.log('❌ Атака заблокирована. Ход:', this.currentTurn, 'Активна:', this.battleActive);
+            console.log('❌ Атака заблокирована');
             return;
         }
 
         console.log('⚔️ Игрок атакует!');
         this.addBattleLog('Вы атакуете!');
         
-        // Расчет урона
-        let damage = Math.floor(Math.random() * 25) + 15; // 15-40 базового урона
-        let isCrit = Math.random() < 0.15; // 15% шанс крита
-        const enemyDodge = Math.random() < 0.08; // 8% шанс уклонения врага
+        let damage = Math.floor(Math.random() * 25) + 15;
+        let isCrit = Math.random() < 0.15;
+        const enemyDodge = Math.random() < 0.08;
 
         // Применяем апгрейды игрока
         if (this.playerNft.upgrades) {
             if (this.playerNft.upgrades.damage) {
                 damage *= this.playerNft.upgrades.damage;
-                console.log('💪 Урон с апгрейдом:', damage);
             }
             if (this.playerNft.upgrades.crit) {
                 const critMultiplier = this.playerNft.upgrades.crit;
@@ -254,7 +267,6 @@ class UndertaleBattle {
             this.enemyHP -= damage;
             this.enemyHP = Math.max(0, this.enemyHP);
             
-            // Эффект встряски для врага
             document.getElementById('enemy-battle-img').classList.add('battle-shake');
             setTimeout(() => {
                 const img = document.getElementById('enemy-battle-img');
@@ -275,27 +287,9 @@ class UndertaleBattle {
         }
     }
 
-    playerDefend() {
-        if (this.currentTurn !== 'player' || !this.battleActive) {
-            console.log('❌ Защита заблокирована. Ход:', this.currentTurn, 'Активна:', this.battleActive);
-            return;
-        }
-
-        console.log('🛡️ Игрок защищается!');
-        this.addBattleLog('Вы приготовились к защите!');
-        this.playerDefending = true;
-
-        this.currentTurn = 'enemy';
-        this.showPlayerActions();
-
-        setTimeout(() => {
-            this.enemyTurn();
-        }, 1500);
-    }
-
     playerDodge() {
         if (this.currentTurn !== 'player' || !this.battleActive) {
-            console.log('❌ Уклонение заблокировано. Ход:', this.currentTurn, 'Активна:', this.battleActive);
+            console.log('❌ Уклонение заблокировано');
             return;
         }
 
@@ -313,30 +307,30 @@ class UndertaleBattle {
 
     enemyTurn() {
         if (this.currentTurn !== 'enemy' || !this.battleActive) {
-            console.log('❌ Ход врага заблокирован. Ход:', this.currentTurn, 'Активна:', this.battleActive);
+            console.log('❌ Ход врага заблокирован');
             return;
         }
 
         console.log('👹 Ход врага!');
         this.addBattleLog('Враг атакует!');
 
-        let damage = Math.floor(Math.random() * 22) + 12; // 12-34 базового урона
-        const isCrit = Math.random() < 0.12; // 12% шанс крита у врага
+        let damage = Math.floor(Math.random() * 22) + 12;
+        const isCrit = Math.random() < 0.12;
 
-        // Применяем апгрейды врага (если есть)
+        // Применяем апгрейды врага
         if (this.enemyNft.upgrades && this.enemyNft.upgrades.damage) {
             damage *= this.enemyNft.upgrades.damage;
         }
 
         // Проверяем уклонение игрока
-        let playerDodgeChance = 0.06; // 6% базовый шанс уклонения
+        let playerDodgeChance = 0.06;
         if (this.playerNft.upgrades && this.playerNft.upgrades.dodge) {
             playerDodgeChance *= this.playerNft.upgrades.dodge;
         }
 
-        // Если игрок использовал "Увернуться", повышаем шанс
+        // Если игрок использовал уклонение
         if (this.playerDodging) {
-            playerDodgeChance += 0.35; // +35% к уклонению
+            playerDodgeChance += 0.35;
         }
 
         const playerDodged = Math.random() < playerDodgeChance;
@@ -345,29 +339,21 @@ class UndertaleBattle {
             this.addBattleLog('Вы уклонились от атаки!');
             this.showDamageEffect(document.getElementById('player-battle-img'), 'МИМО', false);
         } else {
-            // Если игрок защищался, урон уменьшается на 50%
-            if (this.playerDefending) {
-                damage *= 0.5;
-                this.addBattleLog(`🛡️ Блокировка поглотила часть урона! Получено ${Math.round(damage)} урона`);
-                this.showDamageEffect(document.getElementById('player-battle-img'), Math.round(damage), false);
+            if (isCrit) {
+                damage *= 1.7;
+                this.addBattleLog(`💥 КРИТИЧЕСКАЯ АТАКА ВРАГА! Получено ${Math.round(damage)} урона!`);
+                this.showDamageEffect(document.getElementById('player-battle-img'), Math.round(damage), true);
             } else {
-                if (isCrit) {
-                    damage *= 1.7;
-                    this.addBattleLog(`💥 КРИТИЧЕСКАЯ АТАКА ВРАГА! Получено ${Math.round(damage)} урона!`);
-                    this.showDamageEffect(document.getElementById('player-battle-img'), Math.round(damage), true);
-                } else {
-                    this.addBattleLog(`Получено ${Math.round(damage)} урона`);
-                    this.showDamageEffect(document.getElementById('player-battle-img'), Math.round(damage), false);
-                }
+                this.addBattleLog(`Получено ${Math.round(damage)} урона`);
+                this.showDamageEffect(document.getElementById('player-battle-img'), Math.round(damage), false);
             }
             
-            // Применяем урон к игроку
+            // ИСПРАВЛЕНИЕ: правильно применяем урон к игроку
             this.playerHP -= damage;
             this.playerHP = Math.max(0, this.playerHP);
             
             console.log('💔 Урон игроку:', damage, 'Осталось HP:', this.playerHP);
             
-            // Эффект встряски для игрока
             document.getElementById('player-battle-img').classList.add('battle-shake');
             setTimeout(() => {
                 const img = document.getElementById('player-battle-img');
@@ -375,8 +361,7 @@ class UndertaleBattle {
             }, 500);
         }
 
-        this.playerDefending = false; // Сбрасываем защиту
-        this.playerDodging = false; // Сбрасываем уклонение
+        this.playerDodging = false;
         this.updateDisplay();
         this.checkBattleEnd();
 
@@ -437,13 +422,17 @@ class UndertaleBattle {
                 <em>NFT добавлен в вашу коллекцию</em>
             `;
 
-            // Добавляем вражеский NFT в коллекцию
+            // ИСПРАВЛЕНИЕ: правильно добавляем NFT в коллекцию
             if (window.collection && Array.isArray(window.collection)) {
-                window.collection.push({
+                const newNft = {
                     ...this.enemyNft, 
-                    buyPrice: this.enemyNft.price || 100
-                });
+                    buyPrice: this.enemyNft.price || 150
+                };
+                window.collection.push(newNft);
                 console.log('✅ NFT добавлен в коллекцию:', this.enemyNft.name);
+                console.log('📊 Размер коллекции:', window.collection.length);
+            } else {
+                console.error('❌ Коллекция не найдена или не является массивом');
             }
         } else {
             resultTitle.className = 'result-title lose';
@@ -454,21 +443,25 @@ class UndertaleBattle {
                 <em>NFT удален из коллекции</em>
             `;
 
-            // Удаляем NFT игрока из коллекции
+            // ИСПРАВЛЕНИЕ: правильно удаляем NFT из коллекции
             if (window.collection && Array.isArray(window.collection)) {
                 const index = window.collection.findIndex(nft => 
                     nft.name === this.playerNft.name && 
                     nft.img === this.playerNft.img && 
                     nft.buyPrice === this.playerNft.buyPrice
                 );
+                
                 if (index !== -1) {
                     window.collection.splice(index, 1);
                     console.log('❌ NFT удален из коллекции:', this.playerNft.name);
+                    console.log('📊 Размер коллекции:', window.collection.length);
                     
-                    // Сбрасываем активный NFT для битвы
+                    // Сбрасываем активный NFT
                     if (window.activeBattleNft) {
                         window.activeBattleNft = null;
                     }
+                } else {
+                    console.error('❌ NFT не найден в коллекции для удаления');
                 }
             }
         }
@@ -483,14 +476,17 @@ class UndertaleBattle {
             });
         }
 
-        // Показываем результат
         resultOverlay.style.display = 'flex';
 
-        // Обновляем UI и сохраняем данные
-        if (window.updateUI) window.updateUI();
+        // Обновляем UI и сохраняем
+        if (window.updateUI) {
+            window.updateUI();
+        }
         if (window.saveData) {
-            window.saveData();
-            console.log('💾 Данные сохранены');
+            setTimeout(() => {
+                window.saveData();
+                console.log('💾 Данные сохранены');
+            }, 500);
         }
         
         console.log('🎉 Результат битвы показан:', playerWon ? 'ПОБЕДА' : 'ПОРАЖЕНИЕ');
@@ -516,14 +512,13 @@ class UndertaleBattle {
     endBattle() {
         console.log('🚪 Завершение битвы');
         
-        // Удаляем интерфейс битвы
         const container = document.getElementById('undertale-battle-container');
         if (container) {
             container.remove();
             console.log('🗑️ Интерфейс битвы удален');
         }
 
-        // Возвращаемся в главное меню
+        // Возврат в главное меню
         const screens = document.querySelectorAll('.screen');
         screens.forEach(s => s.classList.remove('active'));
         
@@ -550,79 +545,37 @@ class UndertaleBattle {
             console.log('🔄 UI обновлен');
         }
         
-        console.log('✅ Возврат в главное меню завершен');
+        console.log('✅ Возврат завершен');
     }
 }
 
 // Создаем глобальный экземпляр
-console.log('🏗️ Создание глобального экземпляра battleSystem...');
 window.battleSystem = new UndertaleBattle();
 
 // Функция для запуска битвы
 window.startUndertaleBattle = function(playerNft, enemyNft) {
     console.log('🚀 === ЗАПУСК UNDERTALE БИТВЫ ===');
-    console.log('👤 Игрок NFT:', {
-        name: playerNft?.name,
-        img: playerNft?.img?.substring(0, 50) + '...',
-        upgrades: playerNft?.upgrades
-    });
-    console.log('🤖 Враг NFT:', {
-        name: enemyNft?.name,
-        img: enemyNft?.img?.substring(0, 50) + '...',
-        upgrades: enemyNft?.upgrades
-    });
     
     if (!playerNft || !enemyNft) {
-        console.error('❌ КРИТИЧЕСКАЯ ОШИБКА: Отсутствуют данные NFT!');
+        console.error('❌ Отсутствуют данные NFT!');
         alert('Ошибка: не выбран NFT для битвы!');
         return false;
     }
     
-    if (!playerNft.name || !playerNft.img) {
-        console.error('❌ ОШИБКА: Некорректные данные playerNft!', playerNft);
-        alert('Ошибка: некорректные данные игрока!');
-        return false;
-    }
-    
-    if (!enemyNft.name || !enemyNft.img) {
-        console.error('❌ ОШИБКА: Некорректные данные enemyNft!', enemyNft);
-        alert('Ошибка: некорректные данные противника!');
-        return false;
-    }
-    
     const success = window.battleSystem.init(playerNft, enemyNft);
-    console.log(success ? '✅ Битва запущена успешно!' : '❌ Ошибка запуска битвы!');
+    console.log(success ? '✅ Битва запущена!' : '❌ Ошибка запуска!');
     return success;
 };
 
-// Проверка загрузки при готовности DOM
+// Проверки загрузки
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📄 DOM загружен, проверяем Battle System...');
     console.log('✅ Undertale Battle System загружен!');
-    console.log('🔧 Доступные функции:', {
-        startUndertaleBattle: typeof window.startUndertaleBattle,
-        battleSystem: typeof window.battleSystem,
-        battleSystemInit: typeof window.battleSystem?.init
-    });
 });
 
-// Дополнительная проверка через 1 секунду
 setTimeout(() => {
-    console.log('⏰ Финальная проверка Battle System через 1 секунду...');
     if (typeof window.startUndertaleBattle === 'function' && window.battleSystem) {
-        console.log('🟢 ✅ Battle System готов к использованию!');
-        console.log('📊 Статус компонентов:', {
-            battleSystem: !!window.battleSystem,
-            startFunction: typeof window.startUndertaleBattle,
-            initMethod: typeof window.battleSystem.init,
-            DOM: !!document.body
-        });
+        console.log('🟢 ✅ Battle System готов!');
     } else {
         console.error('🔴 ❌ Ошибка загрузки Battle System!');
-        console.error('💥 Проблемы:', {
-            battleSystem: !!window.battleSystem,
-            startFunction: typeof window.startUndertaleBattle,
-            window_battleSystem: window.battleSystem
-        });
     }
 }, 1000);
