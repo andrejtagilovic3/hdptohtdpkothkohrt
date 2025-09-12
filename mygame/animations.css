@@ -210,7 +210,7 @@
         box-shadow: 0 0 15px var(--glow-color, #4caf50);
     }
     50% {
-        box-shadow: 0 0 25px var(--glow-color, #4caf50), 0 0 35px var(--glow-color, #4caf50);
+        box-shadow: 0 0 25px var(--glow-color, #ff0000), 0 0 35px var(--glow-color, #4caf50);
     }
     100% {
         box-shadow: 0 0 15px var(--glow-color, #4caf50);
@@ -549,5 +549,6 @@
     }
 
 }
+
 
 
