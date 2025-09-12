@@ -1,7 +1,6 @@
 const upgradeTypes = {
     damage: {
         name: 'Увеличение урона',
-        description: '+12% к урону',
         rarity: 'common',
         cost: 50,
         icon: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/img_upd/desc/damage.png',
@@ -9,7 +8,6 @@ const upgradeTypes = {
     },
     dodge: {
         name: 'Уклонение',
-        description: '+10% к уклонению',
         rarity: 'uncommon',
         cost: 75,
         icon: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/img_upd/desc/dodge.png',
@@ -17,7 +15,6 @@ const upgradeTypes = {
     },
     crit: {
         name: 'Критический удар',
-        description: '+12% к критам',
         rarity: 'rare',
         cost: 100,
         icon: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/img_upd/desc/crit.png',
