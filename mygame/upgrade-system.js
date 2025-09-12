@@ -1,7 +1,7 @@
 const upgradeTypes = {
     damage: {
         name: 'Увеличение урона',
-        description: '+15% к урону',
+        description: '+12% к урону',
         rarity: 'common',
         cost: 50,
         icon: 'https://hdptohtdpkothkoefgefsaefefgefgsewef.vercel.app/mygame/img_upd/desc/damage.png',
@@ -206,9 +206,9 @@ function showUpgradeResult() {
     }
     
     const rarityMultipliers = {
-        common: { min: 1.10, max: 1.20 },
-        uncommon: { min: 1.20, max: 1.35 },
-        rare: { min: 1.35, max: 1.60 }
+        common: { min: 1.05, max: 1.12 },
+        uncommon: { min: 1.12, max: 1.20 },
+        rare: { min: 1.20, max: 1.30 }
     };
     
     const multiplier = rarityMultipliers[wonRarity];
