@@ -767,37 +767,36 @@ function renderCenterArea() {
         if (activeBattleNft.upgrades && Object.keys(activeBattleNft.upgrades).length > 0) {
             const upgradeValues = Object.values(activeBattleNft.upgrades);
             const maxUpgrade = Math.max(...upgradeValues);
-            
+    
             let rarity = 'common';
             if (maxUpgrade >= 1.35) {
                 rarity = 'rare';
             } else if (maxUpgrade >= 1.20) {
                 rarity = 'uncommon';
             }
-    
+
             const rarityColors = {
                 common: '#4caf50',
                 uncommon: '#2196f3', 
                 rare: '#ff9800'
             };
-    
+
             const rarityColor = rarityColors[rarity];
-            
-            // Используем прямые стили вместо классов анимации
+    
+    // ТОЛЬКО ОБВОДКА БЕЗ АНИМАЦИИ
             upgradeGlow = `
                 border: 3px solid ${rarityColor}; 
                 box-shadow: 0 0 20px ${rarityColor}60;
-                animation: centerNftCustomGlow 3s ease-in-out infinite;
-                --glow-color: ${rarityColor};
             `;
-            
+    
             nameStyle = `color: ${rarityColor}; text-shadow: 0 0 10px ${rarityColor}60;`;
-            
-            upgradeGlow = `
-                border: 3px solid ${rarityColor}; 
-                box-shadow: 0 0 20px ${rarityColor}60;
-            `;
-            
+    
+            const upgradeTypes = {
+                damage: { name: 'Увеличение урона', icon: '⚔️' },
+                dodge: { name: 'Уклонение', icon: '🛡️' },
+                crit: { name: 'Критический удар', icon: '💥' }
+            };
+    
             const upgradesList = Object.entries(activeBattleNft.upgrades)
                 .map(([type, level]) => {
                     const upgrade = upgradeTypes[type];
@@ -810,6 +809,7 @@ function renderCenterArea() {
                 }).filter(Boolean).join('');
             upgradeInfo = `<div style="margin-top: 12px;">${upgradesList}</div>`;
         }
+
         
         centerDiv.innerHTML = `
             <img src="${activeBattleNft.img}" class="center-nft-img" alt="${activeBattleNft.name}" style="${upgradeGlow}">
@@ -842,35 +842,36 @@ function renderCollection() {
                 isUpgraded = true;
                 const upgradeValues = Object.values(nft.upgrades);
                 const maxUpgrade = Math.max(...upgradeValues);
-                
+    
                 let rarity = 'common';
                 if (maxUpgrade >= 1.35) {
                     rarity = 'rare';
                 } else if (maxUpgrade >= 1.20) {
                     rarity = 'uncommon';
                 }
-                
+    
                 const rarityColors = {
                     common: '#4caf50',
                     uncommon: '#2196f3',
                     rare: '#ff9800'
                 };
-                
+    
                 const rarityColor = rarityColors[rarity];
-                
+    
+    // ТОЛЬКО ОБВОДКА БЕЗ АНИМАЦИИ
                 cardStyle = `
                     border: 2px solid ${rarityColor}; 
                     box-shadow: 0 0 15px ${rarityColor}40;
                 `;
-                
+    
                 nameStyle = `color: ${rarityColor}; font-weight: 700;`;
-                
+    
                 const upgradeTypes = {
                     damage: { name: 'Урон', icon: '⚔️' },
                     dodge: { name: 'Уклонение', icon: '🛡️' },
                     crit: { name: 'Крит', icon: '💥' }
                 };
-                
+    
                 const upgradesList = Object.entries(nft.upgrades)
                     .map(([type, level]) => {
                         const upgrade = upgradeTypes[type];
