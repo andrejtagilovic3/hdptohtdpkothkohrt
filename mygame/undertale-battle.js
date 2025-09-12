@@ -7,13 +7,14 @@ class UndertaleBattle {
         this.playerMaxHP = 100;
         this.enemyMaxHP = 100;
         this.currentTurn = 'player';
-        this.battlePhase = 'menu'; // 'menu', 'attack', 'defend', 'enemy_turn'
+        this.battlePhase = 'menu';
         this.battleActive = false;
         this.playerNft = null;
         this.enemyNft = null;
         this.battleContainer = null;
         this.actionButtons = null;
         this.battleLog = [];
+        this.playerDefending = false;
     }
 
     init(playerNft, enemyNft) {
@@ -25,6 +26,7 @@ class UndertaleBattle {
         this.currentTurn = 'player';
         this.battlePhase = 'menu';
         this.battleLog = [];
+        this.playerDefending = false;
         
         this.createBattleUI();
         this.updateDisplay();
@@ -43,153 +45,222 @@ class UndertaleBattle {
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background: #000;
-                color: #fff;
-                font-family: monospace;
+                background: #000000;
+                color: #ffffff;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
                 display: flex;
                 flex-direction: column;
                 z-index: 9999;
             ">
-                <!-- Верхняя панель с кнопкой побега -->
+                <!-- ВЕРХНЯЯ ОБЛАСТЬ - NFT ВРАГА (красная рамка) -->
                 <div style="
+                    flex: 1;
+                    border: 3px solid #f44336;
+                    margin: 10px;
+                    border-radius: 12px;
                     display: flex;
-                    justify-content: space-between;
-                    padding: 15px 20px;
-                    border-bottom: 2px solid #333;
-                    background: #111;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    background: #1a1a1a;
+                    position: relative;
                 ">
-                    <div style="color: #fff; font-size: 18px; font-weight: bold;">⚔️ ДУЭЛЬ</div>
+                    <!-- Кнопка побега в углу -->
                     <button id="escape-btn" style="
-                        background: #d32f2f;
-                        border: 2px solid #fff;
-                        color: #fff;
-                        padding: 8px 16px;
+                        position: absolute;
+                        top: 15px;
+                        right: 15px;
+                        background: #333333;
+                        border: 1px solid #666666;
+                        color: #ffffff;
+                        padding: 8px 12px;
                         border-radius: 6px;
                         cursor: pointer;
-                        font-family: monospace;
-                        font-weight: bold;
-                        font-size: 14px;
+                        font-size: 12px;
+                        font-weight: 600;
                     ">СБЕЖАТЬ (50⭐)</button>
+
+                    <!-- NFT врага -->
+                    <img id="enemy-battle-img" style="
+                        width: 120px;
+                        height: 120px;
+                        border-radius: 12px;
+                        border: 2px solid #f44336;
+                        object-fit: cover;
+                        margin-bottom: 15px;
+                    ">
+                    
+                    <div id="enemy-name" style="
+                        font-size: 18px;
+                        font-weight: 700;
+                        color: #f44336;
+                        margin-bottom: 10px;
+                    ">ВРАГ</div>
+
+                    <!-- HP врага (розовый) -->
+                    <div style="
+                        background: #000000;
+                        border: 2px solid #e91e63;
+                        border-radius: 8px;
+                        width: 200px;
+                        height: 20px;
+                        overflow: hidden;
+                        margin-bottom: 5px;
+                    ">
+                        <div id="enemy-hp-bar" style="
+                            height: 100%;
+                            background: #e91e63;
+                            width: 100%;
+                            transition: width 0.5s ease;
+                        "></div>
+                    </div>
+                    <div id="enemy-hp-text" style="
+                        font-size: 14px;
+                        color: #e91e63;
+                        font-weight: 600;
+                    ">100/100 HP</div>
                 </div>
 
-                <!-- HP области -->
+                <!-- НИЖНЯЯ ОБЛАСТЬ -->
                 <div style="
+                    height: 350px;
+                    margin: 0 10px 10px 10px;
                     display: flex;
-                    justify-content: space-between;
-                    padding: 20px;
-                    background: #111;
+                    flex-direction: column;
+                    gap: 10px;
                 ">
-                    <!-- HP игрока (синий) -->
-                    <div style="
-                        border: 3px solid #2196f3;
-                        background: rgba(33, 150, 243, 0.1);
-                        padding: 15px;
+                    <!-- ЛОГ БОЯ (желтая рамка) -->
+                    <div id="battle-log-container" style="
+                        border: 3px solid #ffc107;
                         border-radius: 12px;
-                        min-width: 45%;
+                        background: #1a1a1a;
+                        padding: 15px;
+                        height: 120px;
+                        overflow-y: auto;
+                        font-size: 14px;
+                        color: #ffffff;
+                        line-height: 1.4;
+                    "></div>
+
+                    <!-- ДЕЙСТВИЯ ИГРОКА -->
+                    <div style="
+                        display: flex;
+                        gap: 10px;
+                        height: 200px;
                     ">
-                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <!-- ЛЕВАЯ ЧАСТЬ - NFT игрока и HP (синяя рамка) -->
+                        <div style="
+                            border: 3px solid #2196f3;
+                            border-radius: 12px;
+                            background: #1a1a1a;
+                            padding: 15px;
+                            width: 200px;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                        ">
                             <img id="player-battle-img" style="
-                                width: 50px;
-                                height: 50px;
+                                width: 80px;
+                                height: 80px;
                                 border-radius: 8px;
-                                margin-right: 12px;
                                 border: 2px solid #2196f3;
                                 object-fit: cover;
+                                margin-bottom: 10px;
                             ">
-                            <div>
-                                <div style="font-weight: bold; color: #2196f3; font-size: 16px;">ВЫ</div>
-                                <div id="player-hp-text" style="font-size: 14px; color: #ccc;">100/100 HP</div>
-                            </div>
-                        </div>
-                        <div style="background: #000; border-radius: 6px; height: 16px; overflow: hidden; border: 1px solid #2196f3;">
-                            <div id="player-hp-bar" style="
-                                height: 100%;
-                                background: linear-gradient(90deg, #2196f3, #64b5f6);
-                                width: 100%;
-                                transition: width 0.5s ease;
-                            "></div>
-                        </div>
-                    </div>
+                            
+                            <div style="
+                                font-size: 14px;
+                                font-weight: 700;
+                                color: #2196f3;
+                                margin-bottom: 8px;
+                            ">ВЫ</div>
 
-                    <!-- HP врага (красный) -->
-                    <div style="
-                        border: 3px solid #f44336;
-                        background: rgba(244, 67, 54, 0.1);
-                        padding: 15px;
-                        border-radius: 12px;
-                        min-width: 45%;
-                    ">
-                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <div>
-                                <div style="font-weight: bold; color: #f44336; font-size: 16px;">ВРАГ</div>
-                                <div id="enemy-hp-text" style="font-size: 14px; color: #ccc;">100/100 HP</div>
-                            </div>
-                            <img id="enemy-battle-img" style="
-                                width: 50px;
-                                height: 50px;
-                                border-radius: 8px;
-                                margin-left: 12px;
-                                border: 2px solid #f44336;
-                                object-fit: cover;
+                            <!-- HP игрока -->
+                            <div style="
+                                background: #000000;
+                                border: 2px solid #2196f3;
+                                border-radius: 6px;
+                                width: 120px;
+                                height: 16px;
+                                overflow: hidden;
+                                margin-bottom: 5px;
                             ">
+                                <div id="player-hp-bar" style="
+                                    height: 100%;
+                                    background: #2196f3;
+                                    width: 100%;
+                                    transition: width 0.5s ease;
+                                "></div>
+                            </div>
+                            <div id="player-hp-text" style="
+                                font-size: 12px;
+                                color: #2196f3;
+                                font-weight: 600;
+                            ">100/100 HP</div>
                         </div>
-                        <div style="background: #000; border-radius: 6px; height: 16px; overflow: hidden; border: 1px solid #f44336;">
-                            <div id="enemy-hp-bar" style="
-                                height: 100%;
-                                background: linear-gradient(90deg, #e91e63, #f06292);
-                                width: 100%;
-                                transition: width 0.5s ease;
-                            "></div>
+
+                        <!-- ПРАВАЯ ЧАСТЬ - Кнопки действий -->
+                        <div style="
+                            flex: 1;
+                            display: flex;
+                            flex-direction: column;
+                            gap: 10px;
+                        ">
+                            <!-- АТАКА (зеленая) -->
+                            <button id="attack-btn" style="
+                                flex: 1;
+                                background: #4caf50;
+                                border: 2px solid #388e3c;
+                                color: #ffffff;
+                                border-radius: 12px;
+                                font-size: 18px;
+                                font-weight: 700;
+                                cursor: pointer;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                transition: all 0.2s ease;
+                            ">⚔️ АТАКА</button>
+
+                            <!-- УКЛОНЕНИЕ (голубое) -->
+                            <button id="defend-btn" style="
+                                flex: 1;
+                                background: #00bcd4;
+                                border: 2px solid #0097a7;
+                                color: #ffffff;
+                                border-radius: 12px;
+                                font-size: 18px;
+                                font-weight: 700;
+                                cursor: pointer;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                transition: all 0.2s ease;
+                            ">🛡️ БЛОК</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Лог боя (желтый) -->
-                <div id="battle-log-container" style="
-                    background: #1a1a00;
-                    border: 3px solid #ffc107;
-                    border-radius: 12px;
-                    margin: 0 20px 20px 20px;
-                    padding: 15px;
-                    min-height: 80px;
-                    max-height: 120px;
-                    overflow-y: auto;
-                    font-size: 16px;
-                    color: #fff3c4;
-                    line-height: 1.4;
-                "></div>
-
-                <!-- Область действий -->
-                <div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px;">
-                    <div id="action-buttons-container" style="
-                        display: flex;
-                        gap: 20px;
-                        flex-wrap: wrap;
-                        justify-content: center;
-                    ">
-                        <!-- Кнопки будут добавлены динамически -->
-                    </div>
-                </div>
-
-                <!-- Результат битвы -->
+                <!-- Результат битвы (скрыт по умолчанию) -->
                 <div id="battle-result-container" style="
                     display: none;
                     position: absolute;
                     top: 50%;
                     left: 50%;
                     transform: translate(-50%, -50%);
-                    background: rgba(0, 0, 0, 0.9);
-                    border: 4px solid;
+                    background: #1a1a1a;
+                    border: 4px solid #333333;
                     border-radius: 16px;
                     padding: 30px;
                     text-align: center;
                     min-width: 300px;
+                    z-index: 10000;
                 ">
-                    <div id="result-text" style="font-size: 24px; font-weight: bold; margin-bottom: 20px;"></div>
-                    <div id="result-details" style="font-size: 16px; margin-bottom: 25px; line-height: 1.4;"></div>
+                    <div id="result-text" style="font-size: 24px; font-weight: bold; margin-bottom: 15px;"></div>
+                    <div id="result-details" style="font-size: 16px; margin-bottom: 20px; line-height: 1.4;"></div>
                     <button id="result-back-btn" style="
-                        background: #fff;
-                        color: #000;
+                        background: #ffffff;
+                        color: #000000;
                         border: none;
                         padding: 12px 24px;
                         border-radius: 8px;
@@ -205,6 +276,8 @@ class UndertaleBattle {
 
         // Устанавливаем обработчики
         document.getElementById('escape-btn').onclick = () => this.attemptEscape();
+        document.getElementById('attack-btn').onclick = () => this.playerAttack();
+        document.getElementById('defend-btn').onclick = () => this.playerDefend();
         document.getElementById('result-back-btn').onclick = () => this.endBattle();
     }
 
@@ -214,8 +287,8 @@ class UndertaleBattle {
         document.getElementById('enemy-battle-img').src = this.enemyNft.img;
 
         // Обновляем HP
-        const playerHPPercent = (this.playerHP / this.playerMaxHP) * 100;
-        const enemyHPPercent = (this.enemyHP / this.enemyMaxHP) * 100;
+        const playerHPPercent = Math.max(0, (this.playerHP / this.playerMaxHP) * 100);
+        const enemyHPPercent = Math.max(0, (this.enemyHP / this.enemyMaxHP) * 100);
 
         document.getElementById('player-hp-bar').style.width = playerHPPercent + '%';
         document.getElementById('enemy-hp-bar').style.width = enemyHPPercent + '%';
@@ -223,12 +296,12 @@ class UndertaleBattle {
         document.getElementById('player-hp-text').textContent = `${Math.max(0, Math.round(this.playerHP))}/${this.playerMaxHP} HP`;
         document.getElementById('enemy-hp-text').textContent = `${Math.max(0, Math.round(this.enemyHP))}/${this.enemyMaxHP} HP`;
 
-        // Цвет HP бара при низком здоровье
+        // Меняем цвет при низком HP
         if (this.playerHP <= 25) {
-            document.getElementById('player-hp-bar').style.background = 'linear-gradient(90deg, #f44336, #e57373)';
+            document.getElementById('player-hp-bar').style.background = '#f44336';
         }
         if (this.enemyHP <= 25) {
-            document.getElementById('enemy-hp-bar').style.background = 'linear-gradient(90deg, #d32f2f, #f44336)';
+            document.getElementById('enemy-hp-bar').style.background = '#d32f2f';
         }
     }
 
@@ -236,54 +309,33 @@ class UndertaleBattle {
         const logContainer = document.getElementById('battle-log-container');
         this.battleLog.push(message);
 
-        // Показываем только последние 4 сообщения
-        const recentLogs = this.battleLog.slice(-4);
-        logContainer.innerHTML = recentLogs.map(log => `<div style="margin-bottom: 5px;">• ${log}</div>`).join('');
+        // Показываем только последние 6 сообщений
+        const recentLogs = this.battleLog.slice(-6);
+        logContainer.innerHTML = recentLogs.map(log => `<div style="margin-bottom: 3px;">• ${log}</div>`).join('');
         
         // Прокручиваем вниз
         logContainer.scrollTop = logContainer.scrollHeight;
     }
 
     showPlayerActions() {
-        const container = document.getElementById('action-buttons-container');
+        const attackBtn = document.getElementById('attack-btn');
+        const defendBtn = document.getElementById('defend-btn');
         
         if (this.currentTurn !== 'player' || !this.battleActive) {
-            container.innerHTML = '<div style="color: #ccc; font-size: 18px;">Ход противника...</div>';
-            return;
+            attackBtn.disabled = true;
+            defendBtn.disabled = true;
+            attackBtn.style.opacity = '0.5';
+            defendBtn.style.opacity = '0.5';
+            attackBtn.style.cursor = 'not-allowed';
+            defendBtn.style.cursor = 'not-allowed';
+        } else {
+            attackBtn.disabled = false;
+            defendBtn.disabled = false;
+            attackBtn.style.opacity = '1';
+            defendBtn.style.opacity = '1';
+            attackBtn.style.cursor = 'pointer';
+            defendBtn.style.cursor = 'pointer';
         }
-
-        container.innerHTML = `
-            <button onclick="battleSystem.playerAttack()" style="
-                background: #4caf50;
-                border: 3px solid #2e7d32;
-                color: #fff;
-                padding: 20px 30px;
-                border-radius: 12px;
-                font-size: 18px;
-                font-weight: bold;
-                cursor: pointer;
-                font-family: monospace;
-                min-width: 150px;
-                transition: all 0.2s ease;
-            " onmouseover="this.style.background='#66bb6a'" onmouseout="this.style.background='#4caf50'">
-                ⚔️ АТАКА
-            </button>
-            <button onclick="battleSystem.playerDefend()" style="
-                background: #00bcd4;
-                border: 3px solid #0097a7;
-                color: #fff;
-                padding: 20px 30px;
-                border-radius: 12px;
-                font-size: 18px;
-                font-weight: bold;
-                cursor: pointer;
-                font-family: monospace;
-                min-width: 150px;
-                transition: all 0.2s ease;
-            " onmouseover="this.style.background='#26c6da'" onmouseout="this.style.background='#00bcd4'">
-                🛡️ БЛОК
-            </button>
-        `;
     }
 
     playerAttack() {
@@ -302,7 +354,7 @@ class UndertaleBattle {
                 damage *= this.playerNft.upgrades.damage;
             }
             if (this.playerNft.upgrades.crit && isCrit) {
-                damage *= 1.5; // Дополнительный множитель при крите
+                damage *= 1.5;
             }
         }
 
@@ -354,32 +406,31 @@ class UndertaleBattle {
 
         let damage = Math.floor(Math.random() * 30) + 12; // 12-42 урона
         const isCrit = Math.random() < 0.15; // 15% шанс крита
-        const playerDodge = Math.random() < 0.08; // 8% базовый шанс уклонения
 
         // Применяем апгрейды врага
-        if (this.enemyNft.upgrades) {
-            if (this.enemyNft.upgrades.damage) {
-                damage *= this.enemyNft.upgrades.damage;
-            }
+        if (this.enemyNft.upgrades && this.enemyNft.upgrades.damage) {
+            damage *= this.enemyNft.upgrades.damage;
         }
 
         // Проверяем уклонение игрока
-        let finalDodgeChance = playerDodge;
+        let playerDodgeChance = 0.08;
         if (this.playerNft.upgrades && this.playerNft.upgrades.dodge) {
-            finalDodgeChance = Math.random() < (0.08 * this.playerNft.upgrades.dodge);
+            playerDodgeChance *= this.playerNft.upgrades.dodge;
         }
 
-        if (finalDodgeChance) {
+        const playerDodged = Math.random() < playerDodgeChance;
+
+        if (playerDodged) {
             this.addBattleLog('Вы уклонились от атаки!');
         } else {
             // Если игрок защищался, урон уменьшается
             if (this.playerDefending) {
                 damage *= 0.5;
-                this.addBattleLog(`Блок частично поглотил урон! Получено ${Math.round(damage)} урона`);
+                this.addBattleLog(`Блок поглотил часть урона! Получено ${Math.round(damage)} урона`);
             } else {
                 if (isCrit) {
                     damage *= 1.8;
-                    this.addBattleLog(`КРИТИЧЕСКАЯ АТАКА ВРАГА! Получено ${Math.round(damage)} урона!`);
+                    this.addBattleLog(`КРИТИЧЕСКАЯ АТАКА! Получено ${Math.round(damage)} урона!`);
                 } else {
                     this.addBattleLog(`Получено ${Math.round(damage)} урона`);
                 }
@@ -423,7 +474,7 @@ class UndertaleBattle {
             resultDetails.innerHTML = `
                 Вы победили и получили:<br>
                 <strong>${this.enemyNft.name}</strong><br>
-                <em>NFT добавлен в вашу коллекцию</em>
+                <em>NFT добавлен в коллекцию</em>
             `;
 
             // Добавляем NFT в коллекцию
@@ -470,6 +521,7 @@ class UndertaleBattle {
         }
 
         stars -= 50;
+        updateUI();
         this.addBattleLog('Вы сбежали из боя! (-50 звёзд)');
         
         setTimeout(() => {
@@ -499,7 +551,7 @@ class UndertaleBattle {
 // Создаем глобальный экземпляр
 window.battleSystem = new UndertaleBattle();
 
-// Функция для запуска новой битвы (заменяет старую)
+// Функция для запуска новой битвы
 window.startUndertaleBattle = function(playerNft, enemyNft) {
     console.log('Запуск боя:', playerNft.name, 'vs', enemyNft.name);
     battleSystem.init(playerNft, enemyNft);
