@@ -179,32 +179,39 @@
 
 @keyframes centerNftGlowGreen {
     0%, 100% {
-        box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+        box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
     }
     50% {
-        box-shadow: 0 0 30px rgba(76, 175, 80, 0.5);
+        box-shadow: 0 0 25px rgba(76, 175, 80, 0.5);
     }
 }
 
 @keyframes centerNftGlowBlue {
     0%, 100% {
-        box-shadow: 0 0 20px rgba(33, 150, 243, 0.3);
+        box-shadow: 0 0 15px rgba(33, 150, 243, 0.3);
     }
     50% {
-        box-shadow: 0 0 30px rgba(33, 150, 243, 0.5);
+        box-shadow: 0 0 25px rgba(33, 150, 243, 0.5);
     }
 }
 
 @keyframes centerNftGlowOrange {
     0%, 100% {
-        box-shadow: 0 0 20px rgba(255, 152, 0, 0.3);
+        box-shadow: 0 0 15px rgba(255, 152, 0, 0.3);
     }
     50% {
-        box-shadow: 0 0 30px rgba(255, 152, 0, 0.5);
+        box-shadow: 0 0 25px rgba(255, 152, 0, 0.5);
     }
 }
 
-
+@keyframes centerNftGlow {
+    0%, 100% {
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.1);
+    }
+}
 
 @keyframes modalSlideIn {
     from {
@@ -534,6 +541,7 @@
     }
 
 }
+
 
 
 
