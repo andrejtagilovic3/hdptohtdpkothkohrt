@@ -968,21 +968,21 @@ function renderProfile() {
                 } else if (maxUpgrade >= 1.20) {
                     rarity = 'uncommon';
                 }
-                
+    
                 const rarityColors = {
                     common: '#4caf50',
                     uncommon: '#2196f3',
                     rare: '#ff9800'
                 };
-                
+    
                 const rarityColor = rarityColors[rarity];
                 
-                // Используем прямые стили с правильным цветом
+    // ТОЛЬКО ОБВОДКА БЕЗ АНИМАЦИИ
                 cardStyle = `
                     border: 2px solid ${rarityColor}; 
                     box-shadow: 0 0 15px ${rarityColor}40;
                 `;
-                
+    
                 nameStyle = `color: ${rarityColor}; font-weight: 700;`;
                 
                 const upgradeTypes = {
@@ -990,7 +990,7 @@ function renderProfile() {
                     dodge: { name: 'Уклонение', icon: '🛡️' },
                     crit: { name: 'Крит', icon: '💥' }
                 };
-                
+    
                 const upgradesList = Object.entries(nft.upgrades)
                     .map(([type, level]) => {
                         const upgrade = upgradeTypes[type];
