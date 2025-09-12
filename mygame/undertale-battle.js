@@ -501,5 +501,11 @@ window.battleSystem = new UndertaleBattle();
 
 // Функция для запуска новой битвы (заменяет старую)
 window.startUndertaleBattle = function(playerNft, enemyNft) {
+    console.log('Запуск боя:', playerNft.name, 'vs', enemyNft.name);
     battleSystem.init(playerNft, enemyNft);
 };
+
+// Дополнительная проверка загрузки
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Undertale Battle System загружен!');
+});
