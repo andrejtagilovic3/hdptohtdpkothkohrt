@@ -758,62 +758,64 @@ function renderCenterArea() {
     const centerDiv = document.getElementById('center-content');
     centerDiv.innerHTML = '';
     
-// НАЙДИ ЭТУ ЧАСТЬ В renderCenterArea() (примерно строки 800-850):
-if (activeBattleNft) {
-    let upgradeGlow = '';
-    let nameStyle = '';
-    let upgradeInfo = '';
+    if (activeBattleNft) {
+        let upgradeGlow = '';
+        let nameStyle = '';
+        let upgradeInfo = '';
+        
+        // Проверяем наличие апгрейдов
+        if (activeBattleNft.upgrades && Object.keys(activeBattleNft.upgrades).length > 0) {
+            const upgradeValues = Object.values(activeBattleNft.upgrades);
+            const maxUpgrade = Math.max(...upgradeValues);
+            
+            let rarity = 'common';
+            let animationName = 'centerNftGlowGreen';
+            if (maxUpgrade >= 1.35) {
+                rarity = 'rare';
+                animationName = 'centerNftGlowOrange';
+            } else if (maxUpgrade >= 1.20) {
+                rarity = 'uncommon';
+                animationName = 'centerNftGlowBlue';
+            }
     
-    // Проверяем наличие апгрейдов
-    if (activeBattleNft.upgrades && Object.keys(activeBattleNft.upgrades).length > 0) {
-        const upgradeValues = Object.values(activeBattleNft.upgrades);
-        const maxUpgrade = Math.max(...upgradeValues);
-        
-        // Определяем цвета для разных типов апгрейдов
-        const upgradeTypeColors = {
-            damage: '#4caf50',  // зеленый для урона
-            dodge: '#2196f3',   // синий для уклонения  
-            crit: '#ff9800'     // оранжевый для крита
-        };
-        
-        // Находим тип апгрейда для правильного цвета
-        let upgradeColor = '#4caf50'; // по умолчанию зеленый
-        const upgradeEntries = Object.entries(activeBattleNft.upgrades);
-        if (upgradeEntries.length > 0) {
-            const firstUpgradeType = upgradeEntries[0][0]; // берем тип первого апгрейда
-            upgradeColor = upgradeTypeColors[firstUpgradeType] || '#4caf50';
+            const rarityColors = {
+                common: '#4caf50',
+                uncommon: '#2196f3',
+                rare: '#ff9800'
+            };
+    
+        const rarityColor = rarityColors[rarity];
+        upgradeGlow = `box-shadow: 0 0 20px ${rarityColor}60; border: 3px solid ${rarityColor}; animation: ${animationName} 3s ease-in-out infinite;`;
+        nameStyle = `color: ${rarityColor}; text-shadow: 0 0 10px ${rarityColor}60;`;
+            
+            const upgradeTypes = {
+                damage: { name: 'Увеличение урона', icon: '⚔️' },
+                dodge: { name: 'Уклонение', icon: '🛡️' },
+                crit: { name: 'Критический удар', icon: '💥' }
+            };
+            
+            const upgradesList = Object.entries(activeBattleNft.upgrades)
+                .map(([type, level]) => {
+                    const upgrade = upgradeTypes[type];
+                    if (upgrade) {
+                        return `<div style="display: inline-block; background: ${rarityColor}20; color: ${rarityColor}; border: 1px solid ${rarityColor}; padding: 4px 8px; border-radius: 6px; margin: 2px; font-size: 12px; font-weight: 600;">
+                            ${upgrade.icon} +${Math.round((level - 1) * 100)}%
+                        </div>`;
+                    }
+                    return '';
+                }).filter(Boolean).join('');
+            upgradeInfo = `<div style="margin-top: 12px;">${upgradesList}</div>`;
         }
-
-        upgradeGlow = `box-shadow: 0 0 15px ${upgradeColor}40; border: 3px solid ${upgradeColor}; animation: centerNftGlow 3s ease-in-out infinite;`;
-        nameStyle = `color: ${upgradeColor}; text-shadow: 0 0 8px ${upgradeColor}40;`;
         
-        const upgradeTypes = {
-            damage: { name: 'Увеличение урона', icon: '⚔️' },
-            dodge: { name: 'Уклонение', icon: '🛡️' },
-            crit: { name: 'Критический удар', icon: '💥' }
-        };
-        
-        const upgradesList = Object.entries(activeBattleNft.upgrades)
-            .map(([type, level]) => {
-                const upgrade = upgradeTypes[type];
-                if (upgrade) {
-                    return `<div style="display: inline-block; background: ${upgradeColor}20; color: ${upgradeColor}; border: 1px solid ${upgradeColor}; padding: 4px 8px; border-radius: 6px; margin: 2px; font-size: 12px; font-weight: 600;">
-                        ${upgrade.icon} +${Math.round((level - 1) * 100)}%
-                    </div>`;
-                }
-                return '';
-            }).filter(Boolean).join('');
-        upgradeInfo = `<div style="margin-top: 12px;">${upgradesList}</div>`;
+        centerDiv.innerHTML = `
+            <img src="${activeBattleNft.img}" class="center-nft-img" alt="${activeBattleNft.name}" style="${upgradeGlow}">
+            <div class="center-nft-name" style="${nameStyle}">${activeBattleNft.name}</div>
+            <div class="center-nft-status">Готов к дуэли</div>
+            ${upgradeInfo}
+        `;
+    } else {
+        centerDiv.innerHTML = '<div class="center-logo">//</div><div class="center-message">У вас не выбран NFT для дуэли, выберите его в <span class="clickable-link" onclick="goToCollection()">коллекции</span></div>';
     }
-    
-    centerDiv.innerHTML = `
-        <img src="${activeBattleNft.img}" class="center-nft-img" alt="${activeBattleNft.name}" style="${upgradeGlow}">
-        <div class="center-nft-name" style="${nameStyle}">${activeBattleNft.name}</div>
-        <div class="center-nft-status">Готов к дуэли</div>
-        ${upgradeInfo}
-    `;
-} else {
-    centerDiv.innerHTML = '<div class="center-logo">//</div><div class="center-message">У вас не выбран NFT для дуэли, выберите его в <span class="clickable-link" onclick="goToCollection()">коллекции</span></div>';
 }
 
 function renderCollection() {
