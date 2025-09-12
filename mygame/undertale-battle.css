@@ -1,0 +1,416 @@
+/* === UNDERTALE BATTLE STYLES === */
+/* Строгий черно-белый дизайн в стиле всего приложения */
+
+.undertale-battle-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #000000;
+    color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    z-index: 9999;
+    font-weight: 600;
+}
+
+/* ВЕРХНЯЯ ОБЛАСТЬ - ВРАГ */
+.enemy-battle-area {
+    flex: 2;
+    border: 2px solid #333333;
+    margin: 10px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #1a1a1a;
+    position: relative;
+    padding: 20px;
+}
+
+.escape-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #333333;
+    border: 1px solid #666666;
+    color: #ffffff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.escape-btn:hover {
+    background: #444444;
+    border-color: #777777;
+}
+
+/* БОЛЬШОЕ изображение врага */
+.enemy-battle-img {
+    width: 180px;
+    height: 180px;
+    border-radius: 12px;
+    border: 2px solid #666666;
+    object-fit: cover;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.enemy-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* HP бары */
+.hp-container {
+    background: #000000;
+    border: 2px solid #666666;
+    border-radius: 8px;
+    width: 220px;
+    height: 20px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.hp-bar {
+    height: 100%;
+    background: #ffffff;
+    width: 100%;
+    transition: width 0.8s ease-out;
+    position: relative;
+}
+
+.hp-bar.critical {
+    background: #888888;
+    animation: criticalFlash 1s ease-in-out infinite;
+}
+
+@keyframes criticalFlash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.hp-text {
+    font-size: 14px;
+    color: #cccccc;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* НИЖНЯЯ ОБЛАСТЬ */
+.battle-bottom-area {
+    height: 300px;
+    margin: 0 10px 10px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ЛОГ БОЯ */
+.battle-log-container {
+    border: 2px solid #333333;
+    border-radius: 12px;
+    background: #1a1a1a;
+    padding: 15px;
+    height: 100px;
+    overflow-y: auto;
+    font-size: 14px;
+    color: #cccccc;
+    line-height: 1.4;
+}
+
+.battle-log-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.battle-log-container::-webkit-scrollbar-track {
+    background: #000000;
+    border-radius: 3px;
+}
+
+.battle-log-container::-webkit-scrollbar-thumb {
+    background: #333333;
+    border-radius: 3px;
+}
+
+/* ОБЛАСТЬ ДЕЙСТВИЙ */
+.battle-actions-area {
+    display: flex;
+    gap: 10px;
+    height: 180px;
+}
+
+/* ИГРОК (маленькое окно посередине) */
+.player-battle-area {
+    border: 2px solid #333333;
+    border-radius: 12px;
+    background: #1a1a1a;
+    padding: 15px;
+    width: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.player-battle-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    border: 2px solid #666666;
+    object-fit: cover;
+    margin-bottom: 8px;
+}
+
+.player-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #cccccc;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.player-hp-container {
+    background: #000000;
+    border: 2px solid #666666;
+    border-radius: 6px;
+    width: 100px;
+    height: 16px;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.player-hp-text {
+    font-size: 11px;
+    color: #cccccc;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* КНОПКИ ДЕЙСТВИЙ */
+.battle-buttons {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.battle-action-btn {
+    flex: 1;
+    background: #333333;
+    border: 2px solid #666666;
+    color: #ffffff;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.battle-action-btn:hover:not(:disabled) {
+    background: #444444;
+    border-color: #777777;
+    transform: translateY(-2px);
+}
+
+.battle-action-btn:active:not(:disabled) {
+    transform: translateY(0);
+    background: #2a2a2a;
+}
+
+.battle-action-btn:disabled {
+    background: #1a1a1a;
+    color: #666666;
+    cursor: not-allowed;
+    opacity: 0.5;
+    border-color: #333333;
+}
+
+.battle-action-btn i {
+    font-size: 18px;
+}
+
+/* РЕЗУЛЬТАТ БИТВЫ */
+.battle-result-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.battle-result-modal {
+    background: #1a1a1a;
+    border: 2px solid #333333;
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    min-width: 300px;
+    max-width: 80%;
+    animation: modalAppear 0.3s ease-out;
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.result-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.result-title.win {
+    color: #ffffff;
+}
+
+.result-title.lose {
+    color: #cccccc;
+}
+
+.result-details {
+    font-size: 16px;
+    margin-bottom: 20px;
+    line-height: 1.4;
+    color: #cccccc;
+}
+
+.result-back-btn {
+    background: #ffffff;
+    color: #000000;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.result-back-btn:hover {
+    background: #eeeeee;
+    transform: translateY(-1px);
+}
+
+/* ЭФФЕКТЫ УРОНА */
+.damage-effect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 1000;
+    font-size: 18px;
+    color: #ffffff;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    animation: damageFloat 1.2s ease-out forwards;
+}
+
+.damage-effect.crit {
+    font-size: 22px;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+@keyframes damageFloat {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+    }
+    20% {
+        opacity: 1;
+        transform: translate(-50%, -60%) scale(1.1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -100%) scale(0.8);
+    }
+}
+
+/* SHAKE эффект при получении урона */
+.battle-shake {
+    animation: battleShake 0.5s ease-in-out;
+}
+
+@keyframes battleShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* MEDIA QUERIES для адаптивности */
+@media (max-height: 600px) {
+    .enemy-battle-area {
+        flex: 1.5;
+        padding: 15px;
+    }
+    
+    .enemy-battle-img {
+        width: 140px;
+        height: 140px;
+    }
+    
+    .battle-bottom-area {
+        height: 250px;
+    }
+    
+    .battle-log-container {
+        height: 80px;
+    }
+    
+    .battle-actions-area {
+        height: 150px;
+    }
+}
+
+@media (max-width: 400px) {
+    .enemy-battle-img {
+        width: 160px;
+        height: 160px;
+    }
+    
+    .battle-actions-area {
+        flex-direction: column;
+        height: auto;
+    }
+    
+    .player-battle-area {
+        width: 100%;
+        flex-direction: row;
+        height: 80px;
+        padding: 10px;
+    }
+    
+    .battle-buttons {
+        flex-direction: row;
+        height: 60px;
+    }
+}
