@@ -769,24 +769,29 @@ function renderCenterArea() {
             const maxUpgrade = Math.max(...upgradeValues);
             
             let rarity = 'common';
-            let animationName = 'centerNftGlowGreen';
             if (maxUpgrade >= 1.35) {
                 rarity = 'rare';
-                animationName = 'centerNftGlowOrange';
             } else if (maxUpgrade >= 1.20) {
                 rarity = 'uncommon';
-                animationName = 'centerNftGlowBlue';
             }
     
             const rarityColors = {
                 common: '#4caf50',
-                uncommon: '#2196f3',
+                uncommon: '#2196f3', 
                 rare: '#ff9800'
             };
     
-        const rarityColor = rarityColors[rarity];
-        upgradeGlow = `box-shadow: 0 0 20px ${rarityColor}60; border: 3px solid ${rarityColor}; animation: ${animationName} 3s ease-in-out infinite;`;
-        nameStyle = `color: ${rarityColor}; text-shadow: 0 0 10px ${rarityColor}60;`;
+            const rarityColor = rarityColors[rarity];
+            
+            // Используем прямые стили вместо классов анимации
+            upgradeGlow = `
+                border: 3px solid ${rarityColor}; 
+                box-shadow: 0 0 20px ${rarityColor}60;
+                animation: centerNftCustomGlow 3s ease-in-out infinite;
+                --glow-color: ${rarityColor};
+            `;
+            
+            nameStyle = `color: ${rarityColor}; text-shadow: 0 0 10px ${rarityColor}60;`;
             
             const upgradeTypes = {
                 damage: { name: 'Увеличение урона', icon: '⚔️' },
@@ -840,8 +845,11 @@ function renderCollection() {
                 const maxUpgrade = Math.max(...upgradeValues);
                 
                 let rarity = 'common';
-                if (maxUpgrade >= 1.20) rarity = 'rare';
-                else if (maxUpgrade >= 1.12) rarity = 'uncommon';
+                if (maxUpgrade >= 1.35) {
+                    rarity = 'rare';
+                } else if (maxUpgrade >= 1.20) {
+                    rarity = 'uncommon';
+                }
                 
                 const rarityColors = {
                     common: '#4caf50',
@@ -850,7 +858,15 @@ function renderCollection() {
                 };
                 
                 const rarityColor = rarityColors[rarity];
-                cardStyle = `border: 2px solid ${rarityColor}; box-shadow: 0 0 15px ${rarityColor}40;`;
+                
+                // Используем прямые стили с правильным цветом
+                cardStyle = `
+                    border: 2px solid ${rarityColor}; 
+                    box-shadow: 0 0 15px ${rarityColor}40;
+                    animation: nftCardCustomGlow 2s ease-in-out infinite;
+                    --glow-color: ${rarityColor};
+                `;
+                
                 nameStyle = `color: ${rarityColor}; font-weight: 700;`;
                 
                 const upgradeTypes = {
@@ -950,8 +966,11 @@ function renderProfile() {
                 const maxUpgrade = Math.max(...upgradeValues);
                 
                 let rarity = 'common';
-                if (maxUpgrade >= 1.20) rarity = 'rare';
-                else if (maxUpgrade >= 1.12) rarity = 'uncommon';
+                if (maxUpgrade >= 1.35) {
+                    rarity = 'rare';
+                } else if (maxUpgrade >= 1.20) {
+                    rarity = 'uncommon';
+                }
                 
                 const rarityColors = {
                     common: '#4caf50',
@@ -960,7 +979,15 @@ function renderProfile() {
                 };
                 
                 const rarityColor = rarityColors[rarity];
-                cardStyle = `border: 2px solid ${rarityColor}; box-shadow: 0 0 15px ${rarityColor}40;`;
+                
+                // Используем прямые стили с правильным цветом
+                cardStyle = `
+                    border: 2px solid ${rarityColor}; 
+                    box-shadow: 0 0 15px ${rarityColor}40;
+                    animation: nftCardCustomGlow 2s ease-in-out infinite;
+                    --glow-color: ${rarityColor};
+                `;
+                
                 nameStyle = `color: ${rarityColor}; font-weight: 700;`;
                 
                 const upgradeTypes = {
