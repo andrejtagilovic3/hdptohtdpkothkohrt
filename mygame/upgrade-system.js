@@ -68,8 +68,8 @@ function renderUpgradeScreen() {
             const maxUpgrade = Math.max(...upgradeValues);
             
             let rarity = 'common';
-            if (maxUpgrade >= 1.35) rarity = 'rare';
-            else if (maxUpgrade >= 1.20) rarity = 'uncommon';
+            if (maxUpgrade >= 1.20) rarity = 'rare';
+            else if (maxUpgrade >= 1.12) rarity = 'uncommon';
             
             const rarityColor = rarityColors[rarity];
             cardStyle = `border: 2px solid ${rarityColor}; box-shadow: 0 0 15px ${rarityColor}40;`;
