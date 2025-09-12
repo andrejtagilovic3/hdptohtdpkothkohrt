@@ -1,7 +1,21 @@
 /* === UNDERTALE BATTLE STYLES === */
 /* Строгий черно-белый дизайн в стиле всего приложения */
 
-.undertale-battle-container {
+.hp-bar.critical {
+    background: #888888;
+    animation: criticalFlash 1s ease-in-out infinite;
+}
+
+@keyframes criticalFlash {
+    0%, 100% { 
+        opacity: 1; 
+        background: #ffffff;
+    }
+    50% { 
+        opacity: 0.6; 
+        background: #888888;
+    }
+}undertale-battle-container {
     position: fixed;
     top: 0;
     left: 0;
@@ -95,8 +109,34 @@
 }
 
 @keyframes criticalFlash {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
+    0%, 100% { 
+        opacity: 1; 
+        background: #ffffff;
+    }
+    50% { 
+        opacity: 0.6; 
+        background: #888888;
+    }
+}
+
+/* Увеличенные кнопки для мобильных устройств */
+.battle-action-btn:hover:not(:disabled) {
+    background: #444444;
+    border-color: #777777;
+    transform: translateY(-2px);
+}
+
+.battle-action-btn:active:not(:disabled) {
+    transform: translateY(0);
+    background: #2a2a2a;
+}
+
+.battle-action-btn:disabled {
+    background: #1a1a1a;
+    color: #666666;
+    cursor: not-allowed;
+    opacity: 0.5;
+    border-color: #333333;
 }
 
 .hp-text {
