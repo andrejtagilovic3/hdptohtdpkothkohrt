@@ -350,6 +350,64 @@ function startBattleSearch() {
     updateStatus();
 }
 
+function startNewBattle() {
+    console.log('Запуск нового боя...');
+    document.getElementById('searching-overlay').style.display = 'none';
+
+    const playerPrice = activeBattleNft.buyPrice;
+    const playerHasUpgrades = activeBattleNft.upgrades && Object.keys(activeBattleNft.upgrades).length > 0;
+    let suitableNfts = [];
+
+    nftTemplates.forEach((template, index) => {
+        const nftPrice = nftPrices[index];
+        
+        // Подбор по цене (±30% от цены игрока)
+        const priceMin = playerPrice * 0.7;
+        const priceMax = playerPrice * 1.3;
+        
+        if (nftPrice >= priceMin && nftPrice <= priceMax) {
+            suitableNfts.push({ 
+                ...template, 
+                price: nftPrice
+            });
+        }
+    });
+
+    let botNft;
+    if (suitableNfts.length === 0) {
+        const randomIndex = Math.floor(Math.random() * nftTemplates.length);
+        botNft = { ...nftTemplates[randomIndex], price: nftPrices[randomIndex] };
+    } else {
+        const randomIndex = Math.floor(Math.random() * suitableNfts.length);
+        botNft = suitableNfts[randomIndex];
+    }
+
+    // Генерируем апгрейды для бота
+    if (playerHasUpgrades) {
+        if (Math.random() < 0.7) {
+            generateBotUpgrades(botNft, true);
+        }
+    } else {
+        if (Math.random() < 0.15) {
+            generateBotUpgrades(botNft, false);
+        }
+    }
+
+    console.log('Игрок:', activeBattleNft.name);
+    console.log('Бот:', botNft.name);
+    console.log('battleSystem:', window.battleSystem);
+
+    // ЗАПУСКАЕМ НОВУЮ БОЕВУЮ СИСТЕМУ
+    if (window.battleSystem && window.battleSystem.init) {
+        window.battleSystem.init(activeBattleNft, botNft);
+    } else {
+        console.error('battleSystem не найден!');
+        alert('Ошибка запуска боя. Убедитесь что файл undertale-battle.js загружен.');
+        // Возвращаемся к поиску
+        document.getElementById('searching-overlay').style.display = 'none';
+    }
+}
+
 function initializeBattle(playerFirst) {
     playerHP = 100;
     botHP = 100;
