@@ -1,4 +1,5 @@
-// ==================== undertale-battle.js ====================
+// ==================== UNDERTALE BATTLE SYSTEM ====================
+// Строгий черно-белый дизайн в стиле приложения
 
 class UndertaleBattle {
     constructor() {
@@ -7,369 +8,249 @@ class UndertaleBattle {
         this.playerMaxHP = 100;
         this.enemyMaxHP = 100;
         this.currentTurn = 'player';
-        this.battlePhase = 'menu';
         this.battleActive = false;
         this.playerNft = null;
         this.enemyNft = null;
-        this.battleContainer = null;
-        this.actionButtons = null;
         this.battleLog = [];
         this.playerDefending = false;
     }
 
     init(playerNft, enemyNft) {
-        this.playerNft = playerNft;
-        this.enemyNft = enemyNft;
+        console.log('Инициализация битвы:', playerNft.name, 'vs', enemyNft.name);
+        
+        this.playerNft = {...playerNft};
+        this.enemyNft = {...enemyNft};
         this.playerHP = 100;
         this.enemyHP = 100;
+        this.playerMaxHP = 100;
+        this.enemyMaxHP = 100;
         this.battleActive = true;
         this.currentTurn = 'player';
-        this.battlePhase = 'menu';
         this.battleLog = [];
         this.playerDefending = false;
         
         this.createBattleUI();
         this.updateDisplay();
         this.showPlayerActions();
+        this.addBattleLog(`Битва началась! ${playerNft.name} против ${enemyNft.name}`);
     }
 
     createBattleUI() {
-        // Убираем старый интерфейс если есть
+        // Удаляем старый интерфейс если есть
         const existing = document.getElementById('undertale-battle-container');
         if (existing) existing.remove();
 
         const battleHTML = `
-            <div id="undertale-battle-container" style="
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: #000000;
-                color: #ffffff;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                display: flex;
-                flex-direction: column;
-                z-index: 9999;
-            ">
-                <!-- ВЕРХНЯЯ ОБЛАСТЬ - NFT ВРАГА (красная рамка) -->
-                <div style="
-                    flex: 1;
-                    border: 3px solid #f44336;
-                    margin: 10px;
-                    border-radius: 12px;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    background: #1a1a1a;
-                    position: relative;
-                ">
-                    <!-- Кнопка побега в углу -->
-                    <button id="escape-btn" style="
-                        position: absolute;
-                        top: 15px;
-                        right: 15px;
-                        background: #333333;
-                        border: 1px solid #666666;
-                        color: #ffffff;
-                        padding: 8px 12px;
-                        border-radius: 6px;
-                        cursor: pointer;
-                        font-size: 12px;
-                        font-weight: 600;
-                    ">СБЕЖАТЬ (50⭐)</button>
+            <div id="undertale-battle-container" class="undertale-battle-container">
+                <!-- ВРАГ - большая область сверху -->
+                <div class="enemy-battle-area">
+                    <button class="escape-btn" onclick="battleSystem.attemptEscape()">
+                        Сбежать (50⭐)
+                    </button>
 
-                    <!-- NFT врага -->
-                    <img id="enemy-battle-img" style="
-                        width: 120px;
-                        height: 120px;
-                        border-radius: 12px;
-                        border: 2px solid #f44336;
-                        object-fit: cover;
-                        margin-bottom: 15px;
-                    ">
-                    
-                    <div id="enemy-name" style="
-                        font-size: 18px;
-                        font-weight: 700;
-                        color: #f44336;
-                        margin-bottom: 10px;
-                    ">ВРАГ</div>
+                    <img id="enemy-battle-img" class="enemy-battle-img" alt="Enemy NFT">
+                    <div id="enemy-name" class="enemy-name">ВРАГ</div>
 
-                    <!-- HP врага (розовый) -->
-                    <div style="
-                        background: #000000;
-                        border: 2px solid #e91e63;
-                        border-radius: 8px;
-                        width: 200px;
-                        height: 20px;
-                        overflow: hidden;
-                        margin-bottom: 5px;
-                    ">
-                        <div id="enemy-hp-bar" style="
-                            height: 100%;
-                            background: #e91e63;
-                            width: 100%;
-                            transition: width 0.5s ease;
-                        "></div>
+                    <!-- HP врага -->
+                    <div class="hp-container">
+                        <div id="enemy-hp-bar" class="hp-bar"></div>
                     </div>
-                    <div id="enemy-hp-text" style="
-                        font-size: 14px;
-                        color: #e91e63;
-                        font-weight: 600;
-                    ">100/100 HP</div>
+                    <div id="enemy-hp-text" class="hp-text">100/100 HP</div>
                 </div>
 
                 <!-- НИЖНЯЯ ОБЛАСТЬ -->
-                <div style="
-                    height: 350px;
-                    margin: 0 10px 10px 10px;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 10px;
-                ">
-                    <!-- ЛОГ БОЯ (желтая рамка) -->
-                    <div id="battle-log-container" style="
-                        border: 3px solid #ffc107;
-                        border-radius: 12px;
-                        background: #1a1a1a;
-                        padding: 15px;
-                        height: 120px;
-                        overflow-y: auto;
-                        font-size: 14px;
-                        color: #ffffff;
-                        line-height: 1.4;
-                    "></div>
+                <div class="battle-bottom-area">
+                    <!-- ЛОГ БОЯ -->
+                    <div id="battle-log-container" class="battle-log-container"></div>
 
-                    <!-- ДЕЙСТВИЯ ИГРОКА -->
-                    <div style="
-                        display: flex;
-                        gap: 10px;
-                        height: 200px;
-                    ">
-                        <!-- ЛЕВАЯ ЧАСТЬ - NFT игрока и HP (синяя рамка) -->
-                        <div style="
-                            border: 3px solid #2196f3;
-                            border-radius: 12px;
-                            background: #1a1a1a;
-                            padding: 15px;
-                            width: 200px;
-                            display: flex;
-                            flex-direction: column;
-                            align-items: center;
-                        ">
-                            <img id="player-battle-img" style="
-                                width: 80px;
-                                height: 80px;
-                                border-radius: 8px;
-                                border: 2px solid #2196f3;
-                                object-fit: cover;
-                                margin-bottom: 10px;
-                            ">
-                            
-                            <div style="
-                                font-size: 14px;
-                                font-weight: 700;
-                                color: #2196f3;
-                                margin-bottom: 8px;
-                            ">ВЫ</div>
-
-                            <!-- HP игрока -->
-                            <div style="
-                                background: #000000;
-                                border: 2px solid #2196f3;
-                                border-radius: 6px;
-                                width: 120px;
-                                height: 16px;
-                                overflow: hidden;
-                                margin-bottom: 5px;
-                            ">
-                                <div id="player-hp-bar" style="
-                                    height: 100%;
-                                    background: #2196f3;
-                                    width: 100%;
-                                    transition: width 0.5s ease;
-                                "></div>
-                            </div>
-                            <div id="player-hp-text" style="
-                                font-size: 12px;
-                                color: #2196f3;
-                                font-weight: 600;
-                            ">100/100 HP</div>
+                    <!-- ОБЛАСТЬ ДЕЙСТВИЙ -->
+                    <div class="battle-actions-area">
+                        <!-- КНОПКИ СЛЕВА -->
+                        <div class="battle-buttons">
+                            <button id="attack-btn" class="battle-action-btn" onclick="battleSystem.playerAttack()">
+                                <i class="fas fa-sword"></i>
+                                АТАКА
+                            </button>
+                            <button id="defend-btn" class="battle-action-btn" onclick="battleSystem.playerDefend()">
+                                <i class="fas fa-shield-alt"></i>
+                                БЛОК
+                            </button>
                         </div>
 
-                        <!-- ПРАВАЯ ЧАСТЬ - Кнопки действий -->
-                        <div style="
-                            flex: 1;
-                            display: flex;
-                            flex-direction: column;
-                            gap: 10px;
-                        ">
-                            <!-- АТАКА (зеленая) -->
-                            <button id="attack-btn" style="
-                                flex: 1;
-                                background: #4caf50;
-                                border: 2px solid #388e3c;
-                                color: #ffffff;
-                                border-radius: 12px;
-                                font-size: 18px;
-                                font-weight: 700;
-                                cursor: pointer;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                transition: all 0.2s ease;
-                            ">⚔️ АТАКА</button>
+                        <!-- ИГРОК В ЦЕНТРЕ (маленькое окно) -->
+                        <div class="player-battle-area">
+                            <img id="player-battle-img" class="player-battle-img" alt="Player NFT">
+                            <div>
+                                <div class="player-name">ВЫ</div>
+                                <div class="player-hp-container">
+                                    <div id="player-hp-bar" class="hp-bar"></div>
+                                </div>
+                                <div id="player-hp-text" class="player-hp-text">100/100 HP</div>
+                            </div>
+                        </div>
 
-                            <!-- УКЛОНЕНИЕ (голубое) -->
-                            <button id="defend-btn" style="
-                                flex: 1;
-                                background: #00bcd4;
-                                border: 2px solid #0097a7;
-                                color: #ffffff;
-                                border-radius: 12px;
-                                font-size: 18px;
-                                font-weight: 700;
-                                cursor: pointer;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                transition: all 0.2s ease;
-                            ">🛡️ БЛОК</button>
+                        <!-- КНОПКИ СПРАВА (пустое место для симметрии) -->
+                        <div class="battle-buttons">
+                            <div style="flex: 1; opacity: 0.3; background: #1a1a1a; border: 2px dashed #333333; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #666666; font-size: 12px;">
+                                Резерв
+                            </div>
+                            <div style="flex: 1; opacity: 0.3; background: #1a1a1a; border: 2px dashed #333333; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #666666; font-size: 12px;">
+                                Резерв
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Результат битвы (скрыт по умолчанию) -->
-                <div id="battle-result-container" style="
-                    display: none;
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background: #1a1a1a;
-                    border: 4px solid #333333;
-                    border-radius: 16px;
-                    padding: 30px;
-                    text-align: center;
-                    min-width: 300px;
-                    z-index: 10000;
-                ">
-                    <div id="result-text" style="font-size: 24px; font-weight: bold; margin-bottom: 15px;"></div>
-                    <div id="result-details" style="font-size: 16px; margin-bottom: 20px; line-height: 1.4;"></div>
-                    <button id="result-back-btn" style="
-                        background: #ffffff;
-                        color: #000000;
-                        border: none;
-                        padding: 12px 24px;
-                        border-radius: 8px;
-                        font-size: 16px;
-                        font-weight: bold;
-                        cursor: pointer;
-                    ">Вернуться в меню</button>
+                <!-- РЕЗУЛЬТАТ БИТВЫ (скрыт по умолчанию) -->
+                <div id="battle-result-overlay" class="battle-result-overlay" style="display: none;">
+                    <div class="battle-result-modal">
+                        <div id="result-title" class="result-title"></div>
+                        <div id="result-details" class="result-details"></div>
+                        <button class="result-back-btn" onclick="battleSystem.endBattle()">
+                            Вернуться в меню
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
 
         document.body.insertAdjacentHTML('beforeend', battleHTML);
-
-        // Устанавливаем обработчики
-        document.getElementById('escape-btn').onclick = () => this.attemptEscape();
-        document.getElementById('attack-btn').onclick = () => this.playerAttack();
-        document.getElementById('defend-btn').onclick = () => this.playerDefend();
-        document.getElementById('result-back-btn').onclick = () => this.endBattle();
+        
+        console.log('UI создан');
     }
 
     updateDisplay() {
         // Обновляем изображения
-        document.getElementById('player-battle-img').src = this.playerNft.img;
-        document.getElementById('enemy-battle-img').src = this.enemyNft.img;
+        const playerImg = document.getElementById('player-battle-img');
+        const enemyImg = document.getElementById('enemy-battle-img');
+        const enemyName = document.getElementById('enemy-name');
+
+        if (playerImg && this.playerNft) {
+            playerImg.src = this.playerNft.img;
+        }
+        if (enemyImg && this.enemyNft) {
+            enemyImg.src = this.enemyNft.img;
+            enemyName.textContent = this.enemyNft.name.toUpperCase();
+        }
 
         // Обновляем HP
         const playerHPPercent = Math.max(0, (this.playerHP / this.playerMaxHP) * 100);
         const enemyHPPercent = Math.max(0, (this.enemyHP / this.enemyMaxHP) * 100);
 
-        document.getElementById('player-hp-bar').style.width = playerHPPercent + '%';
-        document.getElementById('enemy-hp-bar').style.width = enemyHPPercent + '%';
+        const playerHPBar = document.getElementById('player-hp-bar');
+        const enemyHPBar = document.getElementById('enemy-hp-bar');
+        const playerHPText = document.getElementById('player-hp-text');
+        const enemyHPText = document.getElementById('enemy-hp-text');
 
-        document.getElementById('player-hp-text').textContent = `${Math.max(0, Math.round(this.playerHP))}/${this.playerMaxHP} HP`;
-        document.getElementById('enemy-hp-text').textContent = `${Math.max(0, Math.round(this.enemyHP))}/${this.enemyMaxHP} HP`;
-
-        // Меняем цвет при низком HP
-        if (this.playerHP <= 25) {
-            document.getElementById('player-hp-bar').style.background = '#f44336';
+        if (playerHPBar) {
+            playerHPBar.style.width = playerHPPercent + '%';
+            if (this.playerHP <= 25) {
+                playerHPBar.classList.add('critical');
+            } else {
+                playerHPBar.classList.remove('critical');
+            }
         }
-        if (this.enemyHP <= 25) {
-            document.getElementById('enemy-hp-bar').style.background = '#d32f2f';
+
+        if (enemyHPBar) {
+            enemyHPBar.style.width = enemyHPPercent + '%';
+            if (this.enemyHP <= 25) {
+                enemyHPBar.classList.add('critical');
+            } else {
+                enemyHPBar.classList.remove('critical');
+            }
+        }
+
+        if (playerHPText) {
+            playerHPText.textContent = `${Math.max(0, Math.round(this.playerHP))}/${this.playerMaxHP}`;
+        }
+        if (enemyHPText) {
+            enemyHPText.textContent = `${Math.max(0, Math.round(this.enemyHP))}/${this.enemyMaxHP}`;
         }
     }
 
     addBattleLog(message) {
         const logContainer = document.getElementById('battle-log-container');
+        if (!logContainer) return;
+
         this.battleLog.push(message);
 
-        // Показываем только последние 6 сообщений
-        const recentLogs = this.battleLog.slice(-6);
-        logContainer.innerHTML = recentLogs.map(log => `<div style="margin-bottom: 3px;">• ${log}</div>`).join('');
+        // Показываем только последние 5 сообщений
+        const recentLogs = this.battleLog.slice(-5);
+        logContainer.innerHTML = recentLogs
+            .map(log => `<div style="margin-bottom: 4px; padding: 2px 0;">• ${log}</div>`)
+            .join('');
         
         // Прокручиваем вниз
         logContainer.scrollTop = logContainer.scrollHeight;
+        
+        console.log('Лог добавлен:', message);
     }
 
     showPlayerActions() {
         const attackBtn = document.getElementById('attack-btn');
         const defendBtn = document.getElementById('defend-btn');
         
+        if (!attackBtn || !defendBtn) return;
+        
         if (this.currentTurn !== 'player' || !this.battleActive) {
             attackBtn.disabled = true;
             defendBtn.disabled = true;
-            attackBtn.style.opacity = '0.5';
-            defendBtn.style.opacity = '0.5';
-            attackBtn.style.cursor = 'not-allowed';
-            defendBtn.style.cursor = 'not-allowed';
         } else {
             attackBtn.disabled = false;
             defendBtn.disabled = false;
-            attackBtn.style.opacity = '1';
-            defendBtn.style.opacity = '1';
-            attackBtn.style.cursor = 'pointer';
-            defendBtn.style.cursor = 'pointer';
         }
+        
+        console.log('Кнопки обновлены. Ход:', this.currentTurn, 'Активна:', this.battleActive);
     }
 
     playerAttack() {
-        if (this.currentTurn !== 'player' || !this.battleActive) return;
+        if (this.currentTurn !== 'player' || !this.battleActive) {
+            console.log('Атака заблокирована. Ход:', this.currentTurn, 'Активна:', this.battleActive);
+            return;
+        }
 
+        console.log('Игрок атакует!');
         this.addBattleLog('Вы атакуете!');
         
-        // Расчет урона игрока
-        let damage = Math.floor(Math.random() * 35) + 15; // 15-50 урона
-        const isCrit = Math.random() < 0.2; // 20% шанс крита
-        const enemyDodge = Math.random() < 0.1; // 10% шанс уклонения
+        // Расчет урона
+        let damage = Math.floor(Math.random() * 25) + 15; // 15-40 базового урона
+        const isCrit = Math.random() < 0.15; // 15% шанс крита
+        const enemyDodge = Math.random() < 0.08; // 8% шанс уклонения врага
 
         // Применяем апгрейды игрока
         if (this.playerNft.upgrades) {
             if (this.playerNft.upgrades.damage) {
                 damage *= this.playerNft.upgrades.damage;
+                console.log('Урон с апгрейдом:', damage);
             }
             if (this.playerNft.upgrades.crit && isCrit) {
-                damage *= 1.5;
+                damage *= 1.3;
+                console.log('Крит с апгрейдом:', damage);
             }
         }
 
         if (enemyDodge) {
             this.addBattleLog('Враг уклонился от атаки!');
+            this.showDamageEffect(document.getElementById('enemy-battle-img'), 'МИМО', false);
         } else {
             if (isCrit) {
-                damage *= 2;
+                damage *= 1.8;
                 this.addBattleLog(`КРИТИЧЕСКИЙ УДАР! Нанесено ${Math.round(damage)} урона!`);
+                this.showDamageEffect(document.getElementById('enemy-battle-img'), Math.round(damage), true);
             } else {
                 this.addBattleLog(`Нанесено ${Math.round(damage)} урона`);
+                this.showDamageEffect(document.getElementById('enemy-battle-img'), Math.round(damage), false);
             }
             
             this.enemyHP -= damage;
             this.enemyHP = Math.max(0, this.enemyHP);
+            
+            // Эффект встряски для врага
+            document.getElementById('enemy-battle-img').classList.add('battle-shake');
+            setTimeout(() => {
+                const img = document.getElementById('enemy-battle-img');
+                if (img) img.classList.remove('battle-shake');
+            }, 500);
         }
 
         this.updateDisplay();
@@ -386,8 +267,12 @@ class UndertaleBattle {
     }
 
     playerDefend() {
-        if (this.currentTurn !== 'player' || !this.battleActive) return;
+        if (this.currentTurn !== 'player' || !this.battleActive) {
+            console.log('Защита заблокирована. Ход:', this.currentTurn, 'Активна:', this.battleActive);
+            return;
+        }
 
+        console.log('Игрок защищается!');
         this.addBattleLog('Вы приготовились к защите!');
         this.playerDefending = true;
 
@@ -400,20 +285,24 @@ class UndertaleBattle {
     }
 
     enemyTurn() {
-        if (this.currentTurn !== 'enemy' || !this.battleActive) return;
+        if (this.currentTurn !== 'enemy' || !this.battleActive) {
+            console.log('Ход врага заблокирован. Ход:', this.currentTurn, 'Активна:', this.battleActive);
+            return;
+        }
 
+        console.log('Ход врага!');
         this.addBattleLog('Враг атакует!');
 
-        let damage = Math.floor(Math.random() * 30) + 12; // 12-42 урона
-        const isCrit = Math.random() < 0.15; // 15% шанс крита
+        let damage = Math.floor(Math.random() * 22) + 12; // 12-34 базового урона
+        const isCrit = Math.random() < 0.12; // 12% шанс крита у врага
 
-        // Применяем апгрейды врага
+        // Применяем апгрейды врага (если есть)
         if (this.enemyNft.upgrades && this.enemyNft.upgrades.damage) {
             damage *= this.enemyNft.upgrades.damage;
         }
 
         // Проверяем уклонение игрока
-        let playerDodgeChance = 0.08;
+        let playerDodgeChance = 0.06; // 6% базовый шанс уклонения
         if (this.playerNft.upgrades && this.playerNft.upgrades.dodge) {
             playerDodgeChance *= this.playerNft.upgrades.dodge;
         }
@@ -422,25 +311,39 @@ class UndertaleBattle {
 
         if (playerDodged) {
             this.addBattleLog('Вы уклонились от атаки!');
+            this.showDamageEffect(document.getElementById('player-battle-img'), 'МИМО', false);
         } else {
-            // Если игрок защищался, урон уменьшается
+            // Если игрок защищался, урон уменьшается на 50%
             if (this.playerDefending) {
                 damage *= 0.5;
-                this.addBattleLog(`Блок поглотил часть урона! Получено ${Math.round(damage)} урона`);
+                this.addBattleLog(`Блокировка поглотила часть урона! Получено ${Math.round(damage)} урона`);
+                this.showDamageEffect(document.getElementById('player-battle-img'), Math.round(damage), false);
             } else {
                 if (isCrit) {
-                    damage *= 1.8;
-                    this.addBattleLog(`КРИТИЧЕСКАЯ АТАКА! Получено ${Math.round(damage)} урона!`);
+                    damage *= 1.7;
+                    this.addBattleLog(`КРИТИЧЕСКАЯ АТАКА ВРАГА! Получено ${Math.round(damage)} урона!`);
+                    this.showDamageEffect(document.getElementById('player-battle-img'), Math.round(damage), true);
                 } else {
                     this.addBattleLog(`Получено ${Math.round(damage)} урона`);
+                    this.showDamageEffect(document.getElementById('player-battle-img'), Math.round(damage), false);
                 }
             }
             
+            // ИСПРАВЛЕНИЕ БАГА: применяем урон к игроку
             this.playerHP -= damage;
             this.playerHP = Math.max(0, this.playerHP);
+            
+            console.log('Урон игроку:', damage, 'Осталось HP:', this.playerHP);
+            
+            // Эффект встряски для игрока
+            document.getElementById('player-battle-img').classList.add('battle-shake');
+            setTimeout(() => {
+                const img = document.getElementById('player-battle-img');
+                if (img) img.classList.remove('battle-shake');
+            }, 500);
         }
 
-        this.playerDefending = false;
+        this.playerDefending = false; // Сбрасываем защиту
         this.updateDisplay();
         this.checkBattleEnd();
 
@@ -448,116 +351,196 @@ class UndertaleBattle {
             this.currentTurn = 'player';
             setTimeout(() => {
                 this.showPlayerActions();
-            }, 1500);
+                this.addBattleLog('Ваш ход!');
+            }, 1800);
         }
+    }
+
+    showDamageEffect(targetElement, damage, isCrit = false) {
+        if (!targetElement) return;
+
+        const effect = document.createElement('div');
+        effect.className = `damage-effect ${isCrit ? 'crit' : ''}`;
+        effect.textContent = damage;
+        
+        targetElement.style.position = 'relative';
+        targetElement.appendChild(effect);
+        
+        setTimeout(() => {
+            if (effect.parentNode) {
+                effect.parentNode.removeChild(effect);
+            }
+        }, 1200);
     }
 
     checkBattleEnd() {
         if (this.playerHP <= 0) {
+            console.log('Игрок проиграл');
             this.battleActive = false;
             this.showBattleResult(false);
         } else if (this.enemyHP <= 0) {
+            console.log('Игрок победил');
             this.battleActive = false;
             this.showBattleResult(true);
         }
     }
 
     showBattleResult(playerWon) {
-        const resultContainer = document.getElementById('battle-result-container');
-        const resultText = document.getElementById('result-text');
+        const resultOverlay = document.getElementById('battle-result-overlay');
+        const resultTitle = document.getElementById('result-title');
         const resultDetails = document.getElementById('result-details');
 
-        if (playerWon) {
-            resultContainer.style.borderColor = '#4caf50';
-            resultText.style.color = '#4caf50';
-            resultText.textContent = '🏆 ПОБЕДА!';
-            resultDetails.innerHTML = `
-                Вы победили и получили:<br>
-                <strong>${this.enemyNft.name}</strong><br>
-                <em>NFT добавлен в коллекцию</em>
-            `;
-
-            // Добавляем NFT в коллекцию
-            collection.push({...this.enemyNft, buyPrice: this.enemyNft.price || 100});
-        } else {
-            resultContainer.style.borderColor = '#f44336';
-            resultText.style.color = '#f44336';
-            resultText.textContent = '💀 ПОРАЖЕНИЕ!';
-            resultDetails.innerHTML = `
-                Вы проиграли и потеряли:<br>
-                <strong>${this.playerNft.name}</strong><br>
-                <em>NFT удален из коллекции</em>
-            `;
-
-            // Удаляем NFT из коллекции
-            const index = collection.findIndex(nft => 
-                nft.name === this.playerNft.name && 
-                nft.img === this.playerNft.img && 
-                nft.buyPrice === this.playerNft.buyPrice
-            );
-            if (index !== -1) {
-                collection.splice(index, 1);
-                activeBattleNft = null;
-            }
-        }
-
-        // Добавляем в историю
-        battleHistory.push({
-            playerNft: {...this.playerNft},
-            opponentNft: {...this.enemyNft},
-            won: playerWon,
-            timestamp: new Date().toISOString()
-        });
-
-        resultContainer.style.display = 'block';
-        updateUI();
-        saveData();
-    }
-
-    attemptEscape() {
-        if (stars < 50) {
-            this.addBattleLog('Недостаточно звёзд для побега!');
+        if (!resultOverlay || !resultTitle || !resultDetails) {
+            console.error('Элементы результата не найдены');
             return;
         }
 
-        stars -= 50;
-        updateUI();
-        this.addBattleLog('Вы сбежали из боя! (-50 звёзд)');
+        if (playerWon) {
+            resultTitle.className = 'result-title win';
+            resultTitle.innerHTML = '🏆 ПОБЕДА!';
+            resultDetails.innerHTML = `
+                <strong>Вы победили!</strong><br><br>
+                Получен NFT: <strong>${this.enemyNft.name}</strong><br>
+                <em>NFT добавлен в вашу коллекцию</em>
+            `;
+
+            // Добавляем вражеский NFT в коллекцию
+            if (window.collection && Array.isArray(window.collection)) {
+                window.collection.push({
+                    ...this.enemyNft, 
+                    buyPrice: this.enemyNft.price || 100
+                });
+                console.log('NFT добавлен в коллекцию:', this.enemyNft.name);
+            }
+        } else {
+            resultTitle.className = 'result-title lose';
+            resultTitle.innerHTML = '💀 ПОРАЖЕНИЕ!';
+            resultDetails.innerHTML = `
+                <strong>Вы проиграли...</strong><br><br>
+                Потерян NFT: <strong>${this.playerNft.name}</strong><br>
+                <em>NFT удален из коллекции</em>
+            `;
+
+            // Удаляем NFT игрока из коллекции
+            if (window.collection && Array.isArray(window.collection)) {
+                const index = window.collection.findIndex(nft => 
+                    nft.name === this.playerNft.name && 
+                    nft.img === this.playerNft.img && 
+                    nft.buyPrice === this.playerNft.buyPrice
+                );
+                if (index !== -1) {
+                    window.collection.splice(index, 1);
+                    console.log('NFT удален из коллекции:', this.playerNft.name);
+                    
+                    // Сбрасываем активный NFT для битвы
+                    if (window.activeBattleNft) {
+                        window.activeBattleNft = null;
+                    }
+                }
+            }
+        }
+
+        // Добавляем в историю битв
+        if (window.battleHistory && Array.isArray(window.battleHistory)) {
+            window.battleHistory.push({
+                playerNft: {...this.playerNft},
+                opponentNft: {...this.enemyNft},
+                won: playerWon,
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        // Показываем результат
+        resultOverlay.style.display = 'flex';
+
+        // Обновляем UI и сохраняем данные
+        if (window.updateUI) window.updateUI();
+        if (window.saveData) window.saveData();
+        
+        console.log('Результат битвы показан:', playerWon ? 'ПОБЕДА' : 'ПОРАЖЕНИЕ');
+    }
+
+    attemptEscape() {
+        if (window.stars < 50) {
+            this.addBattleLog('Недостаточно звёзд для побега! (нужно 50)');
+            return;
+        }
+
+        window.stars -= 50;
+        this.addBattleLog('Вы сбежали из боя! Потеряно 50 звёзд.');
+        
+        if (window.updateUI) window.updateUI();
+        if (window.saveData) window.saveData();
         
         setTimeout(() => {
             this.endBattle();
-        }, 1000);
+        }, 1500);
     }
 
     endBattle() {
+        console.log('Завершение битвы');
+        
+        // Удаляем интерфейс битвы
         const container = document.getElementById('undertale-battle-container');
         if (container) {
             container.remove();
         }
 
         // Возвращаемся в главное меню
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('main-screen').classList.add('active');
+        const screens = document.querySelectorAll('.screen');
+        screens.forEach(s => s.classList.remove('active'));
+        
+        const mainScreen = document.getElementById('main-screen');
+        if (mainScreen) {
+            mainScreen.classList.add('active');
+        }
 
         // Обновляем навигацию
-        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-        document.querySelectorAll('.nav-item')[0].classList.add('active');
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => item.classList.remove('active'));
+        if (navItems[0]) {
+            navItems[0].classList.add('active');
+        }
 
-        renderCenterArea();
-        updateUI();
+        // Обновляем отображение
+        if (window.renderCenterArea) window.renderCenterArea();
+        if (window.updateUI) window.updateUI();
+        
+        console.log('Возврат в главное меню');
     }
 }
 
 // Создаем глобальный экземпляр
 window.battleSystem = new UndertaleBattle();
 
-// Функция для запуска новой битвы
+// Функция для запуска битвы
 window.startUndertaleBattle = function(playerNft, enemyNft) {
-    console.log('Запуск боя:', playerNft.name, 'vs', enemyNft.name);
-    battleSystem.init(playerNft, enemyNft);
+    console.log('=== ЗАПУСК БИТВЫ ===');
+    console.log('Игрок:', playerNft);
+    console.log('Враг:', enemyNft);
+    
+    if (!playerNft || !enemyNft) {
+        console.error('Ошибка: отсутствуют данные NFT для битвы');
+        return;
+    }
+    
+    window.battleSystem.init(playerNft, enemyNft);
 };
 
-// Дополнительная проверка загрузки
+// Проверка загрузки
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Undertale Battle System загружен!');
+    console.log('✅ Undertale Battle System загружен!');
+    console.log('Доступные функции:', {
+        startUndertaleBattle: typeof window.startUndertaleBattle,
+        battleSystem: typeof window.battleSystem
+    });
 });
+
+// Дополнительная проверка через 1 секунду
+setTimeout(() => {
+    if (typeof window.startUndertaleBattle === 'function') {
+        console.log('✅ Battle System готов к использованию');
+    } else {
+        console.error('❌ Ошибка загрузки Battle System');
+    }
+}, 1000);
