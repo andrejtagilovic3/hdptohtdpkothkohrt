@@ -204,9 +204,6 @@
     }
 }
 
-.center-nft-img {
-    animation: centerNftGlow 3s ease-in-out infinite;
-}
 
 @keyframes upgradeGlow {
     0% {
@@ -552,4 +549,5 @@
     }
 
 }
+
 
