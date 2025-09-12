@@ -350,8 +350,10 @@ function startBattleSearch() {
     updateStatus();
 }
 
+// Исправленная функция startNewBattle - замените эту функцию в вашем script.js
+
 function startNewBattle() {
-    console.log('Запуск нового боя...');
+    console.log('🚀 Запуск нового боя...');
     document.getElementById('searching-overlay').style.display = 'none';
 
     const playerPrice = activeBattleNft.buyPrice;
@@ -393,17 +395,42 @@ function startNewBattle() {
         }
     }
 
-    console.log('Игрок:', activeBattleNft.name);
-    console.log('Бот:', botNft.name);
-    console.log('battleSystem:', window.battleSystem);
+    console.log('👤 Игрок:', activeBattleNft.name);
+    console.log('🤖 Бот:', botNft.name);
+    console.log('🔧 battleSystem:', window.battleSystem);
+    console.log('🔧 startUndertaleBattle:', typeof window.startUndertaleBattle);
 
-    // ЗАПУСКАЕМ НОВУЮ БОЕВУЮ СИСТЕМУ
-    if (window.battleSystem && window.battleSystem.init) {
-        window.battleSystem.init(activeBattleNft, botNft);
+    // ЗАПУСКАЕМ НОВУЮ БОЕВУЮ СИСТЕМУ UNDERTALE
+    if (window.battleSystem && typeof window.battleSystem.init === 'function') {
+        console.log('✅ Запуск через battleSystem.init');
+        const success = window.battleSystem.init(activeBattleNft, botNft);
+        if (success) {
+            console.log('🎉 Битва успешно запущена!');
+        } else {
+            console.error('❌ Ошибка при запуске битвы через battleSystem.init');
+            alert('Ошибка запуска боя. Попробуйте еще раз.');
+            // Возвращаем звёзды игроку
+            stars += 10;
+            updateUI();
+        }
+    } else if (typeof window.startUndertaleBattle === 'function') {
+        console.log('✅ Запуск через startUndertaleBattle');
+        const success = window.startUndertaleBattle(activeBattleNft, botNft);
+        if (!success) {
+            console.error('❌ Ошибка при запуске битвы через startUndertaleBattle');
+            alert('Ошибка запуска боя. Попробуйте еще раз.');
+            // Возвращаем звёзды игроку
+            stars += 10;
+            updateUI();
+        }
     } else {
-        console.error('battleSystem не найден!');
-        alert('Ошибка запуска боя. Убедитесь что файл undertale-battle.js загружен.');
-        // Возвращаемся к поиску
+        console.error('❌ КРИТИЧЕСКАЯ ОШИБКА: battleSystem не найден!');
+        console.error('🔍 Доступные объекты window:', Object.keys(window).filter(key => key.includes('battle')));
+        alert('Ошибка: система боя не загружена. Убедитесь что файл undertale-battle.js подключен правильно.');
+        // Возвращаем звёзды игроку
+        stars += 10;
+        updateUI();
+        // Скрываем оверлей поиска
         document.getElementById('searching-overlay').style.display = 'none';
     }
 }
