@@ -177,6 +177,53 @@
     animation: starPulse 2s ease-in-out infinite;
 }
 
+@keyframes centerNftGlowGreen {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(76, 175, 80, 0.5);
+    }
+}
+
+@keyframes centerNftGlowBlue {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(33, 150, 243, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(33, 150, 243, 0.5);
+    }
+}
+
+@keyframes centerNftGlowOrange {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(255, 152, 0, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(255, 152, 0, 0.5);
+    }
+}
+
+.center-nft-img {
+    animation: centerNftGlow 3s ease-in-out infinite;
+}
+
+@keyframes upgradeGlow {
+    0% {
+        box-shadow: 0 0 15px var(--glow-color, #4caf50);
+    }
+    50% {
+        box-shadow: 0 0 25px var(--glow-color, #4caf50), 0 0 35px var(--glow-color, #4caf50);
+    }
+    100% {
+        box-shadow: 0 0 15px var(--glow-color, #4caf50);
+    }
+}
+
+.nft-card[style*="border: 2px solid"] {
+    animation: upgradeGlow 2s ease-in-out infinite;
+}
+
 @keyframes modalSlideIn {
     from {
         opacity: 0;
@@ -407,13 +454,17 @@
         opacity: 0.8;
     }
     100% {
-        transform: rotate(0deg);
+        transform: rotate(0deg); /* ИЗМЕНЕНО: убрали поворот */
         opacity: 0.6;
     }
 }
 
 .center-logo {
-    animation: logoRotate 8s ease-in-out infinite;
+    animation: logoRotate 8s ease-in-out infinite; /* ИЗМЕНЕНО: плавная анимация */
+}
+
+.center-logo {
+    animation: logoRotate 8s linear infinite;
 }
 
 @keyframes subtleFloat {
@@ -499,4 +550,32 @@
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
+
+}
+
+
+@keyframes centerNftCustomGlow {
+    0%, 100% {
+        box-shadow: 0 0 20px var(--glow-color, #4caf50);
+    }
+    50% {
+        box-shadow: 0 0 30px var(--glow-color, #4caf50), 0 0 40px var(--glow-color, #4caf50);
+    }
+}
+
+@keyframes nftCardCustomGlow {
+    0%, 100% {
+        box-shadow: 0 0 15px var(--glow-color, #4caf50);
+    }
+    50% {
+        box-shadow: 0 0 25px var(--glow-color, #4caf50), 0 0 35px var(--glow-color, #4caf50);
+    }
+}
+
+.center-nft-img {
+    animation: centerNftCustomGlow 3s ease-in-out infinite;
+}
+
+.nft-card[style*="border: 2px solid"] {
+    animation: nftCardCustomGlow 2s ease-in-out infinite;
 }
