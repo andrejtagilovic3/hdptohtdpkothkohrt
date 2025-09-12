@@ -243,7 +243,6 @@ function showUpgradeResult() {
         <div style="color: ${rarityInfo.color}; font-size: 20px; font-weight: bold; margin-bottom: 8px;">${rarityInfo.name} апгрейд!</div>
         <div style="font-size: 18px; margin-bottom: 8px;">${upgrade.name}</div>
         <div style="color: ${rarityInfo.color}; font-size: 16px; font-weight: bold;">Бонус: +${bonusPercent}%</div>
-        <div style="color: #ccc; font-size: 14px; margin-top: 8px;">${upgrade.description}</div>
     `;
     
     result.style.display = 'block';
