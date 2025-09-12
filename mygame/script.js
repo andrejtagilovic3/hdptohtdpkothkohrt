@@ -74,6 +74,7 @@ async function init() {
     updateUserInfo();
     updateReferralInfo();
     console.log('Game initialized successfully');
+    initUIAnimations();
 }
 
 async function loadData() {
@@ -669,7 +670,20 @@ function switchScreen(screen) {
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
     document.querySelectorAll('.nav-item')[['main', 'collection', 'upgrade', 'profile', 'friends'].indexOf(screen)].classList.add('active');
 
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+// Анимация скрытия старого экрана
+    const currentActiveScreen = document.querySelector('.screen.active');
+    if (currentActiveScreen) {
+        currentActiveScreen.classList.add('screen-exit');
+        setTimeout(() => {
+            document.querySelectorAll('.screen').forEach(s => {
+                s.classList.remove('active', 'screen-exit');
+            });
+            showNewScreen(screen);
+        }, 200);
+    } else {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        showNewScreen(screen);
+    }
 
     if (screen === 'main') {
         document.getElementById('main-screen').classList.add('active');
@@ -687,6 +701,32 @@ function switchScreen(screen) {
         document.getElementById('friends-screen').classList.add('active');
         renderFriends();
     }
+
+    currentScreen = screen;
+}
+
+function showNewScreen(screen) {
+    if (screen === 'main') {
+        document.getElementById('main-screen').classList.add('active', 'screen-enter');
+        renderCenterArea();
+    } else if (screen === 'collection') {
+        document.getElementById('collection-screen').classList.add('active', 'screen-enter');
+        renderCollection();
+    } else if (screen === 'upgrade') {
+        document.getElementById('upgrade-screen').classList.add('active', 'screen-enter');
+        renderUpgradeScreen();
+    } else if (screen === 'profile') {
+        document.getElementById('profile-screen').classList.add('active', 'screen-enter');
+        renderProfile();
+    } else if (screen === 'friends') {
+        document.getElementById('friends-screen').classList.add('active', 'screen-enter');
+        renderFriends();
+    }
+    
+    // Убираем класс анимации входа через короткое время
+    setTimeout(() => {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('screen-enter'));
+    }, 300);
 
     currentScreen = screen;
 }
