@@ -90,10 +90,26 @@
 
 .hp-bar {
     height: 100%;
-    background: linear-gradient(90deg, #ffffff 0%, #cccccc 100%);
-    width: 100%;
+    background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%); /* Красный цвет для HP */
+    width: 100%; /* Изначально полная ширина */
     transition: width 0.8s ease-out;
     position: relative;
+}
+
+.hp-bar.critical {
+    background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%);
+    animation: criticalFlash 1s ease-in-out infinite;
+}
+
+@keyframes criticalFlash {
+    0%, 100% { 
+        opacity: 1; 
+        background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%);
+    }
+    50% { 
+        opacity: 0.7; 
+        background: linear-gradient(90deg, #d32f2f 0%, #b71c1c 100%);
+    }
 }
 
 .hp-bar.critical {
@@ -583,3 +599,4 @@
         max-width: 80px;
     }
 }
+
