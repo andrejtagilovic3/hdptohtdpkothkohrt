@@ -224,6 +224,31 @@
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
+.player-hp-container .hp-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%) !important;
+    width: 100% !important; /* Изначально полная ширина */
+    transition: width 0.8s ease-out !important;
+    position: relative;
+}
+
+.player-hp-container .hp-bar.critical {
+    background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%) !important;
+    animation: criticalFlash 1s ease-in-out infinite;
+}
+
+/* Дублируем анимацию для игрока */
+@keyframes playerCriticalFlash {
+    0%, 100% { 
+        opacity: 1; 
+        background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%) !important;
+    }
+    50% { 
+        opacity: 0.7; 
+        background: linear-gradient(90deg, #d32f2f 0%, #b71c1c 100%) !important;
+    }
+}
+
 .player-hp-text {
     font-size: 12px;
     color: #cccccc;
@@ -583,6 +608,7 @@
         max-width: 80px;
     }
 }
+
 
 
 
