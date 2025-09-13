@@ -85,12 +85,11 @@ class UndertaleBattle {
                             <div>
                                 <div class="player-name">ВЫ</div>
                                 <div id="player-nft-name" class="player-nft-name">NFT NAME</div>
-        
-        <!-- ТОЧНО ТАКОЙ ЖЕ HP КОНТЕЙНЕР КАК У ВРАГА -->
-                                <div class="hp-container" style="width: 110px; height: 18px;">
-                                    <div id="player-hp-bar" class="hp-bar"></div>
+        <!-- ИСПРАВЛЕННЫЙ HP КОНТЕЙНЕР -->
+                                <div style="background: #000000; border: 2px solid #666666; border-radius: 8px; width: 110px; height: 18px; overflow: hidden; margin-bottom: 6px;">
+                                    <div id="player-hp-bar" style="height: 100%; background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%); width: 100%; transition: width 0.8s ease-out;"></div>
                                 </div>
-                                <div id="player-hp-text" class="hp-text" style="font-size: 12px;">100/100 HP</div>
+                                <div id="player-hp-text" class="player-hp-text">100/100 HP</div>
                             </div>
                         </div>
 
@@ -146,56 +145,58 @@ class UndertaleBattle {
         }
 
         // ИСПРАВЛЕНИЕ: правильно обновляем HP бары
-// ОДИНАКОВОЕ ОБНОВЛЕНИЕ HP ДЛЯ ИГРОКА И ВРАГА
         const playerHPPercent = Math.max(0, (this.playerHP / this.playerMaxHP) * 100);
         const enemyHPPercent = Math.max(0, (this.enemyHP / this.enemyMaxHP) * 100);
 
         console.log('📊 HP проценты - Игрок:', playerHPPercent + '%', 'Враг:', enemyHPPercent + '%');
 
-// HP БАР ИГРОКА - ТОЧНО ТАК ЖЕ КАК У ВРАГА
         const playerHPBar = document.getElementById('player-hp-bar');
+        const enemyHPBar = document.getElementById('enemy-hp-bar');
+        const playerHPText = document.getElementById('player-hp-text');
+        const enemyHPText = document.getElementById('enemy-hp-text');
+
+        // ИСПРАВЛЕНИЕ: проверяем что элементы найдены и обновляем их
         if (playerHPBar) {
             playerHPBar.style.width = playerHPPercent + '%';
-            console.log('✅ Игрок HP обновлен:', playerHPPercent + '%');
-    
+            console.log('✅ Обновлен HP бар игрока:', playerHPPercent + '%');
+            
             if (this.playerHP <= 25) {
                 playerHPBar.classList.add('critical');
             } else {
                 playerHPBar.classList.remove('critical');
             }
+        } else {
+            console.error('❌ Не найден элемент player-hp-bar');
         }
 
-// HP БАР ВРАГА - БЕЗ ИЗМЕНЕНИЙ
-        const enemyHPBar = document.getElementById('enemy-hp-bar');
         if (enemyHPBar) {
             enemyHPBar.style.width = enemyHPPercent + '%';
-            console.log('✅ Враг HP обновлен:', enemyHPPercent + '%');
-    
+            console.log('✅ Обновлен HP бар врага:', enemyHPPercent + '%');
+            
             if (this.enemyHP <= 25) {
                 enemyHPBar.classList.add('critical');
             } else {
-                    enemyHPBar.classList.remove('critical');
+                enemyHPBar.classList.remove('critical');
             }
         }
 
-// ТЕКСТОВЫЕ СЧЕТЧИКИ
-        const playerHPText = document.getElementById('player-hp-text');
-        const enemyHPText = document.getElementById('enemy-hp-text');
-
+        // ИСПРАВЛЕНИЕ: обновляем текстовые счетчики HP
         if (playerHPText) {
             const displayPlayerHP = Math.max(0, Math.round(this.playerHP));
             playerHPText.textContent = `${displayPlayerHP}/${this.playerMaxHP} HP`;
+            console.log('✅ Обновлен текст HP игрока:', displayPlayerHP + '/' + this.playerMaxHP);
         }
         if (enemyHPText) {
             const displayEnemyHP = Math.max(0, Math.round(this.enemyHP));
             enemyHPText.textContent = `${displayEnemyHP}/${this.enemyMaxHP} HP`;
         }
+    }
 
-            addBattleLog(message) {
-                const logContainer = document.getElementById('battle-log-container');
-                if (!logContainer) return;
+    addBattleLog(message) {
+        const logContainer = document.getElementById('battle-log-container');
+        if (!logContainer) return;
 
-                this.battleLog.push(message);
+        this.battleLog.push(message);
 
         // Показываем только последние 5 сообщений
         const recentLogs = this.battleLog.slice(-5);
@@ -580,5 +581,3 @@ setTimeout(() => {
         console.error('🔴 ❌ Ошибка загрузки Battle System!');
     }
 }, 1000);
-
-
