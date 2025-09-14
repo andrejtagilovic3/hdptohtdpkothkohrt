@@ -3,7 +3,7 @@ class ApiService {
     constructor() {
         // 🔥 ЗАМЕНИТЕ НА ВАШ ДОМЕН ПОСЛЕ ДЕПЛОЯ БЭКЕНДА:
         // После деплоя будет что-то вроде: https://nft-game-backend-username.vercel.app/api
-        this.baseURL = 'https://your-backend-domain.vercel.app/api'; 
+        this.baseURL = 'https://apidsasadsdsad-eqod.vercel.app/api'; 
         this.token = localStorage.getItem('authToken');
     }
 
