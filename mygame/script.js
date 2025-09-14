@@ -1,5 +1,22 @@
 Telegram.WebApp.ready();
 
+// === ПЕРЕМЕННЫЕ ДЛЯ API ИНТЕГРАЦИИ ===
+let isOnline = navigator.onLine;
+let isSyncing = false;
+let userProfile = null;
+
+// Отслеживание подключения
+window.addEventListener('online', () => {
+    isOnline = true;
+    console.log('🌐 Connection restored');
+    syncWithServer();
+});
+
+window.addEventListener('offline', () => {
+    isOnline = false;
+    console.log('📶 Connection lost');
+});
+
 const cloudStorage = Telegram.WebApp.CloudStorage;
 
 const nftTemplates = [
@@ -60,12 +77,22 @@ let botUpgrades = {};
 
 let isSaving = false;
 
-init();
-
 async function init() {
-    console.log('Initializing game...');
+    console.log('🚀 Initializing game...');
     generateReferralCode();
-    await loadData();
+    
+    try {
+        if (isOnline) {
+            await authenticateUser();
+            await loadDataFromServer();
+        } else {
+            await loadData(); // Ваша существующая функция
+        }
+    } catch (error) {
+        console.error('❌ Server error, using local data:', error);
+        await loadData(); // Fallback к локальным данным
+    }
+    
     updateUI();
     renderCenterArea();
     renderCollection();
@@ -73,9 +100,11 @@ async function init() {
     renderProfile();
     updateUserInfo();
     updateReferralInfo();
-    console.log('Game initialized successfully');
+    console.log('✅ Game initialized successfully');
     initUIAnimations();
 }
+
+
 
 async function loadData() {
     try {
@@ -119,6 +148,101 @@ async function loadData() {
     }
 }
 
+async function authenticateUser() {
+    try {
+        console.log('🔐 Authenticating user...');
+        
+        const initData = Telegram.WebApp.initData;
+        const user = tgUser;
+        
+        if (!user) {
+            throw new Error('No Telegram user data');
+        }
+
+        // Проверяем реферальный код из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const referredBy = urlParams.get('start') || null;
+
+        const authResponse = await window.apiService.authenticate(initData, user, referredBy);
+        
+        if (authResponse.success) {
+            userProfile = authResponse.user;
+            console.log('✅ Authentication successful');
+            return true;
+        } else {
+            throw new Error('Authentication failed');
+        }
+    } catch (error) {
+        console.error('❌ Authentication error:', error);
+        throw error;
+    }
+}
+
+// Загрузка данных с сервера
+async function loadDataFromServer() {
+    try {
+        console.log('📡 Loading data from server...');
+        
+        // Загружаем профиль пользователя
+        const profileResponse = await window.apiService.getUserProfile();
+        if (profileResponse.success) {
+            const user = profileResponse.user;
+            stars = user.stars;
+            totalStarsEarned = user.totalStarsEarned;
+            userName = user.firstName || 'Игрок';
+            userProfile = user;
+        }
+
+        // Загружаем коллекцию
+        const collectionResponse = await window.apiService.getCollection();
+        if (collectionResponse.success) {
+            collection = collectionResponse.collection;
+            if (collectionResponse.activeBattleNft) {
+                activeBattleNft = collectionResponse.activeBattleNft;
+            }
+        }
+
+        // Загружаем историю битв (если API готов)
+        try {
+            const historyResponse = await window.apiService.getBattleHistory();
+            if (historyResponse.success) {
+                battleHistory = historyResponse.battles || [];
+            }
+        } catch (historyError) {
+            console.log('📋 Battle history API not ready yet');
+            // Используем локальную историю
+        }
+
+        console.log('✅ Server data loaded successfully');
+    } catch (error) {
+        console.error('❌ Server data loading error:', error);
+        throw error;
+    }
+}
+
+// Синхронизация с сервером
+async function syncWithServer() {
+    if (!isOnline || isSyncing) return;
+
+    isSyncing = true;
+    try {
+        console.log('🔄 Syncing with server...');
+        
+        // Обновляем профиль пользователя
+        await window.apiService.updateUserProfile({
+            stars,
+            totalStarsEarned,
+            battlesCount: battleHistory.length
+        });
+
+        console.log('✅ Server sync completed');
+    } catch (error) {
+        console.error('❌ Server sync error:', error);
+    } finally {
+        isSyncing = false;
+    }
+}
+
 async function saveData() {
     if (isSaving) {
         console.log('Already saving, skipping...');
@@ -127,15 +251,8 @@ async function saveData() {
 
     isSaving = true;
     try {
-        console.log('Saving data to cloud storage...', {
-            stars,
-            collectionLength: collection.length,
-            totalStarsEarned,
-            battleHistoryLength: battleHistory.length,
-            referralCode,
-            friendsCount: referredFriends.length
-        });
-
+        // Сначала сохраняем локально (быстро)
+        console.log('💾 Saving data locally...');
         await setCloudItem('stars', stars.toString());
         await setCloudItem('collection', JSON.stringify(collection));
         await setCloudItem('activeBattleNft', JSON.stringify(activeBattleNft));
@@ -145,9 +262,14 @@ async function saveData() {
         await setCloudItem('referredFriends', JSON.stringify(referredFriends));
         await setCloudItem('starsFromReferrals', starsFromReferrals.toString());
 
-        console.log('Data saved successfully');
+        console.log('✅ Local data saved');
+        
+        // Затем синхронизируем с сервером (если онлайн)
+        if (isOnline) {
+            await syncWithServer();
+        }
     } catch (error) {
-        console.error('Error saving data:', error);
+        console.error('❌ Save data error:', error);
     } finally {
         isSaving = false;
     }
@@ -970,50 +1092,100 @@ function updateReferralInfo() {
     document.getElementById('referral-link').value = `https://t.me/YourBot?start=${referralCode}`;
 }
 
-function buyNft(templateIndex, price) {
-    if (stars >= price) {
-        stars -= price;
-        const nft = { ...nftTemplates[templateIndex], buyPrice: price };
-        collection.push(nft);
+async function buyNft(templateIndex, price) {
+    if (stars < price) {
+        alert('Недостаточно звёзд!');
+        return;
+    }
+
+    try {
+        if (isOnline && window.apiService) {
+            // Покупаем через API
+            const response = await window.apiService.buyNFT(templateIndex + 1, price);
+            
+            if (response.success) {
+                // Обновляем локальные данные
+                const newNft = {
+                    id: response.nft.id,
+                    name: response.nft.name,
+                    img: response.nft.img,
+                    buyPrice: response.nft.buyPrice,
+                    upgrades: response.nft.upgrades || {}
+                };
+                
+                collection.push(newNft);
+                stars -= price;
+                
+                alert(`Куплен ${newNft.name}!`);
+            } else {
+                throw new Error(response.error || 'Purchase failed');
+            }
+        } else {
+            // Офлайн режим (ваша текущая логика)
+            const nft = { ...nftTemplates[templateIndex], buyPrice: price };
+            collection.push(nft);
+            stars -= price;
+            alert(`Куплен ${nft.name}! ${!isOnline ? '(Офлайн)' : ''}`);
+        }
+
         updateUI();
-        alert(`Куплен ${nft.name}!`);
         renderShop();
 
         setTimeout(() => {
             backToCollection();
         }, 500);
-    } else {
-        alert('Недостаточно звёзд!');
+
+    } catch (error) {
+        console.error('❌ Buy NFT error:', error);
+        alert('Ошибка покупки: ' + error.message);
     }
 }
 
-function sellNft(index) {
+async function sellNft(index) {
     const nft = collection[index];
     const sellPrice = Math.floor(nft.buyPrice * 0.8);
-    stars += sellPrice;
 
-    if (activeBattleNft && activeBattleNft.name === nft.name && activeBattleNft.img === nft.img && activeBattleNft.buyPrice === nft.buyPrice) {
-        activeBattleNft = null;
+    try {
+        if (isOnline && window.apiService && nft.id) {
+            // Продаём через API
+            const response = await window.apiService.sellNFT(nft.id);
+            
+            if (response.success) {
+                stars += response.starsEarned;
+                
+                // Сбрасываем активный NFT если он был продан
+                if (activeBattleNft && activeBattleNft.id === nft.id) {
+                    activeBattleNft = null;
+                }
+                
+                collection.splice(index, 1);
+                alert(`Продан за ${response.starsEarned} звёзд!`);
+            } else {
+                throw new Error(response.error || 'Sale failed');
+            }
+        } else {
+            // Офлайн режим (ваша текущая логика)
+            stars += sellPrice;
+            
+            if (activeBattleNft && 
+                activeBattleNft.name === nft.name && 
+                activeBattleNft.img === nft.img && 
+                activeBattleNft.buyPrice === nft.buyPrice) {
+                activeBattleNft = null;
+            }
+            
+            collection.splice(index, 1);
+            alert(`Продан за ${sellPrice} звёзд! ${!isOnline ? '(Офлайн)' : ''}`);
+        }
+
+        updateUI();
+        renderCollection();
+        renderCenterArea();
+
+    } catch (error) {
+        console.error('❌ Sell NFT error:', error);
+        alert('Ошибка продажи: ' + error.message);
     }
-
-    collection.splice(index, 1);
-    updateUI();
-    renderCollection();
-    renderCenterArea();
-    alert(`Продан за ${sellPrice} звёзд!`);
-}
-
-function setToBattle(index) {
-    activeBattleNft = { ...collection[index] };
-    updateUI();
-    renderCollection();
-    renderCenterArea();
-    alert(`${activeBattleNft.name} выбран для дуэли!`);
-    
-    // Переходим в главное меню
-    setTimeout(() => {
-        switchScreen('main');
-    }, 1000);
 }
 
 function showRules() {
