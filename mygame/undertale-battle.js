@@ -85,9 +85,10 @@ class UndertaleBattle {
                             <div>
                                 <div class="player-name">ВЫ</div>
                                 <div id="player-nft-name" class="player-nft-name">NFT NAME</div>
-        <!-- ИСПРАВЛЕННЫЙ HP КОНТЕЙНЕР -->
-                                <div style="background: #000000; border: 2px solid #666666; border-radius: 8px; width: 110px; height: 18px; overflow: hidden; margin-bottom: 6px;">
-                                    <div id="player-hp-bar" style="height: 100%; background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%); width: 100%; transition: width 0.8s ease-out;"></div>
+<!-- ИСПРАВЛЕННЫЙ HP КОНТЕЙНЕР -->
+                                <div class="player-hp-container">
+                                    <div id="player-hp-bar" class="hp-bar"></div>
+                                </div>
                                 </div>
                                 <div id="player-hp-text" class="player-hp-text">100/100 HP</div>
                             </div>
