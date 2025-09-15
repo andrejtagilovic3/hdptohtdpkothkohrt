@@ -82,7 +82,62 @@
 
             <div id="battle-screen" class="screen">
                 <div class="main-content">
-                    <div id="battle-container"></div>
+                    <div class="undertale-battle-container" id="undertale-battle-container">
+                        <div class="enemy-battle-area">
+                            <button class="escape-btn" onclick="battleSystem.attemptEscape()">
+                                Сбежать (50⭐)
+                            </button>
+                            <img id="enemy-battle-img" class="enemy-battle-img" alt="Enemy NFT">
+                            <div id="enemy-name" class="enemy-name">ВРАГ</div>
+                            <div class="hp-container">
+                                <div id="enemy-hp-bar" class="hp-bar" style="width: 100%;"></div>
+                            </div>
+                            <div id="enemy-hp-text" class="hp-text">100/100 HP</div>
+                        </div>
+                        <div class="battle-bottom-area">
+                            <div id="battle-log-container" class="battle-log-container"></div>
+                            <div class="battle-actions-area">
+                                <div class="battle-buttons">
+                                    <button id="attack-btn" class="battle-action-btn" onclick="battleSystem.playerAttack()">
+                                        <i class="fas fa-sword"></i>
+                                        АТАКА
+                                    </button>
+                                    <button id="dodge-btn" class="battle-action-btn" onclick="battleSystem.playerDodge()">
+                                        <i class="fas fa-running"></i>
+                                        УВЕРНУТЬСЯ
+                                    </button>
+                                </div>
+                                <div class="player-battle-area">
+                                    <img id="player-battle-img" class="player-battle-img" alt="Player NFT">
+                                    <div>
+                                        <div class="player-name">ВЫ</div>
+                                        <div id="player-nft-name" class="player-nft-name">NFT NAME</div>
+                                        <div class="player-hp-container">
+                                            <div id="player-hp-bar" class="hp-bar" style="width: 100%;"></div>
+                                        </div>
+                                    </div>
+                                    <div id="player-hp-text" class="player-hp-text">100/100 HP</div>
+                                </div>
+                                <div class="battle-buttons">
+                                    <div style="flex: 1; opacity: 0.3; background: #1a1a1a; border: 2px dashed #333333; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #666666; font-size: 12px;">
+                                        Ресерв
+                                    </div>
+                                    <div style="flex: 1; opacity: 0.3; background: #1a1a1a; border: 2px dashed #333333; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #666666; font-size: 12px;">
+                                        Ресерв
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="battle-result-overlay" class="battle-result-overlay" style="display: none;">
+                            <div class="battle-result-modal">
+                                <div id="result-title" class="result-title"></div>
+                                <div id="result-details" class="result-details"></div>
+                                <button class="result-back-btn" onclick="battleSystem.endBattle()">
+                                    Вернуться в меню
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
