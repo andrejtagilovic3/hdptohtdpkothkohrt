@@ -318,24 +318,36 @@ function purchaseStars(amount) {
 
 
 function startBattleSearch() {
-    if (!activeBattleNft) {
-        alert('Пожалуйста, выберите NFT для битвы.');
-        return;
-    }
+    if (!activeBattleNft || stars < 10) return;
 
-    if (stars < 10) {
-        alert('Недостаточно звёзд для начала дуэли (необходимо 10 звёзд).');
-        return;
-    }
+    stars -= 10;
+    updateUI();
 
-    showScreen('battle-screen', document.querySelector('.bottom-nav .nav-item[onclick*="battle-screen"]'));
+    document.getElementById('searching-overlay').style.display = 'flex';
 
-    const enemyNft = getRandomEnemy();
-    if (window.startUndertaleBattle) {
-        window.startUndertaleBattle(activeBattleNft, enemyNft);
-    } else {
-        console.error('❌ Функция startUndertaleBattle не найдена.');
-    }
+    const searchStatuses = [
+        'Подключение к серверу...',
+        'Поиск игроков...',
+        'Проверка совместимости...',
+        'Оппонент найден!'
+    ];
+
+    let statusIndex = 0;
+    const statusElement = document.getElementById('search-status');
+
+    const updateStatus = () => {
+        if (statusIndex < searchStatuses.length) {
+            statusElement.textContent = searchStatuses[statusIndex];
+            statusIndex++;
+            if (statusIndex < searchStatuses.length) {
+                setTimeout(updateStatus, 800);
+            } else {
+                setTimeout(startNewBattle, 500); // ИЗМЕНЕНО: используем новую функцию
+            }
+        }
+    };
+
+    updateStatus();
 }
 
 // Исправленная функция startNewBattle - замените эту функцию в вашем script.js
