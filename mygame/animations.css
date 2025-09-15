@@ -65,92 +65,27 @@
     }
 }
 
-@keyframes navPulse {
+@keyframes buttonPress {
     0% {
         transform: scale(1);
     }
     50% {
-        transform: scale(1.05);
+        transform: scale(0.98);
     }
     100% {
         transform: scale(1);
     }
 }
 
-@keyframes enemyFloat {
-    0% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-10px);
-    }
-    100% {
-        transform: translateY(0);
-    }
+.play-btn:hover {
+    animation: buttonPulse 1.5s infinite;
 }
 
-@keyframes hitEffect {
-    0% {
-        transform: scale(0.5);
-        opacity: 0;
-    }
-    50% {
-        transform: scale(1.1);
-        opacity: 1;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 0;
-    }
+.play-btn:active {
+    animation: buttonPress 0.1s ease;
 }
 
-@keyframes giftShake {
-    0%, 100% {
-        transform: translateX(0);
-    }
-    20%, 60% {
-        transform: translateX(-10px);
-    }
-    40%, 80% {
-        transform: translateX(10px);
-    }
-}
-
-.gift-box:active {
-    animation: giftShake 0.3s ease-in-out;
-}
-
-@keyframes giftPulse {
-    0%, 100% {
-        transform: scale(1);
-        filter: brightness(1);
-    }
-    50% {
-        transform: scale(1.05);
-        filter: brightness(1.1);
-    }
-}
-
-@keyframes resultAppear {
-    0% {
-        opacity: 0;
-        transform: scale(0.5) translateY(30px);
-    }
-    50% {
-        opacity: 0.8;
-        transform: scale(1.1) translateY(-10px);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
-}
-
-.upgrade-result {
-    animation: resultAppear 0.8s ease-out;
-}
-
-@keyframes cardEntry {
+@keyframes nftCardEnter {
     from {
         opacity: 0;
         transform: translateY(20px) scale(0.9);
@@ -161,7 +96,417 @@
     }
 }
 
-.nft-card, .shop-card {
-    animation: cardEntry 0.3s ease-out backwards;
-    opacity: 0;
+.nft-card {
+    animation: nftCardEnter 0.4s ease-out;
+    animation-fill-mode: both;
+    transition: all 0.3s ease;
 }
+
+.nft-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
+}
+
+.nft-card:nth-child(1) { animation-delay: 0.1s; }
+.nft-card:nth-child(2) { animation-delay: 0.15s; }
+.nft-card:nth-child(3) { animation-delay: 0.2s; }
+.nft-card:nth-child(4) { animation-delay: 0.25s; }
+.nft-card:nth-child(5) { animation-delay: 0.3s; }
+.nft-card:nth-child(6) { animation-delay: 0.35s; }
+.nft-card:nth-child(7) { animation-delay: 0.4s; }
+.nft-card:nth-child(8) { animation-delay: 0.45s; }
+
+@keyframes topBarSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.top-bar {
+    animation: topBarSlideDown 0.5s ease-out;
+}
+
+@keyframes bottomNavSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.bottom-nav {
+    animation: bottomNavSlideUp 0.5s ease-out 0.2s both;
+}
+
+@keyframes navItemActive {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.nav-item.active {
+    animation: navItemActive 0.3s ease;
+}
+
+@keyframes starPulse {
+    0%, 100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    50% {
+        transform: scale(1.1);
+        filter: brightness(1.3);
+    }
+}
+
+.currency-item i {
+    animation: starPulse 2s ease-in-out infinite;
+}
+
+
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(50px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.purchase-content,
+.upgrade-modal {
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes overlayFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.purchase-overlay,
+.upgrade-overlay {
+    animation: overlayFadeIn 0.2s ease-out;
+}
+
+@keyframes battleParticipantEnter {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.participant.left {
+    animation: battleParticipantEnter 0.6s ease-out;
+}
+
+.participant.right {
+    animation: battleParticipantEnter 0.6s ease-out 0.2s both;
+    transform: translateX(50px);
+}
+
+.participant.right {
+    animation-name: battleParticipantEnterRight;
+}
+
+@keyframes battleParticipantEnterRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes vsTextPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+}
+
+.vs-text {
+    animation: vsTextPulse 2s ease-in-out infinite 0.4s;
+}
+
+@keyframes hpBarAnimation {
+    0% {
+        width: 100%;
+    }
+    100% {
+        width: var(--target-width, 100%);
+    }
+}
+
+.hp-bar {
+    animation: hpBarAnimation 0.8s ease-out;
+}
+
+@keyframes battleLogSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.battle-log {
+    animation: battleLogSlideIn 0.3s ease-out;
+}
+
+@keyframes searchingSpinner {
+    0% {
+        transform: rotate(0deg);
+        border-top-color: #ffffff;
+    }
+    25% {
+        border-top-color: #ffd700;
+    }
+    50% {
+        transform: rotate(180deg);
+        border-top-color: #4caf50;
+    }
+    75% {
+        border-top-color: #2196f3;
+    }
+    100% {
+        transform: rotate(360deg);
+        border-top-color: #ffffff;
+    }
+}
+
+.searching-animation {
+    animation: searchingSpinner 1.2s linear infinite;
+}
+
+@keyframes coinFlipShadow {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(255,255,255,0.2);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(255,255,255,0.4), 0 0 60px rgba(255,215,0,0.3);
+    }
+}
+
+.coin {
+    animation: coinFlipShadow 1s ease-in-out infinite;
+}
+
+@keyframes friendItemSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.friend-item {
+    animation: friendItemSlideIn 0.4s ease-out;
+}
+
+.friend-item:nth-child(1) { animation-delay: 0.1s; }
+.friend-item:nth-child(2) { animation-delay: 0.15s; }
+.friend-item:nth-child(3) { animation-delay: 0.2s; }
+.friend-item:nth-child(4) { animation-delay: 0.25s; }
+.friend-item:nth-child(5) { animation-delay: 0.3s; }
+
+@keyframes historyItemSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.battle-history-item {
+    animation: historyItemSlideIn 0.3s ease-out;
+}
+
+.battle-history-item:nth-child(1) { animation-delay: 0.1s; }
+.battle-history-item:nth-child(2) { animation-delay: 0.15s; }
+.battle-history-item:nth-child(3) { animation-delay: 0.2s; }
+.battle-history-item:nth-child(4) { animation-delay: 0.25s; }
+
+@keyframes starsUpdate {
+    0% {
+        transform: scale(1);
+        color: #ffffff;
+    }
+    50% {
+        transform: scale(1.2);
+        color: #ffd700;
+    }
+    100% {
+        transform: scale(1);
+        color: #ffffff;
+    }
+}
+
+.star-count-update {
+    animation: starsUpdate 0.5s ease-out;
+}
+
+@keyframes profileHeaderSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.profile-header {
+    animation: profileHeaderSlideIn 0.5s ease-out;
+}
+
+@keyframes logoRotate {
+    0% {
+        transform: rotate(0deg);
+        opacity: 0.6;
+    }
+    50% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: rotate(0deg); /* ИЗМЕНЕНО: убрали поворот */
+        opacity: 0.6;
+    }
+}
+
+.center-logo {
+    animation: logoRotate 8s ease-in-out infinite; /* ИЗМЕНЕНО: плавная анимация */
+}
+
+.center-logo {
+    animation: logoRotate 8s linear infinite;
+}
+
+@keyframes subtleFloat {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
+.user-avatar {
+    animation: subtleFloat 3s ease-in-out infinite;
+}
+
+@keyframes filterDropdownSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.filter-dropdown {
+    animation: filterDropdownSlideIn 0.2s ease-out;
+}
+
+@keyframes rewardCardGlow {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    }
+}
+
+.reward-card {
+    animation: rewardCardGlow 2s ease-in-out infinite;
+}
+
+@keyframes microBounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-2px);
+    }
+}
+
+.nft-card-btn:hover {
+    animation: microBounce 0.3s ease-in-out;
+}
+
+@keyframes criticalHpFlash {
+    0%, 100% {
+        background: #d32f2f;
+        box-shadow: 0 0 0 rgba(255, 0, 0, 0);
+    }
+    50% {
+        background: #ff1744;
+        box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+    }
+}
+
+.hp-bar.critical {
+    animation: criticalHpFlash 0.8s ease-in-out infinite;
+}
+
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+}
+
+
+
