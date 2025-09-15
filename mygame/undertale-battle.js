@@ -374,23 +374,12 @@ class UndertaleBattle {
                 this.showDamageEffect(document.getElementById('player-battle-img'), Math.round(damage), false);
             }
             
-            // === ИСПРАВЛЕННОЕ ПРИМЕНЕНИЕ УРОНА ===
-            console.log('💔 ПРИМЕНЯЕМ УРОН. ДО:', this.playerHP);
-            const oldHP = this.playerHP;
-            
-            // Обновляем и основную переменную, и дублирующую
+// === ПРИМЕНЕНИЕ УРОНА ===
             this.playerHP = Math.max(0, this.playerHP - damage);
-            this.gameState.playerHP = this.playerHP;
-            
-            console.log('💔 ПОСЛЕ применения урона:', this.playerHP);
-            console.log('💔 В gameState:', this.gameState.playerHP);
-            console.log('💔 Урон нанесен:', oldHP - this.playerHP);
-            
-            // ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ HP БАРА
-            setTimeout(() => {
-                console.log('🔧 ПРИНУДИТЕЛЬНОЕ обновление HP бара игрока');
-                this.forceUpdatePlayerHP(this.playerHP);
-            }, 100);
+            this.gameState.playerHP = this.playerHP; // Синхронизация gameState
+ 
+// ✅ Обновляем HP-бар игрока, используя ваш новый метод
+            this.updateHPBar('player-hp-bar', this.playerHP, this.playerMaxHP);
             
             document.getElementById('player-battle-img').classList.add('battle-shake');
             setTimeout(() => {
@@ -660,3 +649,4 @@ setTimeout(() => {
         console.error('🔴 ❌ Ошибка загрузки Battle System!');
     }
 }, 1000);
+
