@@ -1,4 +1,4 @@
-// ==================== UNDERTALE BATTLE SYSTEM (НОВАЯ HP СИСТЕМА) ====================
+// ==================== UNDERTALE BATTLE SYSTEM (ИСПРАВЛЕННЫЙ) ====================
 
 class UndertaleBattle {
     constructor() {
@@ -52,11 +52,11 @@ class UndertaleBattle {
                     <img id="enemy-battle-img" class="enemy-battle-img" alt="Enemy NFT">
                     <div id="enemy-name" class="enemy-name">ВРАГ</div>
 
-                    <!-- HP врага - НОВАЯ СИСТЕМА -->
-                    <div class="battle-hp-container enemy-hp-container">
-                        <div id="enemy-hp-bar" class="battle-hp-bar"></div>
+                    <!-- HP врага - ИСПОЛЬЗУЕМ СТАРЫЕ КЛАССЫ -->
+                    <div class="hp-container">
+                        <div id="enemy-hp-bar" class="hp-bar"></div>
                     </div>
-                    <div id="enemy-hp-text" class="battle-hp-text">100/100 HP</div>
+                    <div id="enemy-hp-text" class="hp-text">100/100 HP</div>
                 </div>
 
                 <!-- НИЖНЯЯ ОБЛАСТЬ -->
@@ -84,9 +84,9 @@ class UndertaleBattle {
                             <div>
                                 <div class="player-name">ВЫ</div>
                                 <div id="player-nft-name" class="player-nft-name">NFT NAME</div>
-                                <!-- HP игрока - НОВАЯ СИСТЕМА -->
-                                <div class="battle-hp-container player-hp-container">
-                                    <div id="player-hp-bar" class="battle-hp-bar"></div>
+                                <!-- HP игрока - ИСПОЛЬЗУЕМ СТАРЫЕ КЛАССЫ -->
+                                <div class="hp-container">
+                                    <div id="player-hp-bar" class="hp-bar"></div>
                                 </div>
                             </div>
                             <div id="player-hp-text" class="player-hp-text">100/100 HP</div>
@@ -121,44 +121,7 @@ class UndertaleBattle {
         console.log('✅ UI создан');
     }
 
-    // === НОВЫЙ МЕТОД ОБНОВЛЕНИЯ HP БАРОВ ===
-    updateHPBar(barId, currentHP, maxHP) {
-        const bar = document.getElementById(barId);
-        if (!bar) {
-            console.error(`❌ HP бар ${barId} не найден`);
-            return false;
-        }
-
-        const percent = Math.max(0, Math.min(100, (currentHP / maxHP) * 100));
-        
-        console.log(`🔧 Обновление ${barId}: ${currentHP}/${maxHP} = ${percent.toFixed(1)}%`);
-
-        // ИСПОЛЬЗУЕМ setAttribute для принудительной установки ширины
-        bar.setAttribute('style', `width: ${percent}% !important; transition: width 0.8s ease-out !important; height: 100% !important; background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%) !important; position: relative !important;`);
-
-        // Добавляем критический эффект
-        if (currentHP <= 25) {
-            bar.classList.add('critical');
-            bar.setAttribute('style', `width: ${percent}% !important; transition: width 0.8s ease-out !important; height: 100% !important; background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%) !important; position: relative !important; animation: newCriticalFlash 1s ease-in-out infinite !important;`);
-        } else {
-            bar.classList.remove('critical');
-        }
-
-        // Force reflow
-        bar.offsetWidth;
-        
-        // Дополнительная проверка через 50мс
-        setTimeout(() => {
-            if (bar.style.width !== `${percent}%`) {
-                console.warn(`⚠️ Дополнительное обновление ${barId}`);
-                bar.setAttribute('style', `width: ${percent}% !important; transition: width 0.8s ease-out !important; height: 100% !important; background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%) !important; position: relative !important;`);
-                bar.offsetWidth;
-            }
-        }, 50);
-
-        return true;
-    }
-
+    // === ИСПРАВЛЕННЫЙ МЕТОД ОБНОВЛЕНИЯ HP БАРОВ ===
     updateDisplay() {
         console.log('🔄 Обновление отображения. Игрок HP:', this.playerHP, 'Враг HP:', this.enemyHP);
         
@@ -181,9 +144,8 @@ class UndertaleBattle {
             playerNftName.textContent = this.playerNft.name;
         }
 
-        // === ОБНОВЛЯЕМ HP БАРЫ НОВЫМ МЕТОДОМ ===
-        this.updateHPBar('player-hp-bar', this.playerHP, this.playerMaxHP);
-        this.updateHPBar('enemy-hp-bar', this.enemyHP, this.enemyMaxHP);
+        // === ИСПОЛЬЗУЕМ РАБОЧИЙ МЕТОД ИЗ СТАРОГО КОДА ===
+        this.updateHPBarsOld();
 
         // Обновляем текст HP
         const playerHPText = document.getElementById('player-hp-text');
@@ -197,6 +159,43 @@ class UndertaleBattle {
         if (enemyHPText) {
             const displayEnemyHP = Math.max(0, Math.round(this.enemyHP));
             enemyHPText.textContent = `${displayEnemyHP}/${this.enemyMaxHP} HP`;
+        }
+    }
+
+    // === РАБОЧИЙ МЕТОД HP БАРОВ ИЗ СТАРОГО КОДА ===
+    updateHPBarsOld() {
+        const playerHPBar = document.querySelector('#player-hp-bar');
+        const enemyHPBar = document.querySelector('#enemy-hp-bar');
+        
+        console.log('🔧 updateHPBarsOld: Игрок HP:', this.playerHP, 'Враг HP:', this.enemyHP);
+        console.log('🔍 Найдены элементы:', !!playerHPBar, !!enemyHPBar);
+
+        if (playerHPBar) {
+            // Используем тот же метод что и в старом коде
+            playerHPBar.style.width = `${this.playerHP}%`;
+            console.log('✅ HP бар игрока установлен на:', this.playerHP + '%');
+            
+            // Добавляем критический эффект
+            if (this.playerHP <= 25) {
+                playerHPBar.classList.add('low', 'critical');
+            } else {
+                playerHPBar.classList.remove('low', 'critical');
+            }
+        } else {
+            console.error('❌ HP бар игрока не найден!');
+        }
+
+        if (enemyHPBar) {
+            enemyHPBar.style.width = `${this.enemyHP}%`;
+            console.log('✅ HP бар врага установлен на:', this.enemyHP + '%');
+            
+            if (this.enemyHP <= 25) {
+                enemyHPBar.classList.add('low', 'critical');
+            } else {
+                enemyHPBar.classList.remove('low', 'critical');
+            }
+        } else {
+            console.error('❌ HP бар врага не найден!');
         }
     }
 
