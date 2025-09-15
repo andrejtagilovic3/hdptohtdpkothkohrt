@@ -88,6 +88,17 @@
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
+.player-hp-container {
+    background: #000000; /* Черный фон чтобы видеть изменения красного HP */
+    border: 3px solid #666666;
+    border-radius: 10px;
+    width: 120px; /* Меньше, чем у врага, чтобы вписывалось в player-battle-area */
+    height: 20px;
+    overflow: hidden;
+    margin: 8px 0 4px 0; /* Отступы для выравнивания */
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
 .hp-bar {
     height: 100%;
     background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%); /* Красный цвет для HP */
@@ -99,6 +110,11 @@
 .hp-bar.critical {
     background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%);
     animation: criticalFlash 1s ease-in-out infinite;
+}
+
+.player-hp-container .hp-bar.critical {
+    background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%) !important;
+    animation: playerCriticalFlash 1s ease-in-out infinite !important;
 }
 
 @keyframes criticalFlash {
@@ -460,6 +476,11 @@
     .player-battle-area {
         width: 140px;
     }
+    
+    .player-hp-container {
+        width: 110px;
+        height: 18px;
+    }
 }
 
 @media (max-height: 600px) {
@@ -519,6 +540,11 @@
     .player-nft-name {
         font-size: 11px;
         max-width: 100px;
+    }
+    
+    .player-hp-container {
+        width: 100px;
+        height: 16px;
     }
 }
 
@@ -591,8 +617,9 @@
         font-size: 10px;
         max-width: 80px;
     }
+    
+    .player-hp-container {
+        width: 100px;
+        height: 18px;
+    }
 }
-
-
-
-
