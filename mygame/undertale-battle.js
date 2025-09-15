@@ -379,7 +379,6 @@ class UndertaleBattle {
             this.gameState.playerHP = this.playerHP; // Синхронизация gameState
  
 // ✅ Обновляем HP-бар игрока, используя ваш новый метод
-            this.updateHPBar('player-hp-bar', this.playerHP, this.playerMaxHP);
             
             document.getElementById('player-battle-img').classList.add('battle-shake');
             setTimeout(() => {
@@ -649,4 +648,5 @@ setTimeout(() => {
         console.error('🔴 ❌ Ошибка загрузки Battle System!');
     }
 }, 1000);
+
 
