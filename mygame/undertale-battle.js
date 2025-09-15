@@ -158,18 +158,17 @@ class UndertaleBattle {
 
         // ИСПРАВЛЕНИЕ: проверяем что элементы найдены и обновляем их
         if (playerHPBar) {
-            playerHPBar.style.width = playerHPPercent + '%';
-            console.log('✅ Обновлен HP бар игрока:', playerHPPercent + '%');
-            
-            if (this.playerHP <= 25) {
-                playerHPBar.classList.add('critical');
-            } else {
-                playerHPBar.classList.remove('critical');
-            }
-        } else {
-            console.error('❌ Не найден элемент player-hp-bar');
-        }
-
+    playerHPBar.style.setProperty('width', playerHPPercent + '%', 'important');  // С !important, чтобы перебить CSS
+    console.log('✅ Обновлен HP бар игрока:', playerHPPercent + '%');
+    
+    if (this.playerHP <= 25) {
+        playerHPBar.classList.add('critical');
+    } else {
+        playerHPBar.classList.remove('critical');
+    }
+} else {
+    console.error('❌ Не найден элемент player-hp-bar');
+}
         if (enemyHPBar) {
             enemyHPBar.style.width = enemyHPPercent + '%';
             console.log('✅ Обновлен HP бар врага:', enemyHPPercent + '%');
