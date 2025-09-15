@@ -82,38 +82,117 @@
 
             <div id="battle-screen" class="screen">
                 <div class="main-content">
-                    <div id="battle-container"></div>
+                    <h2 class="section-title">Дуэль</h2>
+                    <div class="battle-arena">
+                        <div class="battle-participants">
+                            <div class="participant left">
+                                <img id="player-img" class="participant-img" src="" alt="Player NFT">
+                                <div class="participant-name">Вы</div>
+                                <div class="hp-container">
+                                    <div id="player-hp-bar" class="hp-bar"></div>
+                                </div>
+                                <div id="player-hp-text" class="hp-text">100/100 HP</div>
+                            </div>
+                            <div class="vs-text">VS</div>
+                            <div class="participant right">
+                                <img id="bot-img" class="participant-img" src="" alt="Bot NFT">
+                                <div class="participant-name">Оппонент</div>
+                                <div class="hp-container">
+                                    <div id="bot-hp-bar" class="hp-bar"></div>
+                                </div>
+                                <div id="bot-hp-text" class="hp-text">100/100 HP</div>
+                            </div>
+                        </div>
+                        <div id="battle-log" class="battle-log">Подготовка к дуэли...</div>
+                        <div id="battle-result" class="battle-result" style="display: none;"></div>
+                        <div id="reward-info" class="reward-info" style="display: none;"></div>
+                        <button id="back-to-menu-btn" class="back-btn" onclick="backToMainFromBattle()" style="display: none; width: 100%;">
+                            Вернуться в меню
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <div id="profile-screen" class="screen">
                 <div class="main-content">
-                    <h2 class="section-title">Мой профиль</h2>
                     <div class="profile-header">
                         <div class="profile-avatar" id="profile-avatar">👤</div>
                         <div class="profile-info">
-                            <div class="profile-name" id="profile-name">Игрок</div>
+                            <h2 id="profile-name">Игрок</h2>
                             <div class="profile-stats">
-                                <div class="stat-item">
-                                    <i class="fas fa-star" style="color: #ffd700;"></i>
-                                    <span id="profile-stars-earned">0</span>
-                                </div>
-                                <div class="stat-item">
-                                    <i class="fas fa-certificate" style="color: #1a472a;"></i>
-                                    <span id="profile-nft-count">0</span> NFT
-                                </div>
-                                <div class="stat-item">
-                                    <i class="fas fa-medal" style="color: #666666;"></i>
-                                    <span id="profile-battles-count">0</span> битв
-                                </div>
+                                <div>NFT в коллекции: <span id="profile-nft-count">0</span></div>
+                                <div>Звёзд заработано: <span id="profile-stars-earned">0</span></div>
+                                <div>Дуэли проведено: <span id="profile-battles-count">0</span></div>
                             </div>
                         </div>
                     </div>
-                    <div class="profile-details">
-                        <div class="profile-section">
-                            <h3 class="profile-subtitle">Мои NFT для апгрейда</h3>
-                            <div id="upgradable-nft-grid" class="nft-grid"></div>
+                    <button class="play-btn" onclick="showBattleHistory()" style="margin-bottom: 15px; font-size: 16px;">
+                        История дуэлей
+                    </button>
+                    <h3 class="section-title" style="font-size: 18px;">Моя коллекция</h3>
+                    <div id="profile-collection" class="nft-grid"></div>
+                </div>
+            </div>
+
+            <div id="battle-history-screen" class="screen">
+                <div class="main-content">
+                    <h2 class="section-title">История дуэлей</h2>
+                    <div id="battle-history-list">
+                    </div>
+                    <button class="play-btn" onclick="backToProfile()" style="margin-top: 20px;">
+                        Назад в профиль
+                    </button>
+                </div>
+            </div>
+
+            <div id="friends-screen" class="screen">
+                <div class="main-content">
+                    <h2 class="section-title">Пригласи друзей - Получай Награды!</h2>
+                    <div class="referral-info">
+                        <div class="reward-card">
+                            <div class="reward-text">Каждый приглашенный друг = <span class="reward-amount">1 <i class="fas fa-star" style="color: #ffd700;"></i></span> звезда</div>
                         </div>
+                        <div class="referral-stats">
+                            <div class="stat-item">
+                                <div class="stat-number" id="invited-count">0</div>
+                                <div class="stat-label">Приглашено</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="earned-from-referrals">0</div>
+                                <div class="stat-label">Заработано звёзд</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="referral-actions">
+                        <button class="invite-btn" onclick="inviteFriend()">
+                            <i class="fas fa-user-plus"></i>
+                            Пригласить друга
+                        </button>
+                        <button class="copy-link-btn" onclick="copyReferralLink()">
+                            <i class="fas fa-copy"></i>
+                            Скопировать ссылку
+                        </button>
+                    </div>
+
+                    <div class="referral-code-section">
+                        <div class="section-subtitle">Ваша реферальная ссылка:</div>
+                        <div class="referral-code-container">
+                            <input type="text" id="referral-link" class="referral-input" readonly>
+                            <button class="copy-code-btn" onclick="copyReferralLink()">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="partner-info">
+                        <div class="partner-text">Хотите стать партнёром и зарабатывать TON?</div>
+                        <button class="partner-btn" onclick="showTerms()">Условия</button>
+                    </div>
+
+                    <div class="friends-list-section">
+                        <h3 class="section-subtitle">Приглашенные друзья <span id="friends-count">(0)</span></h3>
+                        <div id="friends-list" class="friends-list"></div>
                     </div>
                 </div>
             </div>
@@ -121,53 +200,131 @@
             <div id="upgrade-screen" class="screen">
                 <div class="main-content">
                     <h2 class="section-title">Апгрейд NFT</h2>
-                    <div class="upgrade-info-container">
-                        <div class="upgrade-preview">
-                            <img id="upgrade-nft-img" src="" alt="NFT">
+                    <div id="upgrade-content">
+                        <div class="upgrade-instruction">
+                            <p>Выберите NFT для апгрейда:</p>
                         </div>
-                        <div class="upgrade-types">
-                            <h4>Выберите тип апгрейда:</h4>
-                            <div id="upgrade-options" class="upgrade-options-grid"></div>
-                        </div>
+                        <div id="upgradable-nft-grid" class="nft-grid"></div>
                     </div>
                 </div>
             </div>
 
-            <div id="upgrade-animation-overlay" class="upgrade-overlay" style="display: none;">
-                <div class="upgrade-animation-container">
-                    <div class="gift-box" id="gift-box">
-                        <div class="gift-box-top"></div>
-                        <div class="gift-box-bottom"></div>
-                        <div class="gift-ribbon"></div>
+            <div id="rules-screen" class="screen">
+                <div class="main-content">
+                    <h2 class="section-title">Правила дуэлей</h2>
+                    <div style="background: #1a1a1a; border-radius: 16px; padding: 20px; margin-bottom: 20px;">
+                        <div style="margin-bottom: 15px;">
+                            <h3 style="color: #ffffff; margin-bottom: 8px;">Как играть:</h3>
+                            <p style="color: #cccccc; line-height: 1.5;">1. Купите NFT в магазине<br>2. Выберите NFT для дуэли в коллекции<br>3. Нажмите "ДУЭЛЬ" в главном меню<br>4. Сражайся и побеждай!</p>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <h3 style="color: #ffffff; margin-bottom: 8px;">Механика:</h3>
+                            <p style="color: #cccccc; line-height: 1.5;">• Всё происходит случайно<br>• Стандартный шанс критического удара: 15%<br>• Стандартный Шанс промаха: 8%<br>• При низком HP шанс крита увеличивается</p>
+                        </div>
+                        <div>
+                            <h3 style="color: #ffffff; margin-bottom: 8px;">Награды:</h3>
+                            <p style="color: #cccccc; line-height: 1.5;">• За победу получаете NFT противника<br>• За поражение теряете свой NFT<br>• Участие в дуэли стоит 10 звёзд</p>
+                        </div>
                     </div>
-                    <div class="upgrade-instruction-text">Нажимайте на подарок!</div>
-                    <div class="tap-counter">Осталось нажатий: <span id="taps-remaining">5</span></div>
-                    <div id="upgrade-result" class="upgrade-result" style="display: none;">
-                        <div class="result-icon"></div>
-                        <div class="result-text"></div>
-                        <button class="result-close-btn" onclick="closeUpgradeAnimation()">Забрать</button>
-                    </div>
+                    <button class="play-btn" onclick="backToMainFromRules()">Назад</button>
                 </div>
             </div>
         </div>
 
-        <div class="bottom-nav" id="bottom-nav">
-            <button class="nav-item active" onclick="showScreen('main-screen', this)">
+        <div class="bottom-nav">
+            <button class="nav-item active" onclick="switchScreen('main')">
                 <i class="fas fa-home"></i>
                 <span>Главная</span>
             </button>
-            <button class="nav-item" onclick="showScreen('collection-screen', this)">
+            <button class="nav-item" onclick="switchScreen('collection')">
                 <i class="fas fa-box-open"></i>
                 <span>Коллекция</span>
             </button>
-            <button class="nav-item" onclick="showScreen('shop-screen', this)">
-                <i class="fas fa-store"></i>
-                <span>Магазин</span>
+            <button class="nav-item" onclick="switchScreen('upgrade')">
+                <i class="fas fa-arrow-up"></i>
+                <span>Апгрейд</span>
             </button>
-            <button class="nav-item" onclick="showScreen('profile-screen', this)">
+            <button class="nav-item" onclick="switchScreen('profile')">
                 <i class="fas fa-user"></i>
                 <span>Профиль</span>
             </button>
+            <button class="nav-item" onclick="switchScreen('friends')">
+                <i class="fas fa-users"></i>
+                <span>Друзья</span>
+            </button>
+        </div>
+
+        <div id="searching-overlay" class="searching-overlay" style="display: none;">
+            <div class="searching-animation"></div>
+            <div class="searching-text">
+                Поиск оппонента...<br>
+                <span id="search-status">Подключение к серверу</span>
+            </div>
+        </div>
+
+        <div id="coin-toss-overlay" class="coin-toss-overlay" style="display: none;">
+            <div class="coin-container">
+                <div id="coin" class="coin">
+                    <div class="front">
+                        <img id="coin-front" src="" alt="Player">
+                    </div>
+                    <div class="back">
+                        <img id="coin-back" src="" alt="Bot">
+                    </div>
+                </div>
+            </div>
+            <div id="coin-result-text" class="searching-text"></div>
+        </div>
+
+        <div id="purchase-overlay" class="purchase-overlay">
+            <div class="purchase-content">
+                <div class="purchase-title">Купить звёзды</div>
+                <div class="purchase-options">
+                    <button class="purchase-btn" onclick="purchaseStars(50)">50 звёзд</button>
+                    <button class="purchase-btn" onclick="purchaseStars(100)">100 звёзд</button>
+                    <button class="purchase-btn" onclick="purchaseStars(200)">200 звёзд</button>
+                    <button class="purchase-btn" onclick="purchaseStars(500)">500 звёзд</button>
+                    <button class="purchase-btn" onclick="purchaseStars(1000)">1000 звёзд</button>
+                    <button class="purchase-btn" onclick="purchaseStars(2000)">2000 звёзд</button>
+                    <button class="purchase-btn" onclick="purchaseStars(5000)">5000 звёзд</button>
+                </div>
+                <div class="close-purchase" onclick="closePurchaseMenu()">Закрыть</div>
+            </div>
+        </div>
+
+        <div id="upgrade-selection-overlay" class="upgrade-overlay" style="display: none;">
+            <div class="upgrade-modal">
+                <div class="upgrade-header">
+                    <h3 id="upgrade-nft-name">NFT Name</h3>
+                    <button class="upgrade-close-btn" onclick="closeUpgradeModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="upgrade-nft-preview">
+                    <img id="upgrade-nft-img" src="" alt="NFT">
+                </div>
+                <div class="upgrade-types">
+                    <h4>Выберите тип апгрейда:</h4>
+                    <div id="upgrade-options" class="upgrade-options-grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="upgrade-animation-overlay" class="upgrade-overlay" style="display: none;">
+            <div class="upgrade-animation-container">
+                <div class="gift-box" id="gift-box">
+                    <div class="gift-box-top"></div>
+                    <div class="gift-box-bottom"></div>
+                    <div class="gift-ribbon"></div>
+                </div>
+                <div class="upgrade-instruction-text">Нажимайте на подарок!</div>
+                <div class="tap-counter">Осталось нажатий: <span id="taps-remaining">5</span></div>
+                <div id="upgrade-result" class="upgrade-result" style="display: none;">
+                    <div class="result-icon"></div>
+                    <div class="result-text"></div>
+                    <button class="result-close-btn" onclick="closeUpgradeAnimation()">Забрать</button>
+                </div>
+            </div>
         </div>
     </div>
 
