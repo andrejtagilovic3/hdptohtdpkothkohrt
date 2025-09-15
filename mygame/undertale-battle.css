@@ -1,4 +1,4 @@
-/* === UNDERTALE BATTLE STYLES (ОБНОВЛЕННЫЕ) === */
+/* === UNDERTALE BATTLE STYLES (НОВАЯ HP СИСТЕМА) === */
 
 .undertale-battle-container {
     position: fixed;
@@ -76,57 +76,61 @@
     letter-spacing: 1px;
 }
 
-/* HP бары (ОБЩИЕ ДЛЯ ВРАГА И ИГРОКА, УНИФИЦИРОВАННЫЕ) */
-.hp-container,
+/* === НОВАЯ HP СИСТЕМА === */
+.battle-hp-container {
+    background: #000000 !important;
+    border: 3px solid #666666 !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+    margin-bottom: 10px !important;
+    position: relative !important;
+}
+
+/* HP контейнер для врага */
+.enemy-hp-container {
+    width: 250px !important;
+    height: 24px !important;
+}
+
+/* HP контейнер для игрока */
 .player-hp-container {
-    background: #000000; /* Черный фон для контраста */
-    border: 3px solid #666666;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
-    margin-bottom: 10px;
+    width: 120px !important;
+    height: 20px !important;
+    margin: 8px 0 4px 0 !important;
 }
 
-.hp-container {
-    width: 250px;
-    height: 24px;
+/* HP БАР - НОВАЯ СИСТЕМА */
+.battle-hp-bar {
+    height: 100% !important;
+    background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%) !important;
+    transition: width 0.8s ease-out !important;
+    position: relative !important;
+    /* НЕ УСТАНАВЛИВАЕМ WIDTH ЗДЕСЬ - ТОЛЬКО ЧЕРЕЗ JAVASCRIPT */
 }
 
-.player-hp-container {
-    width: 120px;
-    height: 20px;
-    margin: 8px 0 4px 0; /* Отступы для выравнивания */
+.battle-hp-bar.critical {
+    background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%) !important;
+    animation: newCriticalFlash 1s ease-in-out infinite !important;
 }
 
-.hp-bar {
-    height: 100%;
-    background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%);
-    transition: width 0.8s ease-out;
-    position: relative;
-}
-
-.hp-bar.critical {
-    background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%);
-    animation: criticalFlash 1s ease-in-out infinite;
-}
-
-@keyframes criticalFlash {
+@keyframes newCriticalFlash {
     0%, 100% { 
-        opacity: 1; 
-        background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%);
+        opacity: 1 !important; 
+        background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%) !important;
     }
     50% { 
-        opacity: 0.7; 
-        background: linear-gradient(90deg, #d32f2f 0%, #b71c1c 100%);
+        opacity: 0.7 !important; 
+        background: linear-gradient(90deg, #d32f2f 0%, #b71c1c 100%) !important;
     }
 }
 
-.hp-text {
-    font-size: 16px;
-    color: #cccccc;
-    font-weight: 700;
-    text-align: center;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+.battle-hp-text {
+    font-size: 16px !important;
+    color: #cccccc !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* НИЖНЯЯ ОБЛАСТЬ */
@@ -223,10 +227,10 @@
 }
 
 .player-hp-text {
-    font-size: 12px;
-    color: #cccccc;
-    font-weight: 700;
-    text-align: center;
+    font-size: 12px !important;
+    color: #cccccc !important;
+    font-weight: 700 !important;
+    text-align: center !important;
 }
 
 /* КНОПКИ ДЕЙСТВИЙ */
@@ -451,8 +455,8 @@
     }
     
     .player-hp-container {
-        width: 110px;
-        height: 18px;
+        width: 110px !important;
+        height: 18px !important;
     }
 }
 
@@ -472,9 +476,9 @@
         margin-bottom: 12px;
     }
     
-    .hp-container {
-        width: 200px;
-        height: 20px;
+    .enemy-hp-container {
+        width: 200px !important;
+        height: 20px !important;
     }
     
     .battle-bottom-area {
@@ -516,8 +520,8 @@
     }
     
     .player-hp-container {
-        width: 100px;
-        height: 16px;
+        width: 100px !important;
+        height: 16px !important;
     }
 }
 
@@ -539,8 +543,8 @@
         height: 130px;
     }
     
-    .hp-container {
-        width: 180px;
+    .enemy-hp-container {
+        width: 180px !important;
     }
     
     .battle-actions-area {
@@ -592,7 +596,7 @@
     }
     
     .player-hp-container {
-        width: 100px;
-        height: 18px;
+        width: 100px !important;
+        height: 18px !important;
     }
 }
