@@ -146,6 +146,7 @@ class UndertaleBattle {
         }
 
         // ИСПРАВЛЕНИЕ: правильно обновляем HP бары
+// ИСПРАВЛЕНИЕ: правильно обновляем HP бары
 const playerHPPercent = Math.max(0, (this.playerHP / this.playerMaxHP) * 100);
 const enemyHPPercent = Math.max(0, (this.enemyHP / this.enemyMaxHP) * 100);
 
@@ -156,9 +157,9 @@ const enemyHPBar = document.getElementById('enemy-hp-bar');
 const playerHPText = document.getElementById('player-hp-text');
 const enemyHPText = document.getElementById('enemy-hp-text');
 
-        // ИСПРАВЛЕНИЕ: проверяем что элементы найдены и обновляем их
-        if (playerHPBar) {
-    playerHPBar.style.setProperty('width', playerHPPercent + '%', 'important');  // С !important, чтобы перебить CSS
+// Для игрока (с !important на width, чтобы точно менялось)
+if (playerHPBar) {
+    playerHPBar.style.setProperty('width', playerHPPercent + '%', 'important');
     console.log('✅ Обновлен HP бар игрока:', playerHPPercent + '%');
     
     if (this.playerHP <= 25) {
@@ -169,29 +170,29 @@ const enemyHPText = document.getElementById('enemy-hp-text');
 } else {
     console.error('❌ Не найден элемент player-hp-bar');
 }
-        if (enemyHPBar) {
-            enemyHPBar.style.width = enemyHPPercent + '%';
-            console.log('✅ Обновлен HP бар врага:', enemyHPPercent + '%');
-            
-            if (this.enemyHP <= 25) {
-                enemyHPBar.classList.add('critical');
-            } else {
-                enemyHPBar.classList.remove('critical');
-            }
-        }
 
-        // ИСПРАВЛЕНИЕ: обновляем текстовые счетчики HP
-        if (playerHPText) {
-            const displayPlayerHP = Math.max(0, Math.round(this.playerHP));
-            playerHPText.textContent = `${displayPlayerHP}/${this.playerMaxHP} HP`;
-            console.log('✅ Обновлен текст HP игрока:', displayPlayerHP + '/' + this.playerMaxHP);
-        }
-        if (enemyHPText) {
-            const displayEnemyHP = Math.max(0, Math.round(this.enemyHP));
-            enemyHPText.textContent = `${displayEnemyHP}/${this.enemyMaxHP} HP`;
-        }
+// Для врага (то же, на всякий)
+if (enemyHPBar) {
+    enemyHPBar.style.setProperty('width', enemyHPPercent + '%', 'important');
+    console.log('✅ Обновлен HP бар врага:', enemyHPPercent + '%');
+    
+    if (this.enemyHP <= 25) {
+        enemyHPBar.classList.add('critical');
+    } else {
+        enemyHPBar.classList.remove('critical');
     }
+}
 
+// ИСПРАВЛЕНИЕ: обновляем текстовые счетчики HP
+if (playerHPText) {
+    const displayPlayerHP = Math.max(0, Math.round(this.playerHP));
+    playerHPText.textContent = `${displayPlayerHP}/${this.playerMaxHP} HP`;
+    console.log('✅ Обновлен текст HP игрока:', displayPlayerHP + '/' + this.playerMaxHP);
+}
+if (enemyHPText) {
+    const displayEnemyHP = Math.max(0, Math.round(this.enemyHP));
+    enemyHPText.textContent = `${displayEnemyHP}/${this.enemyMaxHP} HP`;
+}
     addBattleLog(message) {
         const logContainer = document.getElementById('battle-log-container');
         if (!logContainer) return;
