@@ -100,8 +100,7 @@
 
 .hp-bar {
     height: 100%;
-    background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%); /* Стандартный градиент */
-    width: 100%; /* Изначально полная, без !important */
+    background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%);
     transition: width 0.8s ease-out;
     position: relative;
 }
