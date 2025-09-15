@@ -16,9 +16,9 @@ class UndertaleBattle {
 
     init(playerNft, enemyNft) {
         console.log('🚀 Инициализация битвы:', playerNft.name, 'vs', enemyNft.name);
-        
-        this.playerNft = {...playerNft};
-        this.enemyNft = {...enemyNft};
+
+        this.playerNft = { ...playerNft };
+        this.enemyNft = { ...enemyNft };
         this.playerHP = 100;
         this.enemyHP = 100;
         this.playerMaxHP = 100;
@@ -27,145 +27,284 @@ class UndertaleBattle {
         this.currentTurn = 'player';
         this.battleLog = [];
         this.playerDodging = false;
-        
-        // Пересоздаем UI при каждом запуске битвы
-        this.createBattleUI(); 
+
+        // Вместо создания UI, просто обновляем существующий
+        this.updateStaticUI();
         this.updateDisplay();
         this.showPlayerActions();
         this.addBattleLog(`Битва началась! ${playerNft.name} против ${enemyNft.name}`);
-        
+
         return true;
     }
 
-    createBattleUI() {
-        console.log('🏗️ Создание интерфейса битвы');
-        // Очищаем старый интерфейс, если он есть
-        const battleContainer = document.getElementById('battle-container');
-        if (!battleContainer) {
-            console.error('❌ Не найден контейнер #battle-container!');
-            return;
-        }
-        battleContainer.innerHTML = '';
-
-        const battleHtml = `
-            <div class="battle-arena">
-                <div class="battle-participants">
-                    <div class="participant left">
-                        <img id="player-img" class="participant-img" src="${this.playerNft.img}" alt="Player NFT">
-                        <div class="participant-name">Вы</div>
-                        <div class="hp-container">
-                            <div id="player-hp-bar" class="hp-bar" style="width: 100%;"></div>
-                        </div>
-                        <div class="hp-text" id="player-hp-text">HP: ${this.playerHP}/${this.playerMaxHP}</div>
-                    </div>
-                    <div class="vs-text">VS</div>
-                    <div class="participant right">
-                        <img id="enemy-img" class="participant-img" src="${this.enemyNft.img}" alt="Enemy NFT">
-                        <div class="participant-name">Противник</div>
-                        <div class="hp-container">
-                            <div id="enemy-hp-bar" class="hp-bar" style="width: 100%;"></div>
-                        </div>
-                        <div class="hp-text" id="enemy-hp-text">HP: ${this.enemyHP}/${this.enemyMaxHP}</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="battle-bottom-area">
-                <div class="battle-log" id="battle-log">Готовьтесь к бою!</div>
-                <div class="battle-actions-area" id="battle-actions">
-                    </div>
-            </div>
-            <div id="end-battle-overlay" class="end-battle-overlay" style="display: none;">
-                <div class="battle-result-container">
-                    <div id="battle-result-text" class="battle-result"></div>
-                    <div class="reward-info" id="reward-info" style="display: none;"></div>
-                    <button id="close-battle-btn" class="battle-btn" style="background: #4caf50;">
-                        Вернуться
-                    </button>
-                </div>
-            </div>
-        `;
+    updateStaticUI() {
+        const playerImg = document.getElementById('player-battle-img');
+        const enemyImg = document.getElementById('enemy-battle-img');
+        const enemyName = document.getElementById('enemy-name');
+        const playerNftName = document.getElementById('player-nft-name');
         
-        // Вставляем разметку в контейнер
-        battleContainer.innerHTML = battleHtml;
-        document.getElementById('close-battle-btn').onclick = () => this.endBattle();
-        console.log('✅ UI битвы создан');
+        if (playerImg && this.playerNft) playerImg.src = this.playerNft.img;
+        if (enemyImg && this.enemyNft) enemyImg.src = this.enemyNft.img;
+        if (enemyName && this.enemyNft) enemyName.textContent = this.enemyNft.name.toUpperCase();
+        if (playerNftName && this.playerNft) playerNftName.textContent = this.playerNft.name;
     }
-    
+
     updateDisplay() {
-        const playerHpBar = document.getElementById('player-hp-bar');
-        const playerHpText = document.getElementById('player-hp-text');
-        const enemyHpBar = document.getElementById('enemy-hp-bar');
-        const enemyHpText = document.getElementById('enemy-hp-text');
+        console.log('🔄 Обновление отображения. Игрок HP:', this.playerHP, 'Враг HP:', this.enemyHP);
 
-        if (playerHpBar) {
-            const playerHpPercent = (this.playerHP / this.playerMaxHP) * 100;
-            playerHpBar.style.width = `${playerHpPercent}%`;
-            playerHpBar.classList.toggle('low', playerHpPercent <= 20);
-            console.log(`✅ HP игрока: ${this.playerHP}, процент: ${playerHpPercent.toFixed(2)}%, ширина: ${playerHpBar.style.width}`);
+        const playerHPPercent = Math.max(0, Math.min(100, (this.playerHP / this.playerMaxHP) * 100));
+        const enemyHPPercent = Math.max(0, Math.min(100, (this.enemyHP / this.enemyMaxHP) * 100));
+
+        const playerHPBar = document.getElementById('player-hp-bar');
+        const enemyHPBar = document.getElementById('enemy-hp-bar');
+        const playerHPText = document.getElementById('player-hp-text');
+        const enemyHPText = document.getElementById('enemy-hp-text');
+        const resultOverlay = document.getElementById('battle-result-overlay');
+
+        if (playerHPBar) {
+            playerHPBar.style.width = `${playerHPPercent}%`;
+            playerHPBar.classList.toggle('critical', this.playerHP <= 25);
         }
-        if (playerHpText) {
-            playerHpText.textContent = `HP: ${this.playerHP}/${this.playerMaxHP}`;
+        if (enemyHPBar) {
+            enemyHPBar.style.width = `${enemyHPPercent}%`;
+            enemyHPBar.classList.toggle('critical', this.enemyHP <= 25);
+        }
+        if (playerHPText) {
+            playerHPText.textContent = `${Math.round(this.playerHP)}/${this.playerMaxHP} HP`;
+        }
+        if (enemyHPText) {
+            enemyHPText.textContent = `${Math.round(this.enemyHP)}/${this.enemyMaxHP} HP`;
+        }
+        if (resultOverlay) {
+            resultOverlay.style.display = this.battleActive ? 'none' : 'flex';
         }
 
-        if (enemyHpBar) {
-            const enemyHpPercent = (this.enemyHP / this.enemyMaxHP) * 100;
-            enemyHpBar.style.width = `${enemyHpPercent}%`;
-            enemyHpBar.classList.toggle('low', enemyHpPercent <= 20);
-            console.log(`✅ HP врага: ${this.enemyHP}, процент: ${enemyHpPercent.toFixed(2)}%, ширина: ${enemyHpBar.style.width}`);
-        }
-        if (enemyHpText) {
-            enemyHpText.textContent = `HP: ${this.enemyHP}/${this.enemyMaxHP}`;
-        }
+        console.log('📊 HP проценты - Игрок:', playerHPPercent + '%', 'Враг:', enemyHPPercent + '%');
     }
-    
-    // ... остальной код класса без изменений ...
 
     addBattleLog(message) {
-        const logElement = document.getElementById('battle-log');
-        if (logElement) {
-            logElement.textContent = message;
+        const logContainer = document.getElementById('battle-log-container');
+        if (!logContainer) return;
+
+        this.battleLog.push(message);
+        const recentLogs = this.battleLog.slice(-5);
+        logContainer.innerHTML = recentLogs
+            .map(log => `<div style="margin-bottom: 4px; padding: 2px 0;">• ${log}</div>`)
+            .join('');
+
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
+    showPlayerActions() {
+        const attackBtn = document.getElementById('attack-btn');
+        const dodgeBtn = document.getElementById('dodge-btn');
+
+        if (!attackBtn || !dodgeBtn) return;
+
+        const isPlayerTurn = this.currentTurn === 'player' && this.battleActive;
+        attackBtn.disabled = !isPlayerTurn;
+        dodgeBtn.disabled = !isPlayerTurn;
+    }
+
+    playerAttack() {
+        if (this.currentTurn !== 'player' || !this.battleActive) return;
+
+        this.currentTurn = 'enemy';
+        this.showPlayerActions();
+        this.addBattleLog('Вы атакуете!');
+        
+        let damage = Math.floor(Math.random() * 25) + 15;
+        let isCrit = Math.random() < 0.15;
+        const enemyDodge = Math.random() < 0.08;
+
+        if (this.playerNft.upgrades) {
+            if (this.playerNft.upgrades.damage) damage *= this.playerNft.upgrades.damage;
+            if (this.playerNft.upgrades.crit) if (Math.random() < (0.15 * this.playerNft.upgrades.crit)) isCrit = true;
+        }
+
+        if (enemyDodge) {
+            this.addBattleLog('Враг уклонился от атаки!');
+            this.showDamageEffect(document.getElementById('enemy-battle-img'), 'МИМО', false);
+        } else {
+            if (isCrit) {
+                damage *= 1.8;
+                this.addBattleLog(`💥 КРИТИЧЕСКИЙ УДАР! Нанесено ${Math.round(damage)} урона!`);
+                this.showDamageEffect(document.getElementById('enemy-battle-img'), Math.round(damage), true);
+            } else {
+                this.addBattleLog(`Нанесено ${Math.round(damage)} урона`);
+                this.showDamageEffect(document.getElementById('enemy-battle-img'), Math.round(damage), false);
+            }
+            this.enemyHP -= damage;
+            this.enemyHP = Math.max(0, this.enemyHP);
+            this.shakeElement('enemy-battle-img');
+        }
+
+        this.updateDisplay();
+        this.checkBattleEnd();
+
+        if (this.battleActive) {
+            setTimeout(() => this.enemyTurn(), 2000);
+        }
+    }
+
+    playerDodge() {
+        if (this.currentTurn !== 'player' || !this.battleActive) return;
+        
+        this.addBattleLog('Вы готовитесь увернуться!');
+        this.playerDodging = true;
+        
+        this.currentTurn = 'enemy';
+        this.showPlayerActions();
+
+        setTimeout(() => this.enemyTurn(), 1500);
+    }
+
+    enemyTurn() {
+        if (this.currentTurn !== 'enemy' || !this.battleActive) return;
+
+        this.addBattleLog('Враг атакует!');
+        let damage = Math.floor(Math.random() * 22) + 12;
+        const isCrit = Math.random() < 0.12;
+        let playerDodgeChance = 0.06;
+
+        if (this.playerNft.upgrades && this.playerNft.upgrades.dodge) playerDodgeChance *= this.playerNft.upgrades.dodge;
+        if (this.playerDodging) playerDodgeChance += 0.35;
+
+        const playerDodged = Math.random() < playerDodgeChance;
+
+        if (playerDodged) {
+            this.addBattleLog('Вы уклонились от атаки!');
+            this.showDamageEffect(document.getElementById('player-battle-img'), 'МИМО', false);
+        } else {
+            if (isCrit) {
+                damage *= 1.7;
+                this.addBattleLog(`💥 КРИТИЧЕСКАЯ АТАКА ВРАГА! Получено ${Math.round(damage)} урона!`);
+                this.showDamageEffect(document.getElementById('player-battle-img'), Math.round(damage), true);
+            } else {
+                this.addBattleLog(`Получено ${Math.round(damage)} урона`);
+                this.showDamageEffect(document.getElementById('player-battle-img'), Math.round(damage), false);
+            }
+            this.playerHP -= damage;
+            this.playerHP = Math.max(0, this.playerHP);
+            this.shakeElement('player-battle-img');
+        }
+
+        this.playerDodging = false;
+        this.updateDisplay();
+        this.checkBattleEnd();
+
+        if (this.battleActive) {
+            this.currentTurn = 'player';
+            setTimeout(() => {
+                this.showPlayerActions();
+                this.addBattleLog('Ваш ход!');
+            }, 1800);
         }
     }
     
-    // ...
-    
-    endBattle() {
-        console.log('🏁 Завершение битвы...');
-        this.battleActive = false;
+    shakeElement(elementId) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.classList.add('battle-shake');
+            setTimeout(() => {
+                element.classList.remove('battle-shake');
+            }, 500);
+        }
+    }
+
+    showDamageEffect(targetElement, damage, isCrit = false) {
+        if (!targetElement) return;
+        const effect = document.createElement('div');
+        effect.className = `damage-effect ${isCrit ? 'crit' : ''}`;
+        effect.textContent = damage;
+        targetElement.appendChild(effect);
+        setTimeout(() => {
+            if (effect.parentNode) effect.parentNode.removeChild(effect);
+        }, 1200);
+    }
+
+    checkBattleEnd() {
+        if (this.playerHP <= 0) {
+            this.battleActive = false;
+            this.showBattleResult(false);
+        } else if (this.enemyHP <= 0) {
+            this.battleActive = false;
+            this.showBattleResult(true);
+        }
+    }
+
+    showBattleResult(playerWon) {
+        const resultOverlay = document.getElementById('battle-result-overlay');
+        const resultTitle = document.getElementById('result-title');
+        const resultDetails = document.getElementById('result-details');
         
-        // Удаляем интерфейс битвы
-        const battleContainer = document.getElementById('battle-container');
-        if (battleContainer) {
-            battleContainer.innerHTML = '';
+        if (!resultOverlay || !resultTitle || !resultDetails) return;
+
+        resultOverlay.style.display = 'flex';
+        
+        if (playerWon) {
+            resultTitle.className = 'result-title win';
+            resultTitle.innerHTML = '🏆 ПОБЕДА!';
+            resultDetails.innerHTML = `<strong>Вы победили!</strong><br><br>Получен NFT: <strong>${this.enemyNft.name}</strong>`;
+            if (window.collection && Array.isArray(window.collection)) {
+                window.collection.push({...this.enemyNft, buyPrice: this.enemyNft.price || 150});
+            }
+        } else {
+            resultTitle.className = 'result-title lose';
+            resultTitle.innerHTML = '💀 ПОРАЖЕНИЕ!';
+            resultDetails.innerHTML = `<strong>Вы проиграли...</strong><br><br>Потерян NFT: <strong>${this.playerNft.name}</strong>`;
+            if (window.collection && Array.isArray(window.collection)) {
+                const index = window.collection.findIndex(nft => nft.name === this.playerNft.name);
+                if (index !== -1) window.collection.splice(index, 1);
+            }
+        }
+
+        if (window.battleHistory && Array.isArray(window.battleHistory)) {
+            window.battleHistory.push({
+                playerNft: {...this.playerNft},
+                opponentNft: {...this.enemyNft},
+                won: playerWon,
+                timestamp: new Date().toISOString()
+            });
         }
         
+        if (window.updateUI) window.updateUI();
+        if (window.saveData) setTimeout(() => window.saveData(), 500);
+    }
+
+    attemptEscape() {
+        if (window.stars < 50) {
+            this.addBattleLog('Недостаточно звёзд для побега! (нужно 50)');
+            return;
+        }
+
+        window.stars -= 50;
+        this.addBattleLog('Вы сбежали из боя! Потеряно 50 звёзд.');
+
+        if (window.updateUI) window.updateUI();
+        if (window.saveData) window.saveData();
+
+        setTimeout(() => this.endBattle(), 1500);
+    }
+
+    endBattle() {
         const battleScreen = document.getElementById('battle-screen');
         if (battleScreen) {
-            battleScreen.style.display = 'none';
+            battleScreen.classList.remove('active');
         }
 
-        // Возвращаемся на главный экран
-        showScreen('main-screen', document.querySelector('.nav-item.active'));
+        const mainScreen = document.getElementById('main-screen');
+        if (mainScreen) {
+            mainScreen.classList.add('active');
+        }
+        
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => item.classList.remove('active'));
+        if (navItems[0]) navItems[0].classList.add('active');
 
-        console.log('✅ Возврат завершен');
+        if (window.renderCenterArea) window.renderCenterArea();
+        if (window.updateUI) window.updateUI();
     }
 }
 
-// Создаем глобальный экземпляр
 window.battleSystem = new UndertaleBattle();
-
-// Функция для запуска битвы
-window.startUndertaleBattle = function(playerNft, enemyNft) {
-    console.log('🚀 === ЗАПУСК UNDERTALE БИТВЫ ===');
-    
-    if (!playerNft || !enemyNft) {
-        console.error('❌ Отсутствуют данные NFT!');
-        alert('Ошибка: не выбран NFT для битвы!');
-        return false;
-    }
-    
-    const success = window.battleSystem.init(playerNft, enemyNft);
-    console.log(success ? '✅ Битва запущена!' : '❌ Ошибка запуска!');
-    return success;
-};
