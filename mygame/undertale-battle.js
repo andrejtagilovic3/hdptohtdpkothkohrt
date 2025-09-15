@@ -130,23 +130,25 @@ class UndertaleBattle {
         }
 
         const percent = Math.max(0, Math.min(100, (currentHP / maxHP) * 100));
-        
+    
+    // Добавь лог для отладки — проверь в консоли, вызывается ли для 'player-hp-bar'
         console.log(`🔧 Обновление ${barId}: ${currentHP}/${maxHP} = ${percent.toFixed(1)}%`);
 
-        // ИСПОЛЬЗУЕМ setAttribute для принудительной установки ширины
-        bar.setAttribute('style', `width: ${percent}% !important; transition: width 0.8s ease-out !important; height: 100% !important; background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%) !important; position: relative !important;`);
+    // Упрощаем: устанавливаем только ширину, остальное берём из CSS
+        bar.style.width = percent + '%';  // Без !important и перезаписи всего стиля
 
-        // Добавляем критический эффект
+    // Управляем критическим состоянием через класс (CSS сам обработает background и анимацию)
         if (currentHP <= 25) {
             bar.classList.add('critical');
-            bar.setAttribute('style', `width: ${percent}% !important; transition: width 0.8s ease-out !important; height: 100% !important; background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%) !important; position: relative !important; animation: newCriticalFlash 1s ease-in-out infinite !important;`);
         } else {
             bar.classList.remove('critical');
         }
 
-        // Force reflow
-        bar.offsetWidth;
-        
+    // Принудительный reflow для браузера (если анимация не срабатывает)
+        bar.offsetWidth;  // Это заставит браузер перерендерить элемент
+
+        return true;
+    }
         // Дополнительная проверка через 50мс
         setTimeout(() => {
             if (bar.style.width !== `${percent}%`) {
@@ -588,3 +590,4 @@ setTimeout(() => {
         console.error('🔴 ❌ Ошибка загрузки Battle System!');
     }
 }, 1000);
+
