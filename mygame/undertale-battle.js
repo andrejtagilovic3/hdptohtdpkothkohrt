@@ -1,4 +1,4 @@
-// ==================== UNDERTALE BATTLE SYSTEM (НОВАЯ HP СИСТЕМА) ====================
+// ==================== UNDERTALE BATTLE SYSTEM (ИСПРАВЛЕННАЯ HP СИСТЕМА) ====================
 
 class UndertaleBattle {
     constructor() {
@@ -12,6 +12,14 @@ class UndertaleBattle {
         this.enemyNft = null;
         this.battleLog = [];
         this.playerDodging = false;
+        
+        // ДОБАВЛЕНО: Дублируем состояние для надежности
+        this.gameState = {
+            playerHP: 100,
+            enemyHP: 100,
+            playerMaxHP: 100,
+            enemyMaxHP: 100
+        };
     }
 
     init(playerNft, enemyNft) {
@@ -27,6 +35,14 @@ class UndertaleBattle {
         this.currentTurn = 'player';
         this.battleLog = [];
         this.playerDodging = false;
+        
+        // Инициализируем дублированное состояние
+        this.gameState = {
+            playerHP: 100,
+            enemyHP: 100,
+            playerMaxHP: 100,
+            enemyMaxHP: 100
+        };
         
         this.createBattleUI();
         this.updateDisplay();
@@ -54,7 +70,7 @@ class UndertaleBattle {
 
                     <!-- HP врага - НОВАЯ СИСТЕМА -->
                     <div class="battle-hp-container enemy-hp-container">
-                        <div id="enemy-hp-bar" class="battle-hp-bar"></div>
+                        <div id="enemy-hp-bar" class="battle-hp-bar" style="width: 100%;"></div>
                     </div>
                     <div id="enemy-hp-text" class="battle-hp-text">100/100 HP</div>
                 </div>
@@ -86,7 +102,7 @@ class UndertaleBattle {
                                 <div id="player-nft-name" class="player-nft-name">NFT NAME</div>
                                 <!-- HP игрока - НОВАЯ СИСТЕМА -->
                                 <div class="battle-hp-container player-hp-container">
-                                    <div id="player-hp-bar" class="battle-hp-bar"></div>
+                                    <div id="player-hp-bar" class="battle-hp-bar" style="width: 100%;"></div>
                                 </div>
                             </div>
                             <div id="player-hp-text" class="player-hp-text">100/100 HP</div>
@@ -121,7 +137,7 @@ class UndertaleBattle {
         console.log('✅ UI создан');
     }
 
-    // === НОВЫЙ МЕТОД ОБНОВЛЕНИЯ HP БАРОВ ===
+    // === НОВЫЙ УПРОЩЕННЫЙ МЕТОД ОБНОВЛЕНИЯ HP БАРОВ ===
     updateHPBar(barId, currentHP, maxHP) {
         const bar = document.getElementById(barId);
         if (!bar) {
@@ -133,29 +149,20 @@ class UndertaleBattle {
         
         console.log(`🔧 Обновление ${barId}: ${currentHP}/${maxHP} = ${percent.toFixed(1)}%`);
 
-        // ИСПОЛЬЗУЕМ setAttribute для принудительной установки ширины
-        bar.setAttribute('style', `width: ${percent}% !important; transition: width 0.8s ease-out !important; height: 100% !important; background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%) !important; position: relative !important;`);
-
-        // Добавляем критический эффект
+        // ПРОСТОЕ И НАДЕЖНОЕ ОБНОВЛЕНИЕ
+        bar.style.width = percent + '%';
+        bar.style.transition = 'width 0.8s ease-out';
+        bar.style.height = '100%';
+        
         if (currentHP <= 25) {
-            bar.classList.add('critical');
-            bar.setAttribute('style', `width: ${percent}% !important; transition: width 0.8s ease-out !important; height: 100% !important; background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%) !important; position: relative !important; animation: newCriticalFlash 1s ease-in-out infinite !important;`);
+            bar.style.background = 'linear-gradient(90deg, #ff1744 0%, #d32f2f 100%)';
+            bar.style.animation = 'newCriticalFlash 1s ease-in-out infinite';
         } else {
-            bar.classList.remove('critical');
+            bar.style.background = 'linear-gradient(90deg, #d32f2f 0%, #f44336 100%)';
+            bar.style.animation = 'none';
         }
 
-        // Force reflow
-        bar.offsetWidth;
-        
-        // Дополнительная проверка через 50мс
-        setTimeout(() => {
-            if (bar.style.width !== `${percent}%`) {
-                console.warn(`⚠️ Дополнительное обновление ${barId}`);
-                bar.setAttribute('style', `width: ${percent}% !important; transition: width 0.8s ease-out !important; height: 100% !important; background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%) !important; position: relative !important;`);
-                bar.offsetWidth;
-            }
-        }, 50);
-
+        console.log(`✅ ${barId} обновлен: ширина = ${bar.style.width}`);
         return true;
     }
 
@@ -181,7 +188,7 @@ class UndertaleBattle {
             playerNftName.textContent = this.playerNft.name;
         }
 
-        // === ОБНОВЛЯЕМ HP БАРЫ НОВЫМ МЕТОДОМ ===
+        // === ОБНОВЛЯЕМ HP БАРЫ ===
         this.updateHPBar('player-hp-bar', this.playerHP, this.playerMaxHP);
         this.updateHPBar('enemy-hp-bar', this.enemyHP, this.enemyMaxHP);
 
@@ -276,6 +283,7 @@ class UndertaleBattle {
             
             this.enemyHP -= damage;
             this.enemyHP = Math.max(0, this.enemyHP);
+            this.gameState.enemyHP = this.enemyHP; // Синхронизация
             
             document.getElementById('enemy-battle-img').classList.add('battle-shake');
             setTimeout(() => {
@@ -315,13 +323,17 @@ class UndertaleBattle {
         }, 1500);
     }
 
+    // === ИСПРАВЛЕННЫЙ enemyTurn() ===
     enemyTurn() {
         if (this.currentTurn !== 'enemy' || !this.battleActive) {
             console.log('❌ Ход врага заблокирован');
             return;
         }
 
-        console.log('👹 Ход врага!');
+        console.log('=== НАЧАЛО ХОДА ВРАГА ===');
+        console.log('👹 HP игрока ДО атаки:', this.playerHP);
+        console.log('👹 Состояние dodging:', this.playerDodging);
+        
         this.addBattleLog('Враг атакует!');
 
         let damage = Math.floor(Math.random() * 22) + 12;
@@ -345,6 +357,10 @@ class UndertaleBattle {
 
         const playerDodged = Math.random() < playerDodgeChance;
 
+        console.log('💀 Рассчитанный урон:', damage);
+        console.log('💀 Шанс уклонения:', playerDodgeChance);
+        console.log('💀 Игрок уклонился?', playerDodged);
+
         if (playerDodged) {
             this.addBattleLog('Вы уклонились от атаки!');
             this.showDamageEffect(document.getElementById('player-battle-img'), 'МИМО', false);
@@ -358,10 +374,23 @@ class UndertaleBattle {
                 this.showDamageEffect(document.getElementById('player-battle-img'), Math.round(damage), false);
             }
             
-            this.playerHP -= damage;
-            this.playerHP = Math.max(0, this.playerHP);
+            // === ИСПРАВЛЕННОЕ ПРИМЕНЕНИЕ УРОНА ===
+            console.log('💔 ПРИМЕНЯЕМ УРОН. ДО:', this.playerHP);
+            const oldHP = this.playerHP;
             
-            console.log('💔 Урон игроку:', damage, 'Осталось HP:', this.playerHP);
+            // Обновляем и основную переменную, и дублирующую
+            this.playerHP = Math.max(0, this.playerHP - damage);
+            this.gameState.playerHP = this.playerHP;
+            
+            console.log('💔 ПОСЛЕ применения урона:', this.playerHP);
+            console.log('💔 В gameState:', this.gameState.playerHP);
+            console.log('💔 Урон нанесен:', oldHP - this.playerHP);
+            
+            // ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ HP БАРА
+            setTimeout(() => {
+                console.log('🔧 ПРИНУДИТЕЛЬНОЕ обновление HP бара игрока');
+                this.forceUpdatePlayerHP(this.playerHP);
+            }, 100);
             
             document.getElementById('player-battle-img').classList.add('battle-shake');
             setTimeout(() => {
@@ -370,9 +399,17 @@ class UndertaleBattle {
             }, 500);
         }
 
+        console.log('=== КОНЕЦ РАСЧЕТА УРОНА ===');
+        console.log('👹 Финальное HP игрока:', this.playerHP);
+
         this.playerDodging = false;
-        this.updateDisplay();
-        this.checkBattleEnd();
+        
+        // Обновляем дисплей с задержкой для надежности
+        setTimeout(() => {
+            this.updateDisplay();
+            this.checkBattleEnd();
+            console.log('🔄 Display обновлен, HP игрока:', this.playerHP);
+        }, 200);
 
         if (this.battleActive) {
             this.currentTurn = 'player';
@@ -380,6 +417,39 @@ class UndertaleBattle {
                 this.showPlayerActions();
                 this.addBattleLog('Ваш ход!');
             }, 1800);
+        }
+    }
+
+    // === ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ HP (экстренный метод) ===
+    forceUpdatePlayerHP(newHP) {
+        console.log('🚨 ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ HP игрока:', newHP);
+        
+        // Обновляем все переменные
+        this.playerHP = newHP;
+        this.gameState.playerHP = newHP;
+        
+        // Принудительно обновляем бар и текст
+        const bar = document.getElementById('player-hp-bar');
+        const text = document.getElementById('player-hp-text');
+        
+        if (bar) {
+            const percent = Math.max(0, (newHP / this.playerMaxHP) * 100);
+            bar.style.width = percent + '%';
+            
+            if (newHP <= 25) {
+                bar.style.background = 'linear-gradient(90deg, #ff1744 0%, #d32f2f 100%)';
+                bar.style.animation = 'newCriticalFlash 1s ease-in-out infinite';
+            } else {
+                bar.style.background = 'linear-gradient(90deg, #d32f2f 0%, #f44336 100%)';
+                bar.style.animation = 'none';
+            }
+            
+            console.log('🚨 Бар обновлен принудительно, ширина:', bar.style.width);
+        }
+        
+        if (text) {
+            text.textContent = `${Math.round(newHP)}/${this.playerMaxHP} HP`;
+            console.log('🚨 Текст обновлен принудительно:', text.textContent);
         }
     }
 
@@ -401,6 +471,8 @@ class UndertaleBattle {
     }
 
     checkBattleEnd() {
+        console.log('🏁 Проверка конца битвы. Игрок HP:', this.playerHP, 'Враг HP:', this.enemyHP);
+        
         if (this.playerHP <= 0) {
             console.log('💀 Игрок проиграл');
             this.battleActive = false;
