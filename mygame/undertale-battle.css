@@ -76,10 +76,10 @@
     letter-spacing: 1px;
 }
 
-/* HP бары (ОБЩИЕ ДЛЯ ВРАГА И ИГРОКА) */
+/* HP бары (ОБЩИЕ ДЛЯ ВРАГА И ИГРОКА, УНИФИЦИРОВАННЫЕ) */
 .hp-container,
 .player-hp-container {
-    background: #000000; /* Черный фон чтобы видеть изменения красного HP */
+    background: #000000; /* Черный фон для контраста */
     border: 3px solid #666666;
     border-radius: 10px;
     overflow: hidden;
@@ -95,13 +95,13 @@
 .player-hp-container {
     width: 120px;
     height: 20px;
-    margin: 8px 0 4px 0; /* Отступы для выравнивания в player-area */
+    margin: 8px 0 4px 0; /* Отступы для выравнивания */
 }
 
 .hp-bar {
     height: 100%;
-    background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%); /* Стандартный красный */
-    width: 100%; /* Изначально полная, БЕЗ !important */
+    background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%); /* Стандартный градиент */
+    width: 100%; /* Изначально полная, без !important */
     transition: width 0.8s ease-out;
     position: relative;
 }
