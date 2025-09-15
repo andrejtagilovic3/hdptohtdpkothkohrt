@@ -154,12 +154,12 @@ class UndertaleBattle {
         const enemyHPText = document.getElementById('enemy-hp-text');
 
         // Для игрока
+// Для игрока
         if (playerHPBar) {
-            // ИСПРАВЛЕНИЕ: Устанавливаем стили отдельно, без !important и cssText, чтобы избежать конфликтов
-            playerHPBar.style.width = `${playerHPPercent}%`;
-            playerHPBar.style.transition = 'width 0.8s ease-out';
-            
-            // Force repaint для браузера (хак, чтобы transition всегда срабатывал)
+    // ИСПРАВЛЕНИЕ: Принудительно устанавливаем width с !important через cssText
+            playerHPBar.style.cssText = `width: ${playerHPPercent}% !important; transition: width 0.8s ease-out !important;`;
+    
+    // Force repaint для браузера
             playerHPBar.offsetWidth; // Это заставляет reflow
             
             console.log('✅ Обновлен HP бар игрока:', playerHPPercent + '%');
@@ -175,11 +175,11 @@ class UndertaleBattle {
         }
 
         // Для врага (аналогично)
+// Для врага (аналогично)
         if (enemyHPBar) {
-            enemyHPBar.style.width = `${enemyHPPercent}%`;
-            enemyHPBar.style.transition = 'width 0.8s ease-out';
-            
-            // Force repaint
+            enemyHPBar.style.cssText = `width: ${enemyHPPercent}% !important; transition: width 0.8s ease-out !important;`;
+    
+    // Force repaint
             enemyHPBar.offsetWidth;
             
             console.log('✅ Обновлен HP бар врага:', enemyHPPercent + '%');
@@ -212,8 +212,7 @@ class UndertaleBattle {
                 console.log('🔍 Проверка игрока через 100мс:', playerBar.style.width);
                 if (!playerBar.style.width || playerBar.style.width === '100%') {
                     console.log('⚠️ HP бар игрока не обновился, принудительное обновление!');
-                    playerBar.style.width = playerHPPercent + '%';
-                    playerBar.style.transition = 'width 0.8s ease-out';
+                    playerBar.style.cssText = `width: ${playerHPPercent}% !important; transition: width 0.8s ease-out !important;`;
                     playerBar.offsetWidth; // Force repaint снова
                 }
             }
@@ -222,8 +221,7 @@ class UndertaleBattle {
                 console.log('🔍 Проверка врага через 100мс:', enemyBar.style.width);
                 if (!enemyBar.style.width || enemyBar.style.width === '100%') {
                     console.log('⚠️ HP бар врага не обновился, принудительное обновление!');
-                    enemyBar.style.width = enemyHPPercent + '%';
-                    enemyBar.style.transition = 'width 0.8s ease-out';
+                    enemyBar.style.cssText = `width: ${enemyHPPercent}% !important; transition: width 0.8s ease-out !important;`;
                     enemyBar.offsetWidth;
                 }
             }
@@ -618,3 +616,4 @@ setTimeout(() => {
         console.error('🔴 ❌ Ошибка загрузки Battle System!');
     }
 }, 1000);
+
