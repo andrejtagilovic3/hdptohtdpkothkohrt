@@ -1105,3 +1105,14 @@ function renderUpgradeScreen() {
 // Добавьте эту функцию в конец файла script.js
 
 // Добавьте эту функцию в конец файла script.js
+function setPlayerHp(current, max) {
+    const percent = Math.max(0, (current / max) * 100);
+    playerHpBar.style.width = percent + "%";
+    playerHpText.textContent = `${current}/${max} HP`;
+}
+
+function setBotHp(current, max) {
+    const percent = Math.max(0, (current / max) * 100);
+    botHpBar.style.width = percent + "%";
+    botHpText.textContent = `${current}/${max} HP`;
+}
