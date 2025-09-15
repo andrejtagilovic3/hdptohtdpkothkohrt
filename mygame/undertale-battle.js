@@ -1,4 +1,4 @@
-// ==================== UNDERTALE BATTLE SYSTEM (ИСПРАВЛЕННАЯ ВЕРСИЯ #2) ====================
+// ==================== UNDERTALE BATTLE SYSTEM (ИСПРАВЛЕННАЯ HP СИСТЕМА) ====================
 
 class UndertaleBattle {
     constructor() {
@@ -13,7 +13,7 @@ class UndertaleBattle {
         this.battleLog = [];
         this.playerDodging = false;
         
-        // Дублируем состояние для надежности, как и в предыдущей версии
+        // ДОБАВЛЕНО: Дублируем состояние для надежности
         this.gameState = {
             playerHP: 100,
             enemyHP: 100,
@@ -36,6 +36,7 @@ class UndertaleBattle {
         this.battleLog = [];
         this.playerDodging = false;
         
+        // Инициализируем дублированное состояние
         this.gameState = {
             playerHP: 100,
             enemyHP: 100,
@@ -52,6 +53,7 @@ class UndertaleBattle {
     }
 
     createBattleUI() {
+        // Удаляем старый интерфейс если есть
         const existing = document.getElementById('undertale-battle-container');
         if (existing) existing.remove();
 
@@ -125,10 +127,39 @@ class UndertaleBattle {
         console.log('✅ UI создан');
     }
 
-    // === ОБНОВЛЁННЫЙ МЕТОД ОБНОВЛЕНИЯ ДИСПЛЕЯ ===
+    // === НОВЫЙ УПРОЩЕННЫЙ МЕТОД ОБНОВЛЕНИЯ HP БАРОВ ===
+    updateHPBar(barId, currentHP, maxHP) {
+        const bar = document.getElementById(barId);
+        if (!bar) {
+            console.error(`❌ HP бар ${barId} не найден`);
+            return false;
+        }
+
+        const percent = Math.max(0, Math.min(100, (currentHP / maxHP) * 100));
+        
+        console.log(`🔧 Обновление ${barId}: ${currentHP}/${maxHP} = ${percent.toFixed(1)}%`);
+
+        // ПРОСТОЕ И НАДЕЖНОЕ ОБНОВЛЕНИЕ
+        bar.style.width = percent + '%';
+        bar.style.transition = 'width 0.8s ease-out';
+        bar.style.height = '100%';
+        
+        if (currentHP <= 25) {
+            bar.style.background = 'linear-gradient(90deg, #ff1744 0%, #d32f2f 100%)';
+            bar.style.animation = 'newCriticalFlash 1s ease-in-out infinite';
+        } else {
+            bar.style.background = 'linear-gradient(90deg, #d32f2f 0%, #f44336 100%)';
+            bar.style.animation = 'none';
+        }
+
+        console.log(`✅ ${barId} обновлен: ширина = ${bar.style.width}`);
+        return true;
+    }
+
     updateDisplay() {
         console.log('🔄 Обновление отображения. Игрок HP:', this.playerHP, 'Враг HP:', this.enemyHP);
         
+        // Обновляем изображения и названия
         const playerImg = document.getElementById('player-battle-img');
         const enemyImg = document.getElementById('enemy-battle-img');
         const enemyName = document.getElementById('enemy-name');
@@ -147,18 +178,11 @@ class UndertaleBattle {
             playerNftName.textContent = this.playerNft.name;
         }
 
-        // === ИСПОЛЬЗУЕМ СУЩЕСТВУЮЩУЮ ФУНКЦИЮ ИЗ ui-animations.js ===
-        // Убрали дублирующую логику
-        if (typeof window.animateHPChange === 'function') {
-            window.animateHPChange('player-hp-bar', this.playerHP, this.playerMaxHP);
-            window.animateHPChange('enemy-hp-bar', this.enemyHP, this.enemyMaxHP);
-        } else {
-            // Запасной вариант, если функция не найдена
-            console.warn('⚠️ animateHPChange не найден, используя простой метод обновления');
-            document.getElementById('player-hp-bar').style.width = `${(this.playerHP / this.playerMaxHP) * 100}%`;
-            document.getElementById('enemy-hp-bar').style.width = `${(this.enemyHP / this.enemyMaxHP) * 100}%`;
-        }
+        // === ОБНОВЛЯЕМ HP БАРЫ ===
+        this.updateHPBar('player-hp-bar', this.playerHP, this.playerMaxHP);
+        this.updateHPBar('enemy-hp-bar', this.enemyHP, this.enemyMaxHP);
 
+        // Обновляем текст HP
         const playerHPText = document.getElementById('player-hp-text');
         const enemyHPText = document.getElementById('enemy-hp-text');
 
@@ -179,11 +203,13 @@ class UndertaleBattle {
 
         this.battleLog.push(message);
 
+        // Показываем только последние 5 сообщений
         const recentLogs = this.battleLog.slice(-5);
         logContainer.innerHTML = recentLogs
             .map(log => `<div style="margin-bottom: 4px; padding: 2px 0;">• ${log}</div>`)
             .join('');
         
+        // Прокручиваем вниз
         logContainer.scrollTop = logContainer.scrollHeight;
         
         console.log('📝 Лог добавлен:', message);
@@ -219,6 +245,7 @@ class UndertaleBattle {
         let isCrit = Math.random() < 0.15;
         const enemyDodge = Math.random() < 0.08;
 
+        // Применяем апгрейды игрока
         if (this.playerNft.upgrades) {
             if (this.playerNft.upgrades.damage) {
                 damage *= this.playerNft.upgrades.damage;
@@ -246,7 +273,7 @@ class UndertaleBattle {
             
             this.enemyHP -= damage;
             this.enemyHP = Math.max(0, this.enemyHP);
-            this.gameState.enemyHP = this.enemyHP;
+            this.gameState.enemyHP = this.enemyHP; // Синхронизация
             
             document.getElementById('enemy-battle-img').classList.add('battle-shake');
             setTimeout(() => {
@@ -286,6 +313,7 @@ class UndertaleBattle {
         }, 1500);
     }
 
+    // === ИСПРАВЛЕННЫЙ enemyTurn() ===
     enemyTurn() {
         if (this.currentTurn !== 'enemy' || !this.battleActive) {
             console.log('❌ Ход врага заблокирован');
@@ -301,15 +329,18 @@ class UndertaleBattle {
         let damage = Math.floor(Math.random() * 22) + 12;
         const isCrit = Math.random() < 0.12;
 
+        // Применяем апгрейды врага
         if (this.enemyNft.upgrades && this.enemyNft.upgrades.damage) {
             damage *= this.enemyNft.upgrades.damage;
         }
 
+        // Проверяем уклонение игрока
         let playerDodgeChance = 0.06;
         if (this.playerNft.upgrades && this.playerNft.upgrades.dodge) {
             playerDodgeChance *= this.playerNft.upgrades.dodge;
         }
 
+        // Если игрок использовал уклонение
         if (this.playerDodging) {
             playerDodgeChance += 0.35;
         }
@@ -333,8 +364,9 @@ class UndertaleBattle {
                 this.showDamageEffect(document.getElementById('player-battle-img'), Math.round(damage), false);
             }
             
+            // === ПРИМЕНЕНИЕ УРОНА ===
             this.playerHP = Math.max(0, this.playerHP - damage);
-            this.gameState.playerHP = this.playerHP;
+            this.gameState.playerHP = this.playerHP; // Синхронизация gameState
             
             document.getElementById('player-battle-img').classList.add('battle-shake');
             setTimeout(() => {
@@ -361,6 +393,39 @@ class UndertaleBattle {
                 this.showPlayerActions();
                 this.addBattleLog('Ваш ход!');
             }, 1800);
+        }
+    }
+
+    // === ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ HP (экстренный метод) ===
+    forceUpdatePlayerHP(newHP) {
+        console.log('🚨 ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ HP игрока:', newHP);
+        
+        // Обновляем все переменные
+        this.playerHP = newHP;
+        this.gameState.playerHP = newHP;
+        
+        // Принудительно обновляем бар и текст
+        const bar = document.getElementById('player-hp-bar');
+        const text = document.getElementById('player-hp-text');
+        
+        if (bar) {
+            const percent = Math.max(0, (newHP / this.playerMaxHP) * 100);
+            bar.style.width = percent + '%';
+            
+            if (newHP <= 25) {
+                bar.style.background = 'linear-gradient(90deg, #ff1744 0%, #d32f2f 100%)';
+                bar.style.animation = 'newCriticalFlash 1s ease-in-out infinite';
+            } else {
+                bar.style.background = 'linear-gradient(90deg, #d32f2f 0%, #f44336 100%)';
+                bar.style.animation = 'none';
+            }
+            
+            console.log('🚨 Бар обновлен принудительно, ширина:', bar.style.width);
+        }
+        
+        if (text) {
+            text.textContent = `${Math.round(newHP)}/${this.playerMaxHP} HP`;
+            console.log('🚨 Текст обновлен принудительно:', text.textContent);
         }
     }
 
@@ -414,6 +479,7 @@ class UndertaleBattle {
                 <em>NFT добавлен в вашу коллекцию</em>
             `;
 
+            // Добавляем NFT в коллекцию
             if (window.collection && Array.isArray(window.collection)) {
                 const newNft = {
                     ...this.enemyNft, 
@@ -434,6 +500,7 @@ class UndertaleBattle {
                 <em>NFT удален из коллекции</em>
             `;
 
+            // Удаляем NFT из коллекции
             if (window.collection && Array.isArray(window.collection)) {
                 const index = window.collection.findIndex(nft => 
                     nft.name === this.playerNft.name && 
@@ -446,6 +513,7 @@ class UndertaleBattle {
                     console.log('❌ NFT удален из коллекции:', this.playerNft.name);
                     console.log('📊 Размер коллекции:', window.collection.length);
                     
+                    // Сбрасываем активный NFT
                     if (window.activeBattleNft) {
                         window.activeBattleNft = null;
                     }
@@ -455,6 +523,7 @@ class UndertaleBattle {
             }
         }
 
+        // Добавляем в историю битв
         if (window.battleHistory && Array.isArray(window.battleHistory)) {
             window.battleHistory.push({
                 playerNft: {...this.playerNft},
@@ -466,6 +535,7 @@ class UndertaleBattle {
 
         resultOverlay.style.display = 'flex';
 
+        // Обновляем UI и сохраняем
         if (window.updateUI) {
             window.updateUI();
         }
@@ -505,6 +575,7 @@ class UndertaleBattle {
             console.log('🗑️ Интерфейс битвы удален');
         }
 
+        // Возврат в главное меню
         const screens = document.querySelectorAll('.screen');
         screens.forEach(s => s.classList.remove('active'));
         
@@ -514,12 +585,14 @@ class UndertaleBattle {
             console.log('🏠 Возврат в главное меню');
         }
 
+        // Обновляем навигацию
         const navItems = document.querySelectorAll('.nav-item');
         navItems.forEach(item => item.classList.remove('active'));
         if (navItems[0]) {
             navItems[0].classList.add('active');
         }
 
+        // Обновляем отображение
         if (window.renderCenterArea) {
             window.renderCenterArea();
             console.log('🖼️ Центральная область обновлена');
@@ -533,8 +606,10 @@ class UndertaleBattle {
     }
 }
 
+// Создаем глобальный экземпляр
 window.battleSystem = new UndertaleBattle();
 
+// Функция для запуска битвы
 window.startUndertaleBattle = function(playerNft, enemyNft) {
     console.log('🚀 === ЗАПУСК UNDERTALE БИТВЫ ===');
     
@@ -549,6 +624,7 @@ window.startUndertaleBattle = function(playerNft, enemyNft) {
     return success;
 };
 
+// Проверки загрузки
 document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ Undertale Battle System загружен!');
 });
