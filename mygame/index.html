@@ -32,158 +32,89 @@
             <div id="main-screen" class="screen active">
                 <div class="main-content">
                     <div class="how-to-play-container">
-                        <button class="how-to-play-btn" onclick="showRules()">? Как играть</button>
+                        <button class="how-to-play-btn" onclick="showHowToPlay()">Как играть?</button>
                     </div>
-                    <div id="center-area" class="center-area">
-                        <div id="center-content"></div>
+                    <div class="center-area">
+                        <div class="center-logo">✧</div>
+                        <div class="center-message" id="center-message">Нажмите на кнопку ниже, чтобы начать поиск врага.</div>
+                        <button class="play-btn pulsing" onclick="startBattleSearch()">
+                            <i class="fas fa-bolt"></i> Найти врага
+                        </button>
                     </div>
-                    <button class="play-btn" id="play-button" onclick="startBattleSearch()">ДУЭЛЬ</button>
                 </div>
             </div>
 
             <div id="collection-screen" class="screen">
-                <div class="main-content">
-                    <h2 class="section-title">Коллекция</h2>
-                    <div id="collection-grid" class="nft-grid"></div>
-                    <button class="play-btn" onclick="openShop()" style="margin-top: 20px;">
-                        Купить NFT
-                    </button>
+                <div class="screen-header">
+                    <h2>Моя коллекция</h2>
                 </div>
+                <div class="nft-filters">
+                    <div class="filter-group">
+                        <button class="filter-btn active" data-filter="all">Все</button>
+                        <button class="filter-btn" data-filter="basic">Basic</button>
+                        <button class="filter-btn" data-filter="premium">Premium</button>
+                    </div>
+                    <div class="dropdown-filter">
+                        <button class="dropdown-btn"><i class="fas fa-sort"></i> Сортировка</button>
+                        <div class="dropdown-menu">
+                            <a href="#" data-sort="newest">Новые</a>
+                            <a href="#" data-sort="oldest">Старые</a>
+                        </div>
+                    </div>
+                </div>
+                <div id="nft-grid" class="nft-grid"></div>
             </div>
 
             <div id="shop-screen" class="screen">
-                <div class="main-content">
-                    <div class="shop-header">
-                        <h2 class="section-title">Магазин NFT</h2>
-                        <div class="filter-container">
-                            <button class="filter-btn" id="filter-btn" onclick="toggleFilter()">
-                                <i class="fas fa-dollar-sign"></i>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="filter-dropdown" id="filter-dropdown" style="display: none;">
-                                <div class="filter-option active" onclick="setFilter('price_asc')">
-                                    <i class="fas fa-arrow-up"></i>
-                                    <span>Цена: по возрастанию</span>
-                                </div>
-                                <div class="filter-option" onclick="setFilter('price_desc')">
-                                    <i class="fas fa-arrow-down"></i>
-                                    <span>Цена: по убыванию</span>
-                                </div>
-                                <div class="filter-option" onclick="setFilter('popularity')">
-                                    <i class="fas fa-fire"></i>
-                                    <span>По популярности</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="shop-grid" class="nft-grid"></div>
+                <div class="screen-header">
+                    <h2>Магазин</h2>
                 </div>
-            </div>
-
-            <div id="battle-screen" class="screen">
-                <div class="main-content">
-                    <div class="undertale-battle-container" id="undertale-battle-container">
-                        <div class="enemy-battle-area">
-                            <button class="escape-btn" onclick="battleSystem.attemptEscape()">
-                                Сбежать (50⭐)
-                            </button>
-                            <img id="enemy-battle-img" class="enemy-battle-img" alt="Enemy NFT">
-                            <div id="enemy-name" class="enemy-name">ВРАГ</div>
-                            <div class="hp-container">
-                                <div id="enemy-hp-bar" class="hp-bar" style="width: 100%;"></div>
-                            </div>
-                            <div id="enemy-hp-text" class="hp-text">100/100 HP</div>
-                        </div>
-                        <div class="battle-bottom-area">
-                            <div id="battle-log-container" class="battle-log-container"></div>
-                            <div class="battle-actions-area">
-                                <div class="battle-buttons">
-                                    <button id="attack-btn" class="battle-action-btn" onclick="battleSystem.playerAttack()">
-                                        <i class="fas fa-sword"></i>
-                                        АТАКА
-                                    </button>
-                                    <button id="dodge-btn" class="battle-action-btn" onclick="battleSystem.playerDodge()">
-                                        <i class="fas fa-running"></i>
-                                        УВЕРНУТЬСЯ
-                                    </button>
-                                </div>
-                                <div class="player-battle-area">
-                                    <img id="player-battle-img" class="player-battle-img" alt="Player NFT">
-                                    <div>
-                                        <div class="player-name">ВЫ</div>
-                                        <div id="player-nft-name" class="player-nft-name">NFT NAME</div>
-                                        <div class="player-hp-container">
-                                            <div id="player-hp-bar" class="hp-bar" style="width: 100%;"></div>
-                                        </div>
-                                    </div>
-                                    <div id="player-hp-text" class="player-hp-text">100/100 HP</div>
-                                </div>
-                                <div class="battle-buttons">
-                                    <div style="flex: 1; opacity: 0.3; background: #1a1a1a; border: 2px dashed #333333; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #666666; font-size: 12px;">
-                                        Ресерв
-                                    </div>
-                                    <div style="flex: 1; opacity: 0.3; background: #1a1a1a; border: 2px dashed #333333; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #666666; font-size: 12px;">
-                                        Ресерв
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="battle-result-overlay" class="battle-result-overlay" style="display: none;">
-                            <div class="battle-result-modal">
-                                <div id="result-title" class="result-title"></div>
-                                <div id="result-details" class="result-details"></div>
-                                <button class="result-back-btn" onclick="battleSystem.endBattle()">
-                                    Вернуться в меню
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="profile-screen" class="screen">
-                <div class="main-content">
-                    <h2 class="section-title">Мой профиль</h2>
-                    <div class="profile-header">
-                        <div class="profile-avatar" id="profile-avatar">👤</div>
-                        <div class="profile-info">
-                            <div class="profile-name" id="profile-name">Игрок</div>
-                            <div class="profile-stats">
-                                <div class="stat-item">
-                                    <i class="fas fa-star" style="color: #ffd700;"></i>
-                                    <span id="profile-stars-earned">0</span>
-                                </div>
-                                <div class="stat-item">
-                                    <i class="fas fa-certificate" style="color: #1a472a;"></i>
-                                    <span id="profile-nft-count">0</span> NFT
-                                </div>
-                                <div class="stat-item">
-                                    <i class="fas fa-medal" style="color: #666666;"></i>
-                                    <span id="profile-battles-count">0</span> битв
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="profile-details">
-                        <div class="profile-section">
-                            <h3 class="profile-subtitle">Мои NFT для апгрейда</h3>
-                            <div id="upgradable-nft-grid" class="nft-grid"></div>
-                        </div>
-                    </div>
-                </div>
+                <div id="shop-grid" class="shop-grid"></div>
             </div>
 
             <div id="upgrade-screen" class="screen">
-                <div class="main-content">
-                    <h2 class="section-title">Апгрейд NFT</h2>
-                    <div class="upgrade-info-container">
-                        <div class="upgrade-preview">
-                            <img id="upgrade-nft-img" src="" alt="NFT">
+                <div class="screen-header">
+                    <h2>Апгрейд</h2>
+                </div>
+                <div id="upgradable-nft-grid" class="nft-grid"></div>
+            </div>
+
+            <div id="profile-screen" class="screen">
+                <div class="screen-header">
+                    <h2>Профиль</h2>
+                </div>
+                <div id="profile-content"></div>
+            </div>
+
+            <div id="battle-screen" class="undertale-battle-container screen" style="display: none;">
+                <div class="enemy-battle-area">
+                    <div class="escape-btn" onclick="battleSystem.attemptEscape()">
+                        <i class="fas fa-running"></i>
+                    </div>
+                    <img id="enemy-battle-img" src="" alt="Enemy" class="enemy-battle-img">
+                    <div class="enemy-stats">
+                        <div class="enemy-name" id="enemy-battle-name"></div>
+                        <div class="hp-container">
+                            <div class="hp-bar" id="enemy-hp-bar"></div>
                         </div>
-                        <div class="upgrade-types">
-                            <h4>Выберите тип апгрейда:</h4>
-                            <div id="upgrade-options" class="upgrade-options-grid"></div>
+                    </div>
+                </div>
+                <div class="battle-bottom-area">
+                    <div class="battle-actions-area">
+                        <div class="player-battle-area">
+                            <img id="player-battle-img" src="" alt="Player" class="player-battle-img">
+                            <div class="player-stats">
+                                <div class="player-nft-name" id="player-battle-name"></div>
+                                <div class="player-hp-container">
+                                    <div class="player-hp-bar" id="player-hp-bar"></div>
+                                </div>
+                            </div>
                         </div>
+                        <div class="battle-buttons" id="battle-buttons-area">
+                            </div>
+                    </div>
+                    <div class="battle-log" id="battle-log-area">
+                        <div id="battle-log"></div>
                     </div>
                 </div>
             </div>
