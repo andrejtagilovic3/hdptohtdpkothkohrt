@@ -76,33 +76,32 @@
     letter-spacing: 1px;
 }
 
-/* HP бары */
-.hp-container {
-    background: #000000; /* Черный фон чтобы видеть изменения красного HP */
-    border: 3px solid #666666;
-    border-radius: 10px;
-    width: 250px;
-    height: 24px;
-    overflow: hidden;
-    margin-bottom: 10px;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
+/* HP бары (ОБЩИЕ ДЛЯ ВРАГА И ИГРОКА) */
+.hp-container,
 .player-hp-container {
     background: #000000; /* Черный фон чтобы видеть изменения красного HP */
     border: 3px solid #666666;
     border-radius: 10px;
-    width: 120px; /* Меньше, чем у врага */
-    height: 20px;
     overflow: hidden;
-    margin: 8px 0 4px 0;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+    margin-bottom: 10px;
+}
+
+.hp-container {
+    width: 250px;
+    height: 24px;
+}
+
+.player-hp-container {
+    width: 120px;
+    height: 20px;
+    margin: 8px 0 4px 0; /* Отступы для выравнивания в player-area */
 }
 
 .hp-bar {
     height: 100%;
-    background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%); /* Красный цвет для HP */
-    width: 100%; /* Изначально полная ширина, БЕЗ !important */
+    background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%); /* Стандартный красный */
+    width: 100%; /* Изначально полная, БЕЗ !important */
     transition: width 0.8s ease-out;
     position: relative;
 }
@@ -222,31 +221,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-.player-hp-container .hp-bar {
-    height: 100%;
-    background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%);
-    width: 100%; /* БЕЗ !important, чтобы JS мог менять */
-    transition: width 0.8s ease-out;
-    position: relative;
-}
-
-.player-hp-container .hp-bar.critical {
-    background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%);
-    animation: playerCriticalFlash 1s ease-in-out infinite;
-}
-
-/* Дублируем анимацию для игрока */
-@keyframes playerCriticalFlash {
-    0%, 100% { 
-        opacity: 1; 
-        background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%);
-    }
-    50% { 
-        opacity: 0.7; 
-        background: linear-gradient(90deg, #d32f2f 0%, #b71c1c 100%);
-    }
 }
 
 .player-hp-text {
