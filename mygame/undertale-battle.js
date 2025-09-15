@@ -1,4 +1,4 @@
-// ==================== UNDERTALE BATTLE SYSTEM (ИСПРАВЛЕННАЯ HP СИСТЕМА) ====================
+// ==================== UNDERTALE BATTLE SYSTEM (ОБНОВЛЁННАЯ HP СИСТЕМА) ====================
 
 class UndertaleBattle {
     constructor() {
@@ -83,35 +83,38 @@ class UndertaleBattle {
                             </div>
                             <div id="player-hp-text" class="player-hp-text">100/100 HP</div>
                         </div>
-
-                        <div class="battle-buttons">
-                            <div style="flex: 1; opacity: 0.3; background: #1a1a1a; border: 2px dashed #333333; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #666666; font-size: 12px;">
-                                Резерв
-                            </div>
-                            <div style="flex: 1; opacity: 0.3; background: #1a1a1a; border: 2px dashed #333333; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #666666; font-size: 12px;">
-                                Резерв
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="battle-result-overlay" class="battle-result-overlay" style="display: none;">
-                    <div class="battle-result-modal">
-                        <div id="result-title" class="result-title"></div>
-                        <div id="result-details" class="result-details"></div>
-                        <button class="result-back-btn" onclick="battleSystem.endBattle()">
-                            Вернуться в меню
-                        </button>
                     </div>
                 </div>
             </div>
         `;
-
         document.body.insertAdjacentHTML('beforeend', battleHTML);
-        console.log('✅ UI создан');
+
+        // Устанавливаем изображения
+        document.getElementById('enemy-battle-img').src = this.enemyNft.img;
+        document.getElementById('player-battle-img').src = this.playerNft.img;
+        document.getElementById('player-nft-name').textContent = this.playerNft.name;
+        document.getElementById('enemy-name').textContent = this.enemyNft.name;
     }
 
-    // === ИСПРАВЛЕННЫЙ МЕТОД ОБНОВЛЕНИЯ HP БАРОВ ===
+    showPlayerActions() {
+        document.getElementById('attack-btn').disabled = false;
+        document.getElementById('dodge-btn').disabled = false;
+    }
+
+    addBattleLog(message) {
+        this.battleLog.push(message);
+        const logContainer = document.getElementById('battle-log-container');
+        logContainer.innerHTML = this.battleLog.slice(-5).join('<br>');
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
+    updateDisplay() {
+        this.updateHPBar('player-hp-bar', this.playerHP, this.playerMaxHP);
+        this.updateHPBar('enemy-hp-bar', this.enemyHP, this.enemyMaxHP);
+        document.getElementById('player-hp-text').textContent = `${Math.max(0, this.playerHP)}/${this.playerMaxHP} HP`;
+        document.getElementById('enemy-hp-text').textContent = `${Math.max(0, this.enemyHP)}/${this.enemyMaxHP} HP`;
+    }
+
     updateHPBar(barId, currentHP, maxHP) {
         const bar = document.getElementById(barId);
         if (!bar) {
@@ -119,395 +122,132 @@ class UndertaleBattle {
             return false;
         }
 
-        // Убеждаемся что currentHP не отрицательное
-        currentHP = Math.max(0, currentHP);
         const percent = Math.max(0, Math.min(100, (currentHP / maxHP) * 100));
-        
         console.log(`🔧 Обновление ${barId}: ${currentHP}/${maxHP} = ${percent.toFixed(1)}%`);
 
-        // ВАЖНО: Устанавливаем важность стилей через !important
-        bar.style.cssText = `
-            width: ${percent}% !important;
-            transition: width 0.8s ease-out !important;
-            height: 100% !important;
-            background: ${currentHP <= 25 ? 
-                'linear-gradient(90deg, #ff1744 0%, #d32f2f 100%)' : 
-                'linear-gradient(90deg, #d32f2f 0%, #f44336 100%)'} !important;
-            ${currentHP <= 25 ? 'animation: newCriticalFlash 1s ease-in-out infinite !important;' : ''}
-        `;
+        bar.style.width = percent + '%';
+        if (currentHP <= 25) {
+            bar.classList.add('critical');
+        } else {
+            bar.classList.remove('critical');
+        }
 
-        // Форсируем перерисовку
-        bar.offsetHeight; // Триггерим reflow
-        
-        console.log(`✅ ${barId} обновлен: ширина = ${percent}%`);
+        bar.offsetWidth; // Принудительный reflow
+
         return true;
     }
 
-    updateDisplay() {
-        console.log('🔄 Обновление отображения. Игрок HP:', this.playerHP, 'Враг HP:', this.enemyHP);
-        
-        // Обновляем изображения и названия
-        const playerImg = document.getElementById('player-battle-img');
-        const enemyImg = document.getElementById('enemy-battle-img');
-        const enemyName = document.getElementById('enemy-name');
-        const playerNftName = document.getElementById('player-nft-name');
-
-        if (playerImg && this.playerNft) {
-            playerImg.src = this.playerNft.img;
-            playerImg.alt = this.playerNft.name;
+    checkWinCondition() {
+        if (this.playerHP <= 0) {
+            this.endBattle(false);
+        } else if (this.enemyHP <= 0) {
+            this.endBattle(true);
         }
-        if (enemyImg && this.enemyNft) {
-            enemyImg.src = this.enemyNft.img;
-            enemyImg.alt = this.enemyNft.name;
-            enemyName.textContent = this.enemyNft.name.toUpperCase();
-        }
-        if (playerNftName && this.playerNft) {
-            playerNftName.textContent = this.playerNft.name;
-        }
-
-        // === ОБНОВЛЯЕМ HP БАРЫ С ФОРСИРОВАННОЙ ПЕРЕРИСОВКОЙ ===
-        // Используем setTimeout для гарантии обновления после DOM манипуляций
-        setTimeout(() => {
-            this.updateHPBar('player-hp-bar', this.playerHP, this.playerMaxHP);
-            this.updateHPBar('enemy-hp-bar', this.enemyHP, this.enemyMaxHP);
-        }, 10);
-
-        // Обновляем текст HP
-        const playerHPText = document.getElementById('player-hp-text');
-        const enemyHPText = document.getElementById('enemy-hp-text');
-
-        if (playerHPText) {
-            const displayPlayerHP = Math.max(0, Math.round(this.playerHP));
-            playerHPText.textContent = `${displayPlayerHP}/${this.playerMaxHP} HP`;
-            console.log('✅ Обновлен текст HP игрока:', displayPlayerHP + '/' + this.playerMaxHP);
-        }
-        if (enemyHPText) {
-            const displayEnemyHP = Math.max(0, Math.round(this.enemyHP));
-            enemyHPText.textContent = `${displayEnemyHP}/${this.enemyMaxHP} HP`;
-        }
-
-        // Дополнительная проверка и принудительное обновление HP бара игрока
-        this.forcePlayerHPUpdate();
-    }
-
-    // === НОВЫЙ МЕТОД ДЛЯ ГАРАНТИРОВАННОГО ОБНОВЛЕНИЯ HP ИГРОКА ===
-    forcePlayerHPUpdate() {
-        const playerBar = document.getElementById('player-hp-bar');
-        const playerText = document.getElementById('player-hp-text');
-        
-        if (playerBar) {
-            const percent = Math.max(0, (this.playerHP / this.playerMaxHP) * 100);
-            
-            // Удаляем все старые стили и устанавливаем новые
-            playerBar.removeAttribute('style');
-            
-            // Используем requestAnimationFrame для гарантии обновления
-            requestAnimationFrame(() => {
-                playerBar.style.cssText = `
-                    width: ${percent}% !important;
-                    transition: width 0.8s ease-out !important;
-                    height: 100% !important;
-                    background: ${this.playerHP <= 25 ? 
-                        'linear-gradient(90deg, #ff1744 0%, #d32f2f 100%)' : 
-                        'linear-gradient(90deg, #d32f2f 0%, #f44336 100%)'} !important;
-                    ${this.playerHP <= 25 ? 'animation: newCriticalFlash 1s ease-in-out infinite !important;' : ''}
-                `;
-                console.log(`🎯 Force update player HP bar: ${percent}%`);
-            });
-        }
-        
-        if (playerText) {
-            playerText.textContent = `${Math.max(0, Math.round(this.playerHP))}/${this.playerMaxHP} HP`;
-        }
-    }
-
-    addBattleLog(message) {
-        const logContainer = document.getElementById('battle-log-container');
-        if (!logContainer) return;
-
-        this.battleLog.push(message);
-
-        // Показываем только последние 5 сообщений
-        const recentLogs = this.battleLog.slice(-5);
-        logContainer.innerHTML = recentLogs
-            .map(log => `<div style="margin-bottom: 4px; padding: 2px 0;">• ${log}</div>`)
-            .join('');
-        
-        // Прокручиваем вниз
-        logContainer.scrollTop = logContainer.scrollHeight;
-        
-        console.log('📝 Лог добавлен:', message);
-    }
-
-    showPlayerActions() {
-        const attackBtn = document.getElementById('attack-btn');
-        const dodgeBtn = document.getElementById('dodge-btn');
-        
-        if (!attackBtn || !dodgeBtn) return;
-        
-        if (this.currentTurn !== 'player' || !this.battleActive) {
-            attackBtn.disabled = true;
-            dodgeBtn.disabled = true;
-        } else {
-            attackBtn.disabled = false;
-            dodgeBtn.disabled = false;
-        }
-        
-        console.log('🎮 Кнопки обновлены. Ход:', this.currentTurn, 'Активна:', this.battleActive);
     }
 
     playerAttack() {
-        if (this.currentTurn !== 'player' || !this.battleActive) {
-            console.log('❌ Атака заблокирована');
-            return;
-        }
+        if (!this.battleActive || this.currentTurn !== 'player') return;
 
-        console.log('⚔️ Игрок атакует!');
-        this.addBattleLog('Вы атакуете!');
-        
-        let damage = Math.floor(Math.random() * 25) + 15;
-        let isCrit = Math.random() < 0.15;
-        const enemyDodge = Math.random() < 0.08;
-
-        // Применяем апгрейды игрока
-        if (this.playerNft.upgrades) {
-            if (this.playerNft.upgrades.damage) {
-                damage *= this.playerNft.upgrades.damage;
-            }
-            if (this.playerNft.upgrades.crit) {
-                const critMultiplier = this.playerNft.upgrades.crit;
-                if (Math.random() < (0.15 * critMultiplier)) {
-                    isCrit = true;
-                }
-            }
-        }
-
-        if (enemyDodge) {
-            this.addBattleLog('Враг уклонился от атаки!');
-            this.showDamageEffect(document.getElementById('enemy-battle-img'), 'МИМО', false);
-        } else {
-            if (isCrit) {
-                damage *= 1.8;
-                this.addBattleLog(`💥 КРИТИЧЕСКИЙ УДАР! Нанесено ${Math.round(damage)} урона!`);
-                this.showDamageEffect(document.getElementById('enemy-battle-img'), Math.round(damage), true);
-            } else {
-                this.addBattleLog(`Нанесено ${Math.round(damage)} урона`);
-                this.showDamageEffect(document.getElementById('enemy-battle-img'), Math.round(damage), false);
-            }
-            
-            this.enemyHP -= damage;
-            this.enemyHP = Math.max(0, this.enemyHP);
-            
-            document.getElementById('enemy-battle-img').classList.add('battle-shake');
-            setTimeout(() => {
-                const img = document.getElementById('enemy-battle-img');
-                if (img) img.classList.remove('battle-shake');
-            }, 500);
-        }
+        const damage = Math.floor(Math.random() * 35) + 8; // Базовый урон 8-42
+        this.enemyHP = Math.max(0, this.enemyHP - damage);
+        this.addBattleLog(`Игрок атакует! Урон: ${damage}`);
+        console.log(`Игрок нанёс урон: ${damage}, enemyHP: ${this.enemyHP}`);
 
         this.updateDisplay();
-        this.checkBattleEnd();
+        this.currentTurn = 'enemy';
+        document.getElementById('attack-btn').disabled = true;
+        document.getElementById('dodge-btn').disabled = true;
 
-        if (this.battleActive) {
-            this.currentTurn = 'enemy';
-            this.showPlayerActions();
-            
-            setTimeout(() => {
-                this.enemyTurn();
-            }, 2000);
-        }
+        setTimeout(() => this.enemyTurn(), 1500);
     }
 
     playerDodge() {
-        if (this.currentTurn !== 'player' || !this.battleActive) {
-            console.log('❌ Уклонение заблокировано');
-            return;
+        if (!this.battleActive || this.currentTurn !== 'player') return;
+
+        this.playerDodging = true;
+        this.addBattleLog('Игрок пытается увернуться!');
+        console.log('Игрок активировал уклонение');
+
+        this.updateDisplay();
+        this.currentTurn = 'enemy';
+        document.getElementById('attack-btn').disabled = true;
+        document.getElementById('dodge-btn').disabled = true;
+
+        setTimeout(() => this.enemyTurn(), 1500);
+    }
+
+    enemyTurn() {
+        if (!this.battleActive || this.currentTurn !== 'enemy') return;
+
+        console.log('=== Начало enemyTurn ===');
+        console.log('Текущее playerHP перед расчётом:', this.playerHP);
+        console.log('playerDodging:', this.playerDodging);
+
+        let damage = Math.floor(Math.random() * 21) + 20; // Урон 20-40
+        console.log('Расчитанный damage:', damage);
+
+        if (this.playerDodging) {
+            const missChance = Math.random();
+            console.log('missChance:', missChance);
+            if (missChance < 0.5) {
+                damage = 0;
+                this.addBattleLog('Игрок увернулся! Урон: 0');
+                console.log('Увернулся! damage сброшен на 0');
+            } else {
+                this.addBattleLog('Увернуться не удалось!');
+            }
+            this.playerDodging = false;
         }
 
-        console.log('🏃 Игрок готовится к уклонению!');
-        this.addBattleLog('Вы готовитесь увернуться!');
-        this.playerDodging = true;
+        console.log('Финальный damage перед применением:', damage);
+        console.log('Before subtract: playerHP =', this.playerHP);
+        this.playerHP = Math.max(0, this.playerHP - damage);
+        console.log('After subtract: playerHP =', this.playerHP);
 
-        this.currentTurn = 'enemy';
+        this.addBattleLog(`Враг атакует! Урон: ${damage}`);
+
+        this.updateDisplay();
+        this.checkWinCondition();
+
+        this.currentTurn = 'player';
         this.showPlayerActions();
 
-        setTimeout(() => {
-            this.enemyTurn();
-        }, 1500);
+        console.log('=== Конец enemyTurn ===');
     }
 
-    // === ИСПРАВЛЕННЫЙ enemyTurn() С ГАРАНТИРОВАННЫМ ОБНОВЛЕНИЕМ HP ===
-    enemyTurn() {
-        if (this.currentTurn !== 'enemy' || !this.battleActive) {
-            console.log('❌ Ход врага заблокирован');
-            return;
-        }
+    endBattle(playerWon) {
+        console.log('🎮 Завершение битвы, победа:', playerWon);
+        this.battleActive = false;
 
-        console.log('=== НАЧАЛО ХОДА ВРАГА ===');
-        console.log('👹 HP игрока ДО атаки:', this.playerHP);
-        
-        this.addBattleLog('Враг атакует!');
+        const resultOverlay = document.createElement('div');
+        resultOverlay.id = 'battle-result-overlay';
+        resultOverlay.className = 'battle-result-overlay';
+        resultOverlay.innerHTML = `
+            <div class="battle-result-modal">
+                <div class="battle-result-text">${playerWon ? 'ПОБЕДА!' : 'ПОРАЖЕНИЕ!'}</div>
+                <button class="result-back-btn" onclick="battleSystem.endBattleCleanup()">Вернуться</button>
+            </div>
+        `;
+        document.body.appendChild(resultOverlay);
 
-        let damage = Math.floor(Math.random() * 22) + 12;
-        const isCrit = Math.random() < 0.12;
-
-        // Применяем апгрейды врага
-        if (this.enemyNft.upgrades && this.enemyNft.upgrades.damage) {
-            damage *= this.enemyNft.upgrades.damage;
-        }
-
-        // Проверяем уклонение игрока
-        let playerDodgeChance = 0.06;
-        if (this.playerNft.upgrades && this.playerNft.upgrades.dodge) {
-            playerDodgeChance *= this.playerNft.upgrades.dodge;
-        }
-
-        // Если игрок использовал уклонение
-        if (this.playerDodging) {
-            playerDodgeChance += 0.35;
-        }
-
-        const playerDodged = Math.random() < playerDodgeChance;
-
-        if (playerDodged) {
-            this.addBattleLog('Вы уклонились от атаки!');
-            this.showDamageEffect(document.getElementById('player-battle-img'), 'МИМО', false);
-        } else {
-            if (isCrit) {
-                damage *= 1.7;
-                this.addBattleLog(`💥 КРИТИЧЕСКАЯ АТАКА ВРАГА! Получено ${Math.round(damage)} урона!`);
-                this.showDamageEffect(document.getElementById('player-battle-img'), Math.round(damage), true);
-            } else {
-                this.addBattleLog(`Получено ${Math.round(damage)} урона`);
-                this.showDamageEffect(document.getElementById('player-battle-img'), Math.round(damage), false);
-            }
-            
-            // === ПРИМЕНЕНИЕ УРОНА С ГАРАНТИЕЙ ОБНОВЛЕНИЯ ===
-            const oldHP = this.playerHP;
-            this.playerHP = Math.max(0, this.playerHP - damage);
-            const newHP = this.playerHP;
-            
-            console.log(`💀 HP изменение: ${oldHP} -> ${newHP} (урон: ${damage})`);
-            
-            // Анимация тряски
-            document.getElementById('player-battle-img').classList.add('battle-shake');
-            setTimeout(() => {
-                const img = document.getElementById('player-battle-img');
-                if (img) img.classList.remove('battle-shake');
-            }, 500);
-            
-            // === КРИТИЧЕСКИ ВАЖНО: Обновляем HP бар СРАЗУ ===
-            this.forcePlayerHPUpdate();
-        }
-
-        this.playerDodging = false;
-        
-        console.log('👹 HP игрока ПОСЛЕ атаки:', this.playerHP);
-
-        // Обновляем дисплей с небольшой задержкой для анимации
-        setTimeout(() => {
-            this.updateDisplay();
-            this.checkBattleEnd();
-        }, 300);
-
-        if (this.battleActive) {
-            this.currentTurn = 'player';
-            setTimeout(() => {
-                this.showPlayerActions();
-                this.addBattleLog('Ваш ход!');
-            }, 1800);
-        }
-    }
-
-    showDamageEffect(targetElement, damage, isCrit = false) {
-        if (!targetElement) return;
-
-        const effect = document.createElement('div');
-        effect.className = `damage-effect ${isCrit ? 'crit' : ''}`;
-        effect.textContent = damage;
-        
-        targetElement.style.position = 'relative';
-        targetElement.appendChild(effect);
-        
-        setTimeout(() => {
-            if (effect.parentNode) {
-                effect.parentNode.removeChild(effect);
-            }
-        }, 1200);
-    }
-
-    checkBattleEnd() {
-        console.log('🏁 Проверка конца битвы. Игрок HP:', this.playerHP, 'Враг HP:', this.enemyHP);
-        
-        if (this.playerHP <= 0) {
-            console.log('💀 Игрок проиграл');
-            this.battleActive = false;
-            setTimeout(() => this.showBattleResult(false), 1000);
-        } else if (this.enemyHP <= 0) {
-            console.log('🏆 Игрок победил');
-            this.battleActive = false;
-            setTimeout(() => this.showBattleResult(true), 1000);
-        }
-    }
-
-    showBattleResult(playerWon) {
-        const resultOverlay = document.getElementById('battle-result-overlay');
-        const resultTitle = document.getElementById('result-title');
-        const resultDetails = document.getElementById('result-details');
-
-        if (!resultOverlay || !resultTitle || !resultDetails) {
-            console.error('❌ Элементы результата не найдены');
-            return;
-        }
-
-        if (playerWon) {
-            resultTitle.className = 'result-title win';
-            resultTitle.innerHTML = '🏆 ПОБЕДА!';
-            resultDetails.innerHTML = `
-                <strong>Вы победили!</strong><br><br>
-                Получен NFT: <strong>${this.enemyNft.name}</strong><br>
-                <em>NFT добавлен в вашу коллекцию</em>
-            `;
-
-            // Добавляем NFT в коллекцию
-            if (window.collection && Array.isArray(window.collection)) {
-                const newNft = {
-                    ...this.enemyNft, 
-                    buyPrice: this.enemyNft.price || 150
-                };
-                window.collection.push(newNft);
-                console.log('✅ NFT добавлен в коллекцию:', this.enemyNft.name);
-            }
-        } else {
-            resultTitle.className = 'result-title lose';
-            resultTitle.innerHTML = '💀 ПОРАЖЕНИЕ!';
-            resultDetails.innerHTML = `
-                <strong>Вы проиграли...</strong><br><br>
-                Потерян NFT: <strong>${this.playerNft.name}</strong><br>
-                <em>NFT удален из коллекции</em>
-            `;
-
-            // Удаляем NFT из коллекции
-            if (window.collection && Array.isArray(window.collection)) {
-                const index = window.collection.findIndex(nft => 
-                    nft.name === this.playerNft.name && 
-                    nft.img === this.playerNft.img && 
-                    nft.buyPrice === this.playerNft.buyPrice
-                );
-                
-                if (index !== -1) {
-                    window.collection.splice(index, 1);
-                    console.log('❌ NFT удален из коллекции:', this.playerNft.name);
-                    
-                    // Сбрасываем активный NFT
-                    if (window.activeBattleNft) {
-                        window.activeBattleNft = null;
-                    }
+        // Удаляем NFT из коллекции при проигрыше
+        if (!playerWon && window.collection) {
+            const index = window.collection.findIndex(
+                nft => nft.name === this.playerNft.name && 
+                       nft.img === this.playerNft.img && 
+                       nft.buyPrice === this.playerNft.buyPrice
+            );
+            if (index !== -1) {
+                window.collection.splice(index, 1);
+                console.log('❌ NFT удален из коллекции:', this.playerNft.name);
+                if (window.activeBattleNft) {
+                    window.activeBattleNft = null;
                 }
+            } else {
+                console.error('❌ NFT не найден в коллекции для удаления');
             }
         }
 
-        // Добавляем в историю битв
         if (window.battleHistory && Array.isArray(window.battleHistory)) {
             window.battleHistory.push({
                 playerNft: {...this.playerNft},
@@ -517,9 +257,6 @@ class UndertaleBattle {
             });
         }
 
-        resultOverlay.style.display = 'flex';
-
-        // Обновляем UI и сохраняем
         if (window.updateUI) {
             window.updateUI();
         }
@@ -529,8 +266,25 @@ class UndertaleBattle {
                 console.log('💾 Данные сохранены');
             }, 500);
         }
-        
-        console.log('🎉 Результат битвы показан:', playerWon ? 'ПОБЕДА' : 'ПОРАЖЕНИЕ');
+    }
+
+    endBattleCleanup() {
+        const container = document.getElementById('undertale-battle-container');
+        if (container) container.remove();
+        const overlay = document.getElementById('battle-result-overlay');
+        if (overlay) overlay.remove();
+
+        const screens = document.querySelectorAll('.screen');
+        screens.forEach(s => s.classList.remove('active'));
+        const mainScreen = document.getElementById('main-screen');
+        if (mainScreen) mainScreen.classList.add('active');
+
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => item.classList.remove('active'));
+        if (navItems[0]) navItems[0].classList.add('active');
+
+        if (window.renderCenterArea) window.renderCenterArea();
+        if (window.updateUI) window.updateUI();
     }
 
     attemptEscape() {
@@ -545,46 +299,7 @@ class UndertaleBattle {
         if (window.updateUI) window.updateUI();
         if (window.saveData) window.saveData();
         
-        setTimeout(() => {
-            this.endBattle();
-        }, 1500);
-    }
-
-    endBattle() {
-        console.log('🚪 Завершение битвы');
-        
-        const container = document.getElementById('undertale-battle-container');
-        if (container) {
-            container.remove();
-            console.log('🗑️ Интерфейс битвы удален');
-        }
-
-        // Возврат в главное меню
-        const screens = document.querySelectorAll('.screen');
-        screens.forEach(s => s.classList.remove('active'));
-        
-        const mainScreen = document.getElementById('main-screen');
-        if (mainScreen) {
-            mainScreen.classList.add('active');
-            console.log('🏠 Возврат в главное меню');
-        }
-
-        // Обновляем навигацию
-        const navItems = document.querySelectorAll('.nav-item');
-        navItems.forEach(item => item.classList.remove('active'));
-        if (navItems[0]) {
-            navItems[0].classList.add('active');
-        }
-
-        // Обновляем отображение
-        if (window.renderCenterArea) {
-            window.renderCenterArea();
-        }
-        if (window.updateUI) {
-            window.updateUI();
-        }
-        
-        console.log('✅ Возврат завершен');
+        setTimeout(() => this.endBattleCleanup(), 1500);
     }
 }
 
