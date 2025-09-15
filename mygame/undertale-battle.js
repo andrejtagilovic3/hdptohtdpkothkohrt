@@ -79,19 +79,16 @@ class UndertaleBattle {
                         </div>
 
                         <!-- ИГРОК В ЦЕНТРЕ -->
-<!-- ИГРОК В ЦЕНТРЕ - ИСПРАВЛЕННЫЙ -->
                         <div class="player-battle-area">
                             <img id="player-battle-img" class="player-battle-img" alt="Player NFT">
                             <div>
                                 <div class="player-name">ВЫ</div>
                                 <div id="player-nft-name" class="player-nft-name">NFT NAME</div>
-<!-- ИСПРАВЛЕННЫЙ HP КОНТЕЙНЕР -->
                                 <div class="player-hp-container">
                                     <div id="player-hp-bar" class="hp-bar"></div>
                                 </div>
-                                </div>
-                                <div id="player-hp-text" class="player-hp-text">100/100 HP</div>
                             </div>
+                            <div id="player-hp-text" class="player-hp-text">100/100 HP</div>
                         </div>
 
                         <!-- КНОПКИ СПРАВА -->
@@ -145,54 +142,55 @@ class UndertaleBattle {
             playerNftName.textContent = this.playerNft.name;
         }
 
-        // ИСПРАВЛЕНИЕ: правильно обновляем HP бары
-// ИСПРАВЛЕНИЕ: правильно обновляем HP бары
-const playerHPPercent = Math.max(0, (this.playerHP / this.playerMaxHP) * 100);
-const enemyHPPercent = Math.max(0, (this.enemyHP / this.enemyMaxHP) * 100);
+        // Обновляем HP бары
+        const playerHPPercent = Math.max(0, (this.playerHP / this.playerMaxHP) * 100);
+        const enemyHPPercent = Math.max(0, (this.enemyHP / this.enemyMaxHP) * 100);
 
-console.log('📊 HP проценты - Игрок:', playerHPPercent + '%', 'Враг:', enemyHPPercent + '%');
+        console.log('📊 HP проценты - Игрок:', playerHPPercent + '%', 'Враг:', enemyHPPercent + '%');
 
-const playerHPBar = document.getElementById('player-hp-bar');
-const enemyHPBar = document.getElementById('enemy-hp-bar');
-const playerHPText = document.getElementById('player-hp-text');
-const enemyHPText = document.getElementById('enemy-hp-text');
+        const playerHPBar = document.getElementById('player-hp-bar');
+        const enemyHPBar = document.getElementById('enemy-hp-bar');
+        const playerHPText = document.getElementById('player-hp-text');
+        const enemyHPText = document.getElementById('enemy-hp-text');
 
-// Для игрока (с !important на width, чтобы точно менялось)
-if (playerHPBar) {
-    playerHPBar.style.setProperty('width', playerHPPercent + '%', 'important');
-    console.log('✅ Обновлен HP бар игрока:', playerHPPercent + '%');
-    
-    if (this.playerHP <= 25) {
-        playerHPBar.classList.add('critical');
-    } else {
-        playerHPBar.classList.remove('critical');
+        // Для игрока (с принудительным !important для перебивания CSS)
+        if (playerHPBar) {
+            playerHPBar.style.setProperty('width', playerHPPercent + '%', 'important');
+            console.log('✅ Обновлен HP бар игрока:', playerHPPercent + '%');
+            
+            if (this.playerHP <= 25) {
+                playerHPBar.classList.add('critical');
+            } else {
+                playerHPBar.classList.remove('critical');
+            }
+        } else {
+            console.error('❌ Не найден элемент player-hp-bar');
+        }
+
+        // Для врага
+        if (enemyHPBar) {
+            enemyHPBar.style.setProperty('width', enemyHPPercent + '%', 'important');
+            console.log('✅ Обновлен HP бар врага:', enemyHPPercent + '%');
+            
+            if (this.enemyHP <= 25) {
+                enemyHPBar.classList.add('critical');
+            } else {
+                enemyHPBar.classList.remove('critical');
+            }
+        }
+
+        // Обновляем текст HP
+        if (playerHPText) {
+            const displayPlayerHP = Math.max(0, Math.round(this.playerHP));
+            playerHPText.textContent = `${displayPlayerHP}/${this.playerMaxHP} HP`;
+            console.log('✅ Обновлен текст HP игрока:', displayPlayerHP + '/' + this.playerMaxHP);
+        }
+        if (enemyHPText) {
+            const displayEnemyHP = Math.max(0, Math.round(this.enemyHP));
+            enemyHPText.textContent = `${displayEnemyHP}/${this.enemyMaxHP} HP`;
+        }
     }
-} else {
-    console.error('❌ Не найден элемент player-hp-bar');
-}
 
-// Для врага (то же, на всякий)
-if (enemyHPBar) {
-    enemyHPBar.style.setProperty('width', enemyHPPercent + '%', 'important');
-    console.log('✅ Обновлен HP бар врага:', enemyHPPercent + '%');
-    
-    if (this.enemyHP <= 25) {
-        enemyHPBar.classList.add('critical');
-    } else {
-        enemyHPBar.classList.remove('critical');
-    }
-}
-
-// ИСПРАВЛЕНИЕ: обновляем текстовые счетчики HP
-if (playerHPText) {
-    const displayPlayerHP = Math.max(0, Math.round(this.playerHP));
-    playerHPText.textContent = `${displayPlayerHP}/${this.playerMaxHP} HP`;
-    console.log('✅ Обновлен текст HP игрока:', displayPlayerHP + '/' + this.playerMaxHP);
-}
-if (enemyHPText) {
-    const displayEnemyHP = Math.max(0, Math.round(this.enemyHP));
-    enemyHPText.textContent = `${displayEnemyHP}/${this.enemyMaxHP} HP`;
-}
     addBattleLog(message) {
         const logContainer = document.getElementById('battle-log-container');
         if (!logContainer) return;
@@ -351,7 +349,6 @@ if (enemyHPText) {
                 this.showDamageEffect(document.getElementById('player-battle-img'), Math.round(damage), false);
             }
             
-            // ИСПРАВЛЕНИЕ: правильно применяем урон к игроку
             this.playerHP -= damage;
             this.playerHP = Math.max(0, this.playerHP);
             
@@ -425,7 +422,7 @@ if (enemyHPText) {
                 <em>NFT добавлен в вашу коллекцию</em>
             `;
 
-            // ИСПРАВЛЕНИЕ: правильно добавляем NFT в коллекцию
+            // Добавляем NFT в коллекцию
             if (window.collection && Array.isArray(window.collection)) {
                 const newNft = {
                     ...this.enemyNft, 
@@ -446,7 +443,7 @@ if (enemyHPText) {
                 <em>NFT удален из коллекции</em>
             `;
 
-            // ИСПРАВЛЕНИЕ: правильно удаляем NFT из коллекции
+            // Удаляем NFT из коллекции
             if (window.collection && Array.isArray(window.collection)) {
                 const index = window.collection.findIndex(nft => 
                     nft.name === this.playerNft.name && 
