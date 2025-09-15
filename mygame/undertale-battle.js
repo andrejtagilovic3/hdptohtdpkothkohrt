@@ -59,7 +59,6 @@ class UndertaleBattle {
 
         const battleHTML = `
             <div id="undertale-battle-container" class="undertale-battle-container">
-                <!-- ВРАГ - большая область сверху -->
                 <div class="enemy-battle-area">
                     <button class="escape-btn" onclick="battleSystem.attemptEscape()">
                         Сбежать (50⭐)
@@ -68,21 +67,16 @@ class UndertaleBattle {
                     <img id="enemy-battle-img" class="enemy-battle-img" alt="Enemy NFT">
                     <div id="enemy-name" class="enemy-name">ВРАГ</div>
 
-                    <!-- HP врага - НОВАЯ СИСТЕМА -->
                     <div class="battle-hp-container enemy-hp-container">
                         <div id="enemy-hp-bar" class="battle-hp-bar" style="width: 100%;"></div>
                     </div>
                     <div id="enemy-hp-text" class="battle-hp-text">100/100 HP</div>
                 </div>
 
-                <!-- НИЖНЯЯ ОБЛАСТЬ -->
                 <div class="battle-bottom-area">
-                    <!-- ЛОГ БОЯ -->
                     <div id="battle-log-container" class="battle-log-container"></div>
 
-                    <!-- ОБЛАСТЬ ДЕЙСТВИЙ -->
                     <div class="battle-actions-area">
-                        <!-- КНОПКИ СЛЕВА -->
                         <div class="battle-buttons">
                             <button id="attack-btn" class="battle-action-btn" onclick="battleSystem.playerAttack()">
                                 <i class="fas fa-sword"></i>
@@ -94,13 +88,11 @@ class UndertaleBattle {
                             </button>
                         </div>
 
-                        <!-- ИГРОК В ЦЕНТРЕ -->
                         <div class="player-battle-area">
                             <img id="player-battle-img" class="player-battle-img" alt="Player NFT">
                             <div>
                                 <div class="player-name">ВЫ</div>
                                 <div id="player-nft-name" class="player-nft-name">NFT NAME</div>
-                                <!-- HP игрока - НОВАЯ СИСТЕМА -->
                                 <div class="battle-hp-container player-hp-container">
                                     <div id="player-hp-bar" class="battle-hp-bar" style="width: 100%;"></div>
                                 </div>
@@ -108,7 +100,6 @@ class UndertaleBattle {
                             <div id="player-hp-text" class="player-hp-text">100/100 HP</div>
                         </div>
 
-                        <!-- КНОПКИ СПРАВА -->
                         <div class="battle-buttons">
                             <div style="flex: 1; opacity: 0.3; background: #1a1a1a; border: 2px dashed #333333; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #666666; font-size: 12px;">
                                 Резерв
@@ -120,7 +111,6 @@ class UndertaleBattle {
                     </div>
                 </div>
 
-                <!-- РЕЗУЛЬТАТ БИТВЫ -->
                 <div id="battle-result-overlay" class="battle-result-overlay" style="display: none;">
                     <div class="battle-result-modal">
                         <div id="result-title" class="result-title"></div>
@@ -374,11 +364,9 @@ class UndertaleBattle {
                 this.showDamageEffect(document.getElementById('player-battle-img'), Math.round(damage), false);
             }
             
-// === ПРИМЕНЕНИЕ УРОНА ===
+            // === ПРИМЕНЕНИЕ УРОНА ===
             this.playerHP = Math.max(0, this.playerHP - damage);
             this.gameState.playerHP = this.playerHP; // Синхронизация gameState
- 
-// ✅ Обновляем HP-бар игрока, используя ваш новый метод
             
             document.getElementById('player-battle-img').classList.add('battle-shake');
             setTimeout(() => {
@@ -648,5 +636,3 @@ setTimeout(() => {
         console.error('🔴 ❌ Ошибка загрузки Battle System!');
     }
 }, 1000);
-
-
