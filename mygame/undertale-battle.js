@@ -1,4 +1,4 @@
-// ==================== UNDERTALE BATTLE SYSTEM (ИСПРАВЛЕННЫЙ) ====================
+// ==================== UNDERTALE BATTLE SYSTEM (НОВАЯ HP СИСТЕМА) ====================
 
 class UndertaleBattle {
     constructor() {
@@ -13,65 +13,6 @@ class UndertaleBattle {
         this.battleLog = [];
         this.playerDodging = false;
     }
-    
-    addHPStyles() {
-    // Добавляем CSS стили для HP баров прямо в код
-    const style = document.createElement('style');
-    style.textContent = `
-        .hp-container {
-            background: #000000 !important;
-            border: 3px solid #666666 !important;
-            border-radius: 10px !important;
-            overflow: hidden !important;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5) !important;
-            margin-bottom: 10px !important;
-            position: relative !important;
-            width: 200px !important;
-            height: 20px !important;
-        }
-
-        .enemy-battle-area .hp-container {
-            width: 250px !important;
-            height: 24px !important;
-        }
-
-        .hp-bar {
-            height: 100% !important;
-            background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%) !important;
-            transition: width 0.8s ease-out !important;
-            position: relative !important;
-            width: 100% !important;
-        }
-
-        .hp-bar.low {
-            background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%) !important;
-            animation: pulse 0.5s infinite alternate !important;
-        }
-
-        @keyframes pulse {
-            from { opacity: 0.7; }
-            to { opacity: 1; }
-        }
-
-        .hp-text {
-            font-size: 14px !important;
-            color: #cccccc !important;
-            font-weight: 600 !important;
-            text-align: center !important;
-        }
-
-        .player-hp-text {
-            font-size: 12px !important;
-            color: #cccccc !important;
-            font-weight: 700 !important;
-            text-align: center !important;
-        }
-    `;
-    document.head.appendChild(style);
-    console.log('✅ HP стили добавлены');
-}
-
-
 
     init(playerNft, enemyNft) {
         console.log('🚀 Инициализация битвы:', playerNft.name, 'vs', enemyNft.name);
@@ -86,18 +27,17 @@ class UndertaleBattle {
         this.currentTurn = 'player';
         this.battleLog = [];
         this.playerDodging = false;
-    
-        this.addHPStyles(); // ДОБАВЬТЕ ЭТУ СТРОКУ
+        
         this.createBattleUI();
         this.updateDisplay();
         this.showPlayerActions();
         this.addBattleLog(`Битва началась! ${playerNft.name} против ${enemyNft.name}`);
-    
+        
         return true;
     }
 
     createBattleUI() {
-    // Удаляем старый интерфейс если есть
+        // Удаляем старый интерфейс если есть
         const existing = document.getElementById('undertale-battle-container');
         if (existing) existing.remove();
 
@@ -111,12 +51,12 @@ class UndertaleBattle {
 
                     <img id="enemy-battle-img" class="enemy-battle-img" alt="Enemy NFT">
                     <div id="enemy-name" class="enemy-name">ВРАГ</div>
-    
-                    <!-- HP врага - ИНЛАЙН СТИЛИ -->
-                    <div style="background: #000000; border: 3px solid #666666; border-radius: 10px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5); margin-bottom: 10px; width: 250px; height: 24px; position: relative;">
-                        <div id="enemy-hp-bar" style="height: 100%; background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%); transition: width 0.8s ease-out; position: relative; width: 100%;"></div>
+
+                    <!-- HP врага - НОВАЯ СИСТЕМА -->
+                    <div class="battle-hp-container enemy-hp-container">
+                        <div id="enemy-hp-bar" class="battle-hp-bar"></div>
                     </div>
-                    <div id="enemy-hp-text" style="font-size: 16px; color: #cccccc; font-weight: 700; text-align: center; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);">100/100 HP</div>
+                    <div id="enemy-hp-text" class="battle-hp-text">100/100 HP</div>
                 </div>
 
                 <!-- НИЖНЯЯ ОБЛАСТЬ -->
@@ -144,12 +84,12 @@ class UndertaleBattle {
                             <div>
                                 <div class="player-name">ВЫ</div>
                                 <div id="player-nft-name" class="player-nft-name">NFT NAME</div>
-                                <!-- HP игрока - ИНЛАЙН СТИЛИ -->
-                                <div style="background: #000000; border: 3px solid #666666; border-radius: 10px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5); margin: 8px 0 4px 0; width: 120px; height: 20px; position: relative;">
-                                    <div id="player-hp-bar" style="height: 100%; background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%); transition: width 0.8s ease-out; position: relative; width: 100%;"></div>
+                                <!-- HP игрока - НОВАЯ СИСТЕМА -->
+                                <div class="battle-hp-container player-hp-container">
+                                    <div id="player-hp-bar" class="battle-hp-bar"></div>
                                 </div>
                             </div>
-                            <div id="player-hp-text" style="font-size: 12px; color: #cccccc; font-weight: 700; text-align: center;">100/100 HP</div>
+                            <div id="player-hp-text" class="player-hp-text">100/100 HP</div>
                         </div>
 
                         <!-- КНОПКИ СПРАВА -->
@@ -178,9 +118,47 @@ class UndertaleBattle {
         `;
 
         document.body.insertAdjacentHTML('beforeend', battleHTML);
-        console.log('✅ UI создан с инлайн стилями');
+        console.log('✅ UI создан');
     }
-    // === ИСПРАВЛЕННЫЙ МЕТОД ОБНОВЛЕНИЯ HP БАРОВ ===
+
+    // === НОВЫЙ МЕТОД ОБНОВЛЕНИЯ HP БАРОВ ===
+    updateHPBar(barId, currentHP, maxHP) {
+        const bar = document.getElementById(barId);
+        if (!bar) {
+            console.error(`❌ HP бар ${barId} не найден`);
+            return false;
+        }
+
+        const percent = Math.max(0, Math.min(100, (currentHP / maxHP) * 100));
+        
+        console.log(`🔧 Обновление ${barId}: ${currentHP}/${maxHP} = ${percent.toFixed(1)}%`);
+
+        // ИСПОЛЬЗУЕМ setAttribute для принудительной установки ширины
+        bar.setAttribute('style', `width: ${percent}% !important; transition: width 0.8s ease-out !important; height: 100% !important; background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%) !important; position: relative !important;`);
+
+        // Добавляем критический эффект
+        if (currentHP <= 25) {
+            bar.classList.add('critical');
+            bar.setAttribute('style', `width: ${percent}% !important; transition: width 0.8s ease-out !important; height: 100% !important; background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%) !important; position: relative !important; animation: newCriticalFlash 1s ease-in-out infinite !important;`);
+        } else {
+            bar.classList.remove('critical');
+        }
+
+        // Force reflow
+        bar.offsetWidth;
+        
+        // Дополнительная проверка через 50мс
+        setTimeout(() => {
+            if (bar.style.width !== `${percent}%`) {
+                console.warn(`⚠️ Дополнительное обновление ${barId}`);
+                bar.setAttribute('style', `width: ${percent}% !important; transition: width 0.8s ease-out !important; height: 100% !important; background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%) !important; position: relative !important;`);
+                bar.offsetWidth;
+            }
+        }, 50);
+
+        return true;
+    }
+
     updateDisplay() {
         console.log('🔄 Обновление отображения. Игрок HP:', this.playerHP, 'Враг HP:', this.enemyHP);
         
@@ -203,8 +181,9 @@ class UndertaleBattle {
             playerNftName.textContent = this.playerNft.name;
         }
 
-        // === ИСПОЛЬЗУЕМ РАБОЧИЙ МЕТОД ИЗ СТАРОГО КОДА ===
-        this.updateHPBarsOld();
+        // === ОБНОВЛЯЕМ HP БАРЫ НОВЫМ МЕТОДОМ ===
+        this.updateHPBar('player-hp-bar', this.playerHP, this.playerMaxHP);
+        this.updateHPBar('enemy-hp-bar', this.enemyHP, this.enemyMaxHP);
 
         // Обновляем текст HP
         const playerHPText = document.getElementById('player-hp-text');
@@ -220,72 +199,6 @@ class UndertaleBattle {
             enemyHPText.textContent = `${displayEnemyHP}/${this.enemyMaxHP} HP`;
         }
     }
-
-    // === РАБОЧИЙ МЕТОД HP БАРОВ ИЗ СТАРОГО КОДА ===
-    updateHPBarsOld() {
-        const playerHPBar = document.querySelector('#player-hp-bar');
-        const enemyHPBar = document.querySelector('#enemy-hp-bar');
-    
-        console.log('🔧 updateHPBarsOld: Игрок HP:', this.playerHP, 'Враг HP:', this.enemyHP);
-
-        if (playerHPBar) {
-            playerHPBar.style.width = this.playerHP + '%';
-            console.log('✅ HP бар игрока установлен на:', this.playerHP + '%');
-            console.log('🔍 Реальная ширина:', playerHPBar.style.width);
-        }
-
-        if (enemyHPBar) {
-            enemyHPBar.style.width = this.enemyHP + '%';
-            console.log('✅ HP бар врага установлен на:', this.enemyHP + '%');
-        }
-    }
-        if (playerHPBar) {
-            // ПРИНУДИТЕЛЬНО УСТАНАВЛИВАЕМ WIDTH
-            playerHPBar.style.cssText = `
-                width: ${this.playerHP}% !important;
-                height: 100% !important;
-                background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%) !important;
-                transition: width 0.8s ease-out !important;
-                position: relative !important;
-            `;
-        
-        // Force reflow
-            playerHPBar.offsetHeight;
-        
-            console.log('✅ HP бар игрока установлен на:', this.playerHP + '%');
-            console.log('🔍 Текущий style.width:', playerHPBar.style.width);
-        
-            if (this.playerHP <= 25) {
-                playerHPBar.classList.add('low');
-            } else {
-                playerHPBar.classList.remove('low');
-            }
-        } else {
-            console.error('❌ HP бар игрока не найден!');
-        }
-
-    if (enemyHPBar) {
-        enemyHPBar.style.cssText = `
-            width: ${this.enemyHP}% !important;
-            height: 100% !important;
-            background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%) !important;
-            transition: width 0.8s ease-out !important;
-            position: relative !important;
-        `;
-        
-        enemyHPBar.offsetHeight;
-        
-        console.log('✅ HP бар врага установлен на:', this.enemyHP + '%');
-        
-        if (this.enemyHP <= 25) {
-            enemyHPBar.classList.add('low');
-        } else {
-            enemyHPBar.classList.remove('low');
-        }
-    } else {
-        console.error('❌ HP бар врага не найден!');
-    }
-}
 
     addBattleLog(message) {
         const logContainer = document.getElementById('battle-log-container');
@@ -675,4 +588,3 @@ setTimeout(() => {
         console.error('🔴 ❌ Ошибка загрузки Battle System!');
     }
 }, 1000);
-
