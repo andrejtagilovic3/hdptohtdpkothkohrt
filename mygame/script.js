@@ -269,7 +269,6 @@ function generateBotUpgrades(botNft, matchPlayerLevel) {
         botNft.upgrades[randomType] = upgradeValue;
     }
 }
-
 function setFilter(filterType) {
     currentFilter = filterType;
 
@@ -434,7 +433,6 @@ function startNewBattle() {
         document.getElementById('searching-overlay').style.display = 'none';
     }
 }
-
 function initializeBattle(playerFirst) {
     playerHP = 100;
     botHP = 100;
