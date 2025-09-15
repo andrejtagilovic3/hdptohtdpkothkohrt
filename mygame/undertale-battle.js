@@ -146,15 +146,15 @@ class UndertaleBattle {
         }
 
         // ИСПРАВЛЕНИЕ: правильно обновляем HP бары
-        const playerHPPercent = Math.max(0, (this.playerHP / this.playerMaxHP) * 100);
-        const enemyHPPercent = Math.max(0, (this.enemyHP / this.enemyMaxHP) * 100);
+const playerHPPercent = Math.max(0, (this.playerHP / this.playerMaxHP) * 100);
+const enemyHPPercent = Math.max(0, (this.enemyHP / this.enemyMaxHP) * 100);
 
-        console.log('📊 HP проценты - Игрок:', playerHPPercent + '%', 'Враг:', enemyHPPercent + '%');
+console.log('📊 HP проценты - Игрок:', playerHPPercent + '%', 'Враг:', enemyHPPercent + '%');
 
-        const playerHPBar = document.getElementById('player-hp-bar');
-        const enemyHPBar = document.getElementById('enemy-hp-bar');
-        const playerHPText = document.getElementById('player-hp-text');
-        const enemyHPText = document.getElementById('enemy-hp-text');
+const playerHPBar = document.getElementById('player-hp-bar');
+const enemyHPBar = document.getElementById('enemy-hp-bar');
+const playerHPText = document.getElementById('player-hp-text');
+const enemyHPText = document.getElementById('enemy-hp-text');
 
         // ИСПРАВЛЕНИЕ: проверяем что элементы найдены и обновляем их
         if (playerHPBar) {
