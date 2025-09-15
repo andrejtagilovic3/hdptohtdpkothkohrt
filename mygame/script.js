@@ -1103,3 +1103,8 @@ function renderUpgradeScreen() {
         grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888888;">Система апгрейдов загружается...</div>';
     }
 }
+
+// Добавьте эту функцию в конец файла script.js
+
+// Добавьте эту функцию в конец файла script.js
+
