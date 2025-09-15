@@ -92,17 +92,17 @@
     background: #000000; /* Черный фон чтобы видеть изменения красного HP */
     border: 3px solid #666666;
     border-radius: 10px;
-    width: 120px; /* Меньше, чем у врага, чтобы вписывалось в player-battle-area */
+    width: 120px; /* Меньше, чем у врага */
     height: 20px;
     overflow: hidden;
-    margin: 8px 0 4px 0; /* Отступы для выравнивания */
+    margin: 8px 0 4px 0;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .hp-bar {
     height: 100%;
     background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%); /* Красный цвет для HP */
-    width: 100%; /* Изначально полная ширина */
+    width: 100%; /* Изначально полная ширина, БЕЗ !important */
     transition: width 0.8s ease-out;
     position: relative;
 }
@@ -110,11 +110,6 @@
 .hp-bar.critical {
     background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%);
     animation: criticalFlash 1s ease-in-out infinite;
-}
-
-.player-hp-container .hp-bar.critical {
-    background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%) !important;
-    animation: playerCriticalFlash 1s ease-in-out infinite !important;
 }
 
 @keyframes criticalFlash {
@@ -231,21 +226,26 @@
 
 .player-hp-container .hp-bar {
     height: 100%;
-    background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%) !important;
-    width: 100%; /* ← УБРАЛИ ТОЛЬКО !important */
-    transition: width 0.8s ease-out !important;
+    background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%);
+    width: 100%; /* БЕЗ !important, чтобы JS мог менять */
+    transition: width 0.8s ease-out;
     position: relative;
+}
+
+.player-hp-container .hp-bar.critical {
+    background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%);
+    animation: playerCriticalFlash 1s ease-in-out infinite;
 }
 
 /* Дублируем анимацию для игрока */
 @keyframes playerCriticalFlash {
     0%, 100% { 
         opacity: 1; 
-        background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%) !important;
+        background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%);
     }
     50% { 
         opacity: 0.7; 
-        background: linear-gradient(90deg, #d32f2f 0%, #b71c1c 100%) !important;
+        background: linear-gradient(90deg, #d32f2f 0%, #b71c1c 100%);
     }
 }
 
