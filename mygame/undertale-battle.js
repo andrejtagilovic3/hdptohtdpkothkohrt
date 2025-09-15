@@ -54,7 +54,7 @@ class UndertaleBattle {
 
                     <!-- HP врага -->
                     <div class="hp-container">
-                        <div id="enemy-hp-bar" class="hp-bar"></div>
+                        <div id="enemy-hp-bar" class="hp-bar" style="width: 100% !important;"></div>
                     </div>
                     <div id="enemy-hp-text" class="hp-text">100/100 HP</div>
                 </div>
@@ -85,7 +85,7 @@ class UndertaleBattle {
                                 <div class="player-name">ВЫ</div>
                                 <div id="player-nft-name" class="player-nft-name">NFT NAME</div>
                                 <div class="player-hp-container">
-                                    <div id="player-hp-bar" class="hp-bar"></div>
+                                    <div id="player-hp-bar" class="hp-bar" style="width: 100% !important;"></div>
                                 </div>
                             </div>
                             <div id="player-hp-text" class="player-hp-text">100/100 HP</div>
@@ -142,9 +142,9 @@ class UndertaleBattle {
             playerNftName.textContent = this.playerNft.name;
         }
 
-        // Обновляем HP бары
-        const playerHPPercent = Math.max(0, (this.playerHP / this.playerMaxHP) * 100);
-        const enemyHPPercent = Math.max(0, (this.enemyHP / this.enemyMaxHP) * 100);
+        // ИСПРАВЛЕННОЕ ОБНОВЛЕНИЕ HP БАРОВ
+        const playerHPPercent = Math.max(0, Math.min(100, (this.playerHP / this.playerMaxHP) * 100));
+        const enemyHPPercent = Math.max(0, Math.min(100, (this.enemyHP / this.enemyMaxHP) * 100));
 
         console.log('📊 HP проценты - Игрок:', playerHPPercent + '%', 'Враг:', enemyHPPercent + '%');
 
@@ -153,10 +153,15 @@ class UndertaleBattle {
         const playerHPText = document.getElementById('player-hp-text');
         const enemyHPText = document.getElementById('enemy-hp-text');
 
-        // Для игрока (с принудительным !important для перебивания CSS)
+        // КРИТИЧЕСКИ ВАЖНО: Принудительное обновление стилей
         if (playerHPBar) {
-            playerHPBar.style.setProperty('width', playerHPPercent + '%', 'important');
+            // Сначала сбрасываем все стили
+            playerHPBar.style.cssText = '';
+            // Затем устанавливаем новую ширину с !important
+            playerHPBar.style.cssText = `width: ${playerHPPercent}% !important; transition: width 0.8s ease-out !important;`;
+            
             console.log('✅ Обновлен HP бар игрока:', playerHPPercent + '%');
+            console.log('🔧 CSS стиль игрока:', playerHPBar.style.cssText);
             
             if (this.playerHP <= 25) {
                 playerHPBar.classList.add('critical');
@@ -169,8 +174,13 @@ class UndertaleBattle {
 
         // Для врага
         if (enemyHPBar) {
-            enemyHPBar.style.setProperty('width', enemyHPPercent + '%', 'important');
+            // Сначала сбрасываем все стили
+            enemyHPBar.style.cssText = '';
+            // Затем устанавливаем новую ширину с !important
+            enemyHPBar.style.cssText = `width: ${enemyHPPercent}% !important; transition: width 0.8s ease-out !important;`;
+            
             console.log('✅ Обновлен HP бар врага:', enemyHPPercent + '%');
+            console.log('🔧 CSS стиль врага:', enemyHPBar.style.cssText);
             
             if (this.enemyHP <= 25) {
                 enemyHPBar.classList.add('critical');
@@ -189,6 +199,28 @@ class UndertaleBattle {
             const displayEnemyHP = Math.max(0, Math.round(this.enemyHP));
             enemyHPText.textContent = `${displayEnemyHP}/${this.enemyMaxHP} HP`;
         }
+
+        // ДОПОЛНИТЕЛЬНАЯ ПРОВЕРКА ЧЕРЕЗ 100мс
+        setTimeout(() => {
+            const playerBar = document.getElementById('player-hp-bar');
+            const enemyBar = document.getElementById('enemy-hp-bar');
+            
+            if (playerBar) {
+                console.log('🔍 Проверка игрока через 100мс:', playerBar.style.width);
+                if (!playerBar.style.width || playerBar.style.width === '100%') {
+                    console.log('⚠️ HP бар игрока не обновился, принудительное обновление!');
+                    playerBar.style.width = playerHPPercent + '%';
+                }
+            }
+            
+            if (enemyBar) {
+                console.log('🔍 Проверка врага через 100мс:', enemyBar.style.width);
+                if (!enemyBar.style.width || enemyBar.style.width === '100%') {
+                    console.log('⚠️ HP бар врага не обновился, принудительное обновление!');
+                    enemyBar.style.width = enemyHPPercent + '%';
+                }
+            }
+        }, 100);
     }
 
     addBattleLog(message) {
