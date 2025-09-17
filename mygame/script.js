@@ -73,6 +73,16 @@ async function init() {
     renderProfile();
     updateUserInfo();
     updateReferralInfo();
+    
+    // ДОБАВЬТЕ ЭТУ ПРОВЕРКУ:
+    setTimeout(() => {
+        if (window.battleSystem && typeof window.battleSystem.init === 'function') {
+            console.log('✅ Battle System загружен и готов!');
+        } else {
+            console.warn('⚠️ Battle System не загружен. Проверьте подключение undertale-battle.js');
+        }
+    }, 1000);
+    
     console.log('Game initialized successfully');
     initUIAnimations();
 }
@@ -396,186 +406,39 @@ function startNewBattle() {
 
     console.log('👤 Игрок:', activeBattleNft.name);
     console.log('🤖 Бот:', botNft.name);
-    console.log('🔧 battleSystem:', window.battleSystem);
-    console.log('🔧 startUndertaleBattle:', typeof window.startUndertaleBattle);
 
-    // ЗАПУСКАЕМ НОВУЮ БОЕВУЮ СИСТЕМУ UNDERTALE
+    // ЗАПУСКАЕМ НОВУЮ БОЕВУЮ СИСТЕМУ
     if (window.battleSystem && typeof window.battleSystem.init === 'function') {
         console.log('✅ Запуск через battleSystem.init');
         const success = window.battleSystem.init(activeBattleNft, botNft);
         if (success) {
             console.log('🎉 Битва успешно запущена!');
         } else {
-            console.error('❌ Ошибка при запуске битвы через battleSystem.init');
-            alert('Ошибка запуска боя. Попробуйте еще раз.');
-            // Возвращаем звёзды игроку
-            stars += 10;
-            updateUI();
+            console.error('❌ Ошибка при запуске битвы');
+            handleBattleError();
         }
     } else if (typeof window.startUndertaleBattle === 'function') {
         console.log('✅ Запуск через startUndertaleBattle');
         const success = window.startUndertaleBattle(activeBattleNft, botNft);
         if (!success) {
-            console.error('❌ Ошибка при запуске битвы через startUndertaleBattle');
-            alert('Ошибка запуска боя. Попробуйте еще раз.');
-            // Возвращаем звёзды игроку
-            stars += 10;
-            updateUI();
+            console.error('❌ Ошибка при запуске битвы');
+            handleBattleError();
         }
     } else {
         console.error('❌ КРИТИЧЕСКАЯ ОШИБКА: battleSystem не найден!');
-        console.error('🔍 Доступные объекты window:', Object.keys(window).filter(key => key.includes('battle')));
-        alert('Ошибка: система боя не загружена. Убедитесь что файл undertale-battle.js подключен правильно.');
-        // Возвращаем звёзды игроку
-        stars += 10;
-        updateUI();
-        // Скрываем оверлей поиска
-        document.getElementById('searching-overlay').style.display = 'none';
+        handleBattleError();
     }
 }
-function initializeBattle(playerFirst) {
-    playerHP = 100;
-    botHP = 100;
-    battleInProgress = true;
 
-    document.getElementById('player-img').src = activeBattleNft.img;
-    document.getElementById('bot-img').src = botNft.img;
-    document.getElementById('battle-log').textContent = 'Бой начался!';
-    // Добавляем обводку для апгрейженных NFT
-    const playerImg = document.getElementById('player-img');
-    const botImg = document.getElementById('bot-img');
-
-    if (activeBattleNft.upgrades && Object.keys(activeBattleNft.upgrades).length > 0) {
-        const playerUpgradeLevel = Math.max(...Object.values(activeBattleNft.upgrades));
-        let playerColor = '#4caf50'; // зеленый для обычных
-        if (playerUpgradeLevel >= 1.12) playerColor = '#ff9800'; // оранжевый для редких
-        else if (playerUpgradeLevel >= 1.12) playerColor = '#2196f3'; // синий для необычных
-    
-        playerImg.style.border = `3px solid ${playerColor}`;
-        playerImg.style.boxShadow = `0 0 15px ${playerColor}60`;
-    }
-
-    if (botNft.upgrades && Object.keys(botNft.upgrades).length > 0) {
-        const botUpgradeLevel = Math.max(...Object.values(botNft.upgrades));
-        let botColor = '#4caf50';
-        if (botUpgradeLevel >= 1.12) botColor = '#ff9800';
-        else if (botUpgradeLevel >= 1.12) botColor = '#2196f3';
-    
-        botImg.style.border = `3px solid ${botColor}`;
-        botImg.style.boxShadow = `0 0 15px ${botColor}60`;
-    }
-    
-    // Скрываем кнопку возврата
-    document.getElementById('back-to-menu-btn').style.display = 'none';
-    
-    updateHPBars();
-
-    setTimeout(() => performAttack(playerFirst), 1500);
+function handleBattleError() {
+    alert('Ошибка запуска боя. Попробуйте еще раз.');
+    // Возвращаем звёзды игроку
+    stars += 10;
+    updateUI();
+    // Скрываем оверлей поиска
+    document.getElementById('searching-overlay').style.display = 'none';
 }
 
-function performAttack(isPlayerTurn) {
-    if (!battleInProgress) return;
-
-    let damage;
-    const isLowHP = (isPlayerTurn ? botHP : playerHP) <= 25;
-    let critChance = isLowHP ? 0.3 : 0.15;
-    let dodgeChance = 0.08;
-
-    // ПРИМЕНЯЕМ АПГРЕЙДЫ
-    if (isPlayerTurn && activeBattleNft && activeBattleNft.upgrades) {
-        if (activeBattleNft.upgrades.crit) {
-            critChance *= activeBattleNft.upgrades.crit;
-        }
-    } else if (!isPlayerTurn && botNft && botNft.upgrades) {
-        if (botNft.upgrades.crit) {
-            critChance *= botNft.upgrades.crit;
-        }
-    }
-
-    // ПРИМЕНЯЕМ УКЛОНЕНИЯ
-    if (!isPlayerTurn && activeBattleNft && activeBattleNft.upgrades && activeBattleNft.upgrades.dodge) {
-        dodgeChance *= activeBattleNft.upgrades.dodge;
-    } else if (isPlayerTurn && botNft && botNft.upgrades && botNft.upgrades.dodge) {
-        dodgeChance *= botNft.upgrades.dodge;
-    }
-
-    const isCritical = Math.random() < critChance;
-    const isMiss = Math.random() < dodgeChance;
-
-    if (isCritical) {
-        damage = Math.floor(Math.random() * 30) + 45;
-    } else {
-        damage = Math.floor(Math.random() * 35) + 8;
-    }
-
-    // ПРИМЕНЯЕМ УРОН
-    if (isPlayerTurn && activeBattleNft && activeBattleNft.upgrades && activeBattleNft.upgrades.damage) {
-        damage *= activeBattleNft.upgrades.damage;
-    } else if (!isPlayerTurn && botNft && botNft.upgrades && botNft.upgrades.damage) {
-        damage *= botNft.upgrades.damage;
-    }
-
-    damage = Math.floor(damage);
-
-    // БАЛАНС: БОТ ПОЛУЧАЕТ +15% К УРОНУ И -10% К ПОЛУЧАЕМОМУ УРОНУ
-    if (!isPlayerTurn) {
-        damage *= 1.15; // Бот наносит больше урона
-    } else {
-        damage *= 0.90; // Игрок наносит меньше урона
-    }
-
-    damage = Math.floor(damage); // Окончательное округление
-
-    const log = document.getElementById('battle-log');
-    let targetImg;
-
-    if (isPlayerTurn) {
-        targetImg = document.getElementById('bot-img');
-    } else {
-        targetImg = document.getElementById('player-img');
-    }
-
-    if (isMiss) {
-        if (isPlayerTurn) {
-            log.textContent = 'Промах! Ваша атака не попала в цель!';
-        } else {
-            log.textContent = 'Уклонение! Вы избежали атаки оппонента!';
-        }
-    } else {
-        if (isPlayerTurn) {
-            botHP = Math.max(0, botHP - damage);
-            if (isCritical) {
-                log.textContent = `КРИТИЧЕСКИЙ УДАР! Вы наносите ${damage} урона оппоненту!`;
-            } else {
-                log.textContent = `Вы наносите ${damage} урона оппоненту!`;
-            }
-        } else {
-            playerHP = Math.max(0, playerHP - damage);
-            if (isCritical) {
-                log.textContent = `КРИТИЧЕСКАЯ АТАКА ОППОНЕНТА! Вы получаете ${damage} урона!`;
-            } else {
-                log.textContent = `Оппонент наносит вам ${damage} урона!`;
-            }
-        }
-        targetImg.classList.add('shake');
-        setTimeout(() => targetImg.classList.remove('shake'), 500);
-    }
-
-    updateHPBars();
-
-    if ((playerHP <= 15 || botHP <= 15) && playerHP > 0 && botHP > 0) {
-        setTimeout(() => {
-            log.textContent = 'Критическое состояние! Следующий удар может быть решающим!';
-        }, 1000);
-    }
-
-    if (playerHP <= 0 || botHP <= 0) {
-        setTimeout(() => endBattle(), 2000);
-    } else {
-        const delay = Math.random() * 1000 + 1500;
-        setTimeout(() => performAttack(!isPlayerTurn), delay);
-    }
-}
 
 
 function switchScreen(screen) {
