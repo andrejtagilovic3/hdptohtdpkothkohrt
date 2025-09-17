@@ -78,15 +78,15 @@
 
 /* === НОВАЯ УЛУЧШЕННАЯ HP СИСТЕМА === */
 .battle-hp-container {
-    background: #000000 !important;
-    border: 3px solid #666666 !important;
-    border-radius: 10px !important;
-    overflow: hidden !important;
+    background: #000000;
+    border: 3px solid #666666;
+    border-radius: 10px;
+    overflow: hidden;
     box-shadow: 
         inset 0 2px 4px rgba(0, 0, 0, 0.5),
-        0 0 10px rgba(255, 255, 255, 0.1) !important;
-    margin-bottom: 10px !important;
-    position: relative !important;
+        0 0 10px rgba(255, 255, 255, 0.1);
+    margin-bottom: 10px;
+    position: relative;
 }
 
 /* HP контейнер для врага */
@@ -104,14 +104,15 @@
 
 /* HP БАР - НОВАЯ КРАСИВАЯ СИСТЕМА */
 .battle-hp-bar {
-    height: 100% !important;
-    background: linear-gradient(90deg, #4caf50 0%, #2e7d32 100%) !important;
-    transition: all 0.8s ease-out !important;
-    position: relative !important;
-    border-radius: 2px !important;
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50 0%, #2e7d32 100%);
+    transition: width 0.8s ease-out; /* БЕЗ !important */
+    position: relative;
+    border-radius: 2px;
     box-shadow: 
         inset 0 1px 2px rgba(255, 255, 255, 0.3),
-        0 0 5px rgba(76, 175, 80, 0.4) !important;
+        0 0 5px rgba(76, 175, 80, 0.4);
+    /* width задается через JavaScript */
 }
 
 /* HP БАР - СОСТОЯНИЯ ПО УРОВНЮ ЗДОРОВЬЯ */
