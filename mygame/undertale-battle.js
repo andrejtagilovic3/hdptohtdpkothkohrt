@@ -149,51 +149,59 @@ class BattleSystem {
     }
 
     // === HP SYSTEM (ПРАВИЛЬНАЯ РЕАЛИЗАЦИЯ) ===
-      updateHPBar(type, current, max) {
-        const percent = (current / max) * 100;
-        const barElement = document.getElementById(`${type}-hp-bar`);
-        const container = document.getElementById(`${type}-hp-container`);
+    updateHPBar(barElement, currentHP, maxHP, isPlayer = false) {
+        if (!barElement) {
+            console.error('❌ HP бар не найден');
+            return false;
+        }
 
-    // Принудительная перерисовка для устранения бага рендера
-        barElement.style.opacity = '0';
-        barElement.offsetHeight; // Force reflow
+    // Убеждаемся что HP не отрицательное
+        currentHP = Math.max(0, currentHP);
+        const percent = Math.max(0, Math.min(100, (currentHP / maxHP) * 100));
+    
+        console.log(`🔧 Обновление HP бара (${isPlayer ? 'ИГРОК' : 'ВРАГ'}): ${currentHP}/${maxHP} = ${percent.toFixed(1)}%`);
+
+    // Определяем цвет в зависимости от процента HP
+        let backgroundColor;
+        let shouldAnimate = false;
+
+        if (percent <= 25) {
+            backgroundColor = 'linear-gradient(90deg, #ff1744 0%, #d32f2f 100%)';
+            shouldAnimate = true;
+        } else if (percent <= 50) {
+            backgroundColor = 'linear-gradient(90deg, #ff9800 0%, #f57c00 100%)';
+        } else {
+            backgroundColor = 'linear-gradient(90deg, #4caf50 0%, #2e7d32 100%)';
+        }
+
+        // ВАЖНО! Применяем стили ПО ОТДЕЛЬНОСТИ, а не через cssText
         barElement.style.width = `${percent}%`;
-        barElement.style.background = current > max * 0.3 ? 'green' : 'red';
-        barElement.style.opacity = '1';
+        barElement.style.height = '100%';
+        barElement.style.background = backgroundColor;
+        barElement.style.transition = 'width 0.8s ease-out';
+        barElement.style.borderRadius = '2px';
+        barElement.style.position = 'relative';
+    
+    // Анимация для критического состояния
+        if (shouldAnimate) {
+            barElement.style.animation = 'critical-flash 1s ease-in-out infinite';
+            barElement.classList.add('critical');
+        } else {
+            barElement.style.animation = '';
+            barElement.classList.remove('critical');
+        }
 
-    // Временное отключение анимации для теста
-        barElement.style.transition = 'none';
-        setTimeout(() => {
-          barElement.style.transition = 'width 0.8s'; // Вернуть анимацию после перерисовки
-        }, 0);
-      }
-
-  updateHPBars() {
-    this.updateHPBar('player', this.playerHP, this.playerMaxHP);
-    this.updateHPBar('enemy', this.enemyHP, this.enemyMaxHP);
-  }
-
-  playerAttack() {
-    this.playerDodging = false;
-    const result = this.calculateAttack(true);
-    this.applyAttackResult(true, result.damage, result.isMiss);
-    if (this.enemyHP > 0) {
-      setTimeout(() => this.enemyAttack(), 1000);
+    // Форсируем перерисовку браузера
+        void barElement.offsetHeight;
+    
+    // Дополнительная проверка для игрока
+        if (isPlayer) {
+            console.log(`✅ HP бар ИГРОКА обновлен: ширина = ${barElement.style.width}`);
+            console.log(`   Актуальная ширина элемента: ${barElement.offsetWidth}px`);
+        }
+    
+        return true;
     }
-  }
-
-  playerDodge() {
-    this.playerDodging = true;
-    this.battleLog.innerHTML += '<p>Игрок готовится увернуться!</p>';
-    setTimeout(() => this.enemyAttack(), 1000);
-  }
-
-  enemyAttack() {
-    const result = this.calculateAttack(false);
-    this.applyAttackResult(false, result.damage, result.isMiss);
-    this.isPlayerTurn = true;
-  }
-}
     updateHPBars() {
         console.log('🔄 Начинаем обновление HP баров...');
     
@@ -674,5 +682,3 @@ setTimeout(() => {
         console.error('🔴 ❌ Ошибка загрузки Battle System!');
     }
 }, 1000);
-
-
