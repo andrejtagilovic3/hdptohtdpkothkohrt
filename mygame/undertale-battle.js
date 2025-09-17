@@ -155,13 +155,13 @@ class BattleSystem {
             return false;
         }
 
-        // Убеждаемся что HP не отрицательное
+    // Убеждаемся что HP не отрицательное
         currentHP = Math.max(0, currentHP);
         const percent = Math.max(0, Math.min(100, (currentHP / maxHP) * 100));
-        
-        console.log(`🔧 Обновление HP бара: ${currentHP}/${maxHP} = ${percent.toFixed(1)}%`);
+    
+        console.log(`🔧 Обновление HP бара (${isPlayer ? 'ИГРОК' : 'ВРАГ'}): ${currentHP}/${maxHP} = ${percent.toFixed(1)}%`);
 
-        // Определяем цвет в зависимости от процента HP
+    // Определяем цвет в зависимости от процента HP
         let backgroundColor;
         let shouldAnimate = false;
 
@@ -174,47 +174,59 @@ class BattleSystem {
             backgroundColor = 'linear-gradient(90deg, #4caf50 0%, #2e7d32 100%)';
         }
 
-        // Применяем стили
-        barElement.style.cssText = `
-            width: ${percent}% !important;
-            height: 100% !important;
-            background: ${backgroundColor} !important;
-            transition: width 0.8s ease-out !important;
-            border-radius: 2px !important;
-            position: relative !important;
-            ${shouldAnimate ? 'animation: critical-flash 1s ease-in-out infinite !important;' : ''}
-        `;
-
-        // Добавляем/убираем класс критического состояния
+        // ВАЖНО! Применяем стили ПО ОТДЕЛЬНОСТИ, а не через cssText
+        barElement.style.width = `${percent}%`;
+        barElement.style.height = '100%';
+        barElement.style.background = backgroundColor;
+        barElement.style.transition = 'width 0.8s ease-out';
+        barElement.style.borderRadius = '2px';
+        barElement.style.position = 'relative';
+    
+    // Анимация для критического состояния
         if (shouldAnimate) {
+            barElement.style.animation = 'critical-flash 1s ease-in-out infinite';
             barElement.classList.add('critical');
         } else {
+            barElement.style.animation = '';
             barElement.classList.remove('critical');
         }
 
-        // Форсируем перерисовку
-        barElement.offsetHeight;
-        
-        console.log(`✅ HP бар обновлен: ширина = ${percent}%`);
+    // Форсируем перерисовку браузера
+        void barElement.offsetHeight;
+    
+    // Дополнительная проверка для игрока
+        if (isPlayer) {
+            console.log(`✅ HP бар ИГРОКА обновлен: ширина = ${barElement.style.width}`);
+            console.log(`   Актуальная ширина элемента: ${barElement.offsetWidth}px`);
+        }
+    
         return true;
     }
-
     updateHPBars() {
-        // Обновляем HP бары
-        this.updateHPBar(this.elements.playerHPBar, this.playerHP, this.maxHP, true);
-        this.updateHPBar(this.elements.enemyHPBar, this.enemyHP, this.maxHP, false);
+        console.log('🔄 Начинаем обновление HP баров...');
+    
+    // Обновляем HP бары
+        const playerUpdated = this.updateHPBar(this.elements.playerHPBar, this.playerHP, this.maxHP, true);
+        const enemyUpdated = this.updateHPBar(this.elements.enemyHPBar, this.enemyHP, this.maxHP, false);
 
-        // Обновляем текст HP
+    // Обновляем текст HP
         if (this.elements.playerHPText) {
             const displayPlayerHP = Math.max(0, Math.round(this.playerHP));
             this.elements.playerHPText.textContent = `${displayPlayerHP}/${this.maxHP} HP`;
+            console.log(`📝 Текст HP игрока обновлен: ${displayPlayerHP}/${this.maxHP}`);
         }
+    
         if (this.elements.enemyHPText) {
             const displayEnemyHP = Math.max(0, Math.round(this.enemyHP));
             this.elements.enemyHPText.textContent = `${displayEnemyHP}/${this.maxHP} HP`;
         }
 
-        console.log('🔄 HP бары обновлены. Игрок:', this.playerHP, 'Враг:', this.enemyHP);
+    // Проверка реальных значений
+        console.log('🔍 Финальная проверка:');
+        console.log('   Игрок HP:', this.playerHP, '| Бар ширина:', this.elements.playerHPBar?.style.width);
+        console.log('   Враг HP:', this.enemyHP, '| Бар ширина:', this.elements.enemyHPBar?.style.width);
+    
+        return playerUpdated && enemyUpdated;
     }
 
     // Обновление всего дисплея
@@ -670,3 +682,4 @@ setTimeout(() => {
         console.error('🔴 ❌ Ошибка загрузки Battle System!');
     }
 }, 1000);
+
