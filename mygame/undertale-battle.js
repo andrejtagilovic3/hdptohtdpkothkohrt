@@ -1,4 +1,4 @@
-// ==================== UNDERTALE BATTLE SYSTEM (ПЕРЕПИСАННАЯ ЧИСТАЯ ВЕРСИЯ) ====================
+// ==================== UNDERTALE BATTLE SYSTEM (ИСПРАВЛЕННАЯ ВЕРСИЯ HP) ====================
 
 class BattleSystem {
     constructor() {
@@ -148,85 +148,71 @@ class BattleSystem {
         this.elements.resultBackBtn.addEventListener('click', () => this.endBattle());
     }
 
-    // === HP SYSTEM (ПРАВИЛЬНАЯ РЕАЛИЗАЦИЯ) ===
+    // === HP SYSTEM (ПОЛНОСТЬЮ ПЕРЕПИСАННАЯ СИСТЕМА) ===
     updateHPBar(barElement, currentHP, maxHP, isPlayer = false) {
         if (!barElement) {
             console.error('❌ HP бар не найден');
             return false;
         }
 
-    // Убеждаемся что HP не отрицательное
-        currentHP = Math.max(0, currentHP);
+        // Убеждаемся что HP не отрицательное и округляем
+        currentHP = Math.max(0, Math.round(currentHP));
         const percent = Math.max(0, Math.min(100, (currentHP / maxHP) * 100));
-    
+        
         console.log(`🔧 Обновление HP бара (${isPlayer ? 'ИГРОК' : 'ВРАГ'}): ${currentHP}/${maxHP} = ${percent.toFixed(1)}%`);
 
-    // Определяем цвет в зависимости от процента HP
-        let backgroundColor;
-        let shouldAnimate = false;
-
-        if (percent <= 25) {
-            backgroundColor = 'linear-gradient(90deg, #ff1744 0%, #d32f2f 100%)';
-            shouldAnimate = true;
-        } else if (percent <= 50) {
-            backgroundColor = 'linear-gradient(90deg, #ff9800 0%, #f57c00 100%)';
+        // Определяем класс CSS для цвета
+        barElement.className = 'battle-hp-bar'; // Сбрасываем классы
+        
+        if (percent > 50) {
+            barElement.classList.add('healthy');
+        } else if (percent > 25) {
+            barElement.classList.add('damaged');
         } else {
-            backgroundColor = 'linear-gradient(90deg, #4caf50 0%, #2e7d32 100%)';
-        }
-
-        // ВАЖНО! Применяем стили ПО ОТДЕЛЬНОСТИ, а не через cssText
-        barElement.style.width = `${percent}%`;
-        barElement.style.height = '100%';
-        barElement.style.background = backgroundColor;
-        barElement.style.transition = 'width 0.8s ease-out';
-        barElement.style.borderRadius = '2px';
-        barElement.style.position = 'relative';
-    
-    // Анимация для критического состояния
-        if (shouldAnimate) {
-            barElement.style.animation = 'critical-flash 1s ease-in-out infinite';
             barElement.classList.add('critical');
-        } else {
-            barElement.style.animation = '';
-            barElement.classList.remove('critical');
         }
 
-    // Форсируем перерисовку браузера
-        void barElement.offsetHeight;
-    
-    // Дополнительная проверка для игрока
+        // ВАЖНО! Устанавливаем ширину напрямую через style
+        barElement.style.width = `${percent}%`;
+        
+        // Логируем для отладки
         if (isPlayer) {
-            console.log(`✅ HP бар ИГРОКА обновлен: ширина = ${barElement.style.width}`);
-            console.log(`   Актуальная ширина элемента: ${barElement.offsetWidth}px`);
+            console.log(`✅ HP бар ИГРОКА: ширина установлена на ${percent}%`);
+            console.log(`   Реальная ширина: ${barElement.offsetWidth}px из ${barElement.parentElement.offsetWidth}px`);
         }
-    
+        
         return true;
     }
-    updateHPBars() {
-        console.log('🔄 Начинаем обновление HP баров...');
-    
-    // Обновляем HP бары
-        const playerUpdated = this.updateHPBar(this.elements.playerHPBar, this.playerHP, this.maxHP, true);
-        const enemyUpdated = this.updateHPBar(this.elements.enemyHPBar, this.enemyHP, this.maxHP, false);
 
-    // Обновляем текст HP
+    // НОВАЯ система обновления HP
+    updateHPBars() {
+        console.log('🔄 === НАЧАЛО ОБНОВЛЕНИЯ HP БАРОВ ===');
+        console.log(`   Текущее HP: Игрок=${this.playerHP}, Враг=${this.enemyHP}`);
+        
+        // Обновляем HP бары
+        const playerSuccess = this.updateHPBar(this.elements.playerHPBar, this.playerHP, this.maxHP, true);
+        const enemySuccess = this.updateHPBar(this.elements.enemyHPBar, this.enemyHP, this.maxHP, false);
+
+        // Обновляем текстовые значения HP
+        this.updateHPTexts();
+
+        console.log(`🔄 === КОНЕЦ ОБНОВЛЕНИЯ HP БАРОВ ===`);
+        return playerSuccess && enemySuccess;
+    }
+
+    // Отдельная функция для обновления текста HP
+    updateHPTexts() {
         if (this.elements.playerHPText) {
             const displayPlayerHP = Math.max(0, Math.round(this.playerHP));
             this.elements.playerHPText.textContent = `${displayPlayerHP}/${this.maxHP} HP`;
-            console.log(`📝 Текст HP игрока обновлен: ${displayPlayerHP}/${this.maxHP}`);
+            console.log(`📝 Текст HP игрока: ${displayPlayerHP}/${this.maxHP}`);
         }
-    
+        
         if (this.elements.enemyHPText) {
             const displayEnemyHP = Math.max(0, Math.round(this.enemyHP));
             this.elements.enemyHPText.textContent = `${displayEnemyHP}/${this.maxHP} HP`;
+            console.log(`📝 Текст HP врага: ${displayEnemyHP}/${this.maxHP}`);
         }
-
-    // Проверка реальных значений
-        console.log('🔍 Финальная проверка:');
-        console.log('   Игрок HP:', this.playerHP, '| Бар ширина:', this.elements.playerHPBar?.style.width);
-        console.log('   Враг HP:', this.enemyHP, '| Бар ширина:', this.elements.enemyHPBar?.style.width);
-    
-        return playerUpdated && enemyUpdated;
     }
 
     // Обновление всего дисплея
@@ -247,13 +233,29 @@ class BattleSystem {
             this.elements.playerNftName.textContent = this.playerNft.name;
         }
 
-        // Обновляем HP с небольшой задержкой для корректного отображения
-        setTimeout(() => {
-            this.updateHPBars();
-        }, 10);
+        // Обновляем HP с принудительным обновлением
+        this.forceUpdateHP();
 
         // Обновляем состояние кнопок
         this.updateActionButtons();
+    }
+
+    // НОВАЯ функция принудительного обновления HP
+    forceUpdateHP() {
+        console.log('💪 ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ HP');
+        
+        // Немедленное обновление HP баров
+        this.updateHPBars();
+        
+        // Дополнительное обновление через микро-задачу
+        Promise.resolve().then(() => {
+            this.updateHPBars();
+        });
+        
+        // И еще одно через setTimeout для гарантии
+        setTimeout(() => {
+            this.updateHPBars();
+        }, 50);
     }
 
     // Обновление состояния кнопок действий
@@ -357,11 +359,13 @@ class BattleSystem {
         
         console.log('👹 HP игрока ПОСЛЕ атаки:', this.playerHP);
 
-        // Обновляем дисплей с небольшой задержкой для анимации
+        // КРИТИЧЕСКИ ВАЖНО: принудительно обновляем HP после атаки
+        this.forceUpdateHP();
+
+        // Проверяем окончание битвы
         setTimeout(() => {
-            this.updateDisplay();
             this.checkBattleEnd();
-        }, 300);
+        }, 500);
 
         if (this.isActive) {
             this.currentTurn = 'player';
@@ -433,6 +437,8 @@ class BattleSystem {
         const targetImg = isPlayerAttack ? this.elements.enemyImg : this.elements.playerImg;
         const { damage, isCritical, isMiss } = result;
 
+        console.log(`💥 Применение атаки: урон=${damage}, крит=${isCritical}, промах=${isMiss}, атакует_игрок=${isPlayerAttack}`);
+
         if (isMiss) {
             if (isPlayerAttack) {
                 this.addLog('Промах! Ваша атака не попала в цель!');
@@ -443,14 +449,20 @@ class BattleSystem {
         } else {
             // Применяем урон
             if (isPlayerAttack) {
+                const oldHP = this.enemyHP;
                 this.enemyHP = Math.max(0, this.enemyHP - damage);
+                console.log(`⚔️ Урон врагу: ${oldHP} -> ${this.enemyHP} (урон: ${damage})`);
+                
                 if (isCritical) {
                     this.addLog(`💥 КРИТИЧЕСКИЙ УДАР! Вы наносите ${damage} урона оппоненту!`);
                 } else {
                     this.addLog(`Вы наносите ${damage} урона оппоненту!`);
                 }
             } else {
+                const oldHP = this.playerHP;
                 this.playerHP = Math.max(0, this.playerHP - damage);
+                console.log(`💀 Урон игроку: ${oldHP} -> ${this.playerHP} (урон: ${damage})`);
+                
                 if (isCritical) {
                     this.addLog(`💥 КРИТИЧЕСКАЯ АТАКА ОППОНЕНТА! Вы получаете ${damage} урона!`);
                 } else {
@@ -462,8 +474,9 @@ class BattleSystem {
             this.addShakeEffect(targetImg);
         }
 
-        // Немедленно обновляем HP бары
-        this.updateHPBars();
+        // КРИТИЧЕСКИ ВАЖНО: немедленно обновляем HP бары после урона
+        console.log('🚨 НЕМЕДЛЕННОЕ ОБНОВЛЕНИЕ HP ПОСЛЕ УРОНА');
+        this.forceUpdateHP();
 
         // Проверка критического состояния
         if ((this.playerHP <= 15 || this.enemyHP <= 15) && this.playerHP > 0 && this.enemyHP > 0) {
