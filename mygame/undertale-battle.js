@@ -155,15 +155,18 @@ class BattleSystem {
             return false;
         }
 
-        // Убеждаемся что HP не отрицательное и округляем
+    // Убеждаемся что HP не отрицательное и округляем
         currentHP = Math.max(0, Math.round(currentHP));
         const percent = Math.max(0, Math.min(100, (currentHP / maxHP) * 100));
-        
+    
         console.log(`🔧 Обновление HP бара (${isPlayer ? 'ИГРОК' : 'ВРАГ'}): ${currentHP}/${maxHP} = ${percent.toFixed(1)}%`);
-
-        // Определяем класс CSS для цвета
+    
+    // ВАЖНО! Сначала устанавливаем ширину
+        barElement.style.width = `${percent}%`;
+    
+    // Определяем класс CSS для цвета на основе процента
         barElement.className = 'battle-hp-bar'; // Сбрасываем классы
-        
+    
         if (percent > 50) {
             barElement.classList.add('healthy');
         } else if (percent > 25) {
@@ -171,49 +174,52 @@ class BattleSystem {
         } else {
             barElement.classList.add('critical');
         }
-
-        // ВАЖНО! Устанавливаем ширину напрямую через style
-        barElement.style.width = `${percent}%`;
-        
-        // Логируем для отладки
-        if (isPlayer) {
-            console.log(`✅ HP бар ИГРОКА: ширина установлена на ${percent}%`);
-            console.log(`   Реальная ширина: ${barElement.offsetWidth}px из ${barElement.parentElement.offsetWidth}px`);
-        }
-        
+    
+    // Сохраняем актуальные значения HP в data-атрибуты
+        barElement.dataset.currentHp = currentHP;
+        barElement.dataset.maxHp = maxHP;
+        barElement.dataset.percent = percent.toFixed(1);
+    
+        console.log(`✅ HP бар ${isPlayer ? 'ИГРОКА' : 'ВРАГА'}: ширина=${percent}%, HP=${currentHP}/${maxHP}`);
+    
         return true;
     }
-
     // НОВАЯ система обновления HP
     updateHPBars() {
         console.log('🔄 === НАЧАЛО ОБНОВЛЕНИЯ HP БАРОВ ===');
         console.log(`   Текущее HP: Игрок=${this.playerHP}, Враг=${this.enemyHP}`);
-        
-        // Обновляем HP бары
+    
+    // Обновляем HP бары
         const playerSuccess = this.updateHPBar(this.elements.playerHPBar, this.playerHP, this.maxHP, true);
         const enemySuccess = this.updateHPBar(this.elements.enemyHPBar, this.enemyHP, this.maxHP, false);
 
-        // Обновляем текстовые значения HP
+    // Обновляем текстовые значения HP на основе данных из баров
         this.updateHPTexts();
 
         console.log(`🔄 === КОНЕЦ ОБНОВЛЕНИЯ HP БАРОВ ===`);
         return playerSuccess && enemySuccess;
     }
-
     // Отдельная функция для обновления текста HP
     updateHPTexts() {
-        if (this.elements.playerHPText) {
-            const displayPlayerHP = Math.max(0, Math.round(this.playerHP));
-            this.elements.playerHPText.textContent = `${displayPlayerHP}/${this.maxHP} HP`;
-            console.log(`📝 Текст HP игрока: ${displayPlayerHP}/${this.maxHP}`);
-        }
+    // Обновляем текст игрока
+        if (this.elements.playerHPBar && this.elements.playerHPText) {
+            const playerCurrentHP = parseInt(this.elements.playerHPBar.dataset.currentHp) || this.playerHP;
+            const playerMaxHP = parseInt(this.elements.playerHPBar.dataset.maxHp) || this.maxHP;
         
-        if (this.elements.enemyHPText) {
-            const displayEnemyHP = Math.max(0, Math.round(this.enemyHP));
-            this.elements.enemyHPText.textContent = `${displayEnemyHP}/${this.maxHP} HP`;
-            console.log(`📝 Текст HP врага: ${displayEnemyHP}/${this.maxHP}`);
+            this.elements.playerHPText.textContent = `${playerCurrentHP}/${playerMaxHP} HP`;
+            console.log(`📝 Текст HP игрока: ${playerCurrentHP}/${playerMaxHP}`);
+        }
+    
+    // Обновляем текст врага
+        if (this.elements.enemyHPBar && this.elements.enemyHPText) {
+            const enemyCurrentHP = parseInt(this.elements.enemyHPBar.dataset.currentHp) || this.enemyHP;
+            const enemyMaxHP = parseInt(this.elements.enemyHPBar.dataset.maxHp) || this.maxHP;
+        
+            this.elements.enemyHPText.textContent = `${enemyCurrentHP}/${enemyMaxHP} HP`;
+            console.log(`📝 Текст HP врага: ${enemyCurrentHP}/${enemyMaxHP}`);
         }
     }
+
 
     // Обновление всего дисплея
     updateDisplay() {
@@ -695,3 +701,4 @@ setTimeout(() => {
         console.error('🔴 ❌ Ошибка загрузки Battle System!');
     }
 }, 1000);
+
