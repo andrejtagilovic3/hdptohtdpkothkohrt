@@ -361,72 +361,16 @@ function startBattleSearch() {
 
 // Исправленная функция startNewBattle - замените эту функцию в вашем script.js
 
-function startNewBattle() {
-    console.log('🚀 Запуск нового боя...');
-    document.getElementById('searching-overlay').style.display = 'none';
-
-    const playerPrice = activeBattleNft.buyPrice;
-    const playerHasUpgrades = activeBattleNft.upgrades && Object.keys(activeBattleNft.upgrades).length > 0;
-    let suitableNfts = [];
-
-    nftTemplates.forEach((template, index) => {
-        const nftPrice = nftPrices[index];
-        
-        // Подбор по цене (±30% от цены игрока)
-        const priceMin = playerPrice * 0.7;
-        const priceMax = playerPrice * 1.3;
-        
-        if (nftPrice >= priceMin && nftPrice <= priceMax) {
-            suitableNfts.push({ 
-                ...template, 
-                price: nftPrice
-            });
-        }
-    });
-
-    let botNft;
-    if (suitableNfts.length === 0) {
-        const randomIndex = Math.floor(Math.random() * nftTemplates.length);
-        botNft = { ...nftTemplates[randomIndex], price: nftPrices[randomIndex] };
-    } else {
-        const randomIndex = Math.floor(Math.random() * suitableNfts.length);
-        botNft = suitableNfts[randomIndex];
-    }
-
-    // Генерируем апгрейды для бота
-    if (playerHasUpgrades) {
-        if (Math.random() < 0.7) {
-            generateBotUpgrades(botNft, true);
-        }
-    } else {
-        if (Math.random() < 0.15) {
-            generateBotUpgrades(botNft, false);
-        }
-    }
-
-    console.log('👤 Игрок:', activeBattleNft.name);
-    console.log('🤖 Бот:', botNft.name);
-
-    // ЗАПУСКАЕМ НОВУЮ БОЕВУЮ СИСТЕМУ
-    if (window.battleSystem && typeof window.battleSystem.init === 'function') {
-        console.log('✅ Запуск через battleSystem.init');
-        const success = window.battleSystem.init(activeBattleNft, botNft);
+function startBattle() {
+    if (activeBattleNft && botNft) {
+        const success = window.launchBattle(activeBattleNft, botNft);
         if (success) {
-            console.log('🎉 Битва успешно запущена!');
+            console.log('Battle launched successfully!');
         } else {
-            console.error('❌ Ошибка при запуске битвы');
-            handleBattleError();
-        }
-    } else if (typeof window.startUndertaleBattle === 'function') {
-        console.log('✅ Запуск через startUndertaleBattle');
-        const success = window.startUndertaleBattle(activeBattleNft, botNft);
-        if (!success) {
-            console.error('❌ Ошибка при запуске битвы');
-            handleBattleError();
+            console.error('Failed to launch battle!');
         }
     } else {
-        console.error('❌ КРИТИЧЕСКАЯ ОШИБКА: battleSystem не найден!');
-        handleBattleError();
+        console.error('No active NFT or bot NFT selected!');
     }
 }
 
