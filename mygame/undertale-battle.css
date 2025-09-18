@@ -78,15 +78,17 @@
 
 /* === НОВАЯ УЛУЧШЕННАЯ HP СИСТЕМА === */
 .battle-hp-container {
-    background: #000000;
-    border: 3px solid #666666;
-    border-radius: 10px;
-    overflow: hidden;
+    background: #000000 !important;
+    border: 3px solid #666666 !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
     box-shadow: 
         inset 0 2px 4px rgba(0, 0, 0, 0.5),
-        0 0 10px rgba(255, 255, 255, 0.1);
-    margin-bottom: 10px;
-    position: relative;
+        0 0 10px rgba(255, 255, 255, 0.1) !important;
+    margin-bottom: 10px !important;
+    position: relative !important;
+    /* Принудительно устанавливаем размеры */
+    min-height: 20px !important;
 }
 
 /* HP контейнер для врага */
@@ -104,15 +106,20 @@
 
 /* HP БАР - НОВАЯ КРАСИВАЯ СИСТЕМА */
 .battle-hp-bar {
-    height: 100%;
-    background: linear-gradient(90deg, #4caf50 0%, #2e7d32 100%);
-    transition: width 0.8s ease-out; /* БЕЗ !important */
-    position: relative;
-    border-radius: 2px;
+    height: 100% !important;
+    /* НЕ устанавливаем width здесь - он устанавливается через JavaScript */
+    background: linear-gradient(90deg, #4caf50 0%, #2e7d32 100%) !important;
+    transition: width 0.8s ease-out !important;
+    position: relative !important;
+    border-radius: 2px !important;
     box-shadow: 
         inset 0 1px 2px rgba(255, 255, 255, 0.3),
-        0 0 5px rgba(76, 175, 80, 0.4);
-    /* width задается через JavaScript */
+        0 0 5px rgba(76, 175, 80, 0.4) !important;
+    /* Убеждаемся что элемент не сжимается */
+    min-height: 100% !important;
+    display: block !important;
+    /* Принудительно указываем что это блочный элемент */
+    content: '' !important;
 }
 
 /* HP БАР - СОСТОЯНИЯ ПО УРОВНЮ ЗДОРОВЬЯ */
@@ -135,13 +142,13 @@
 @keyframes critical-flash {
     0%, 100% { 
         opacity: 1 !important; 
-        background: linear-gradient(90deg, #ff1744 0%, #d32f2f 100%) !important;
         transform: scale(1) !important;
+        filter: brightness(1) !important;
     }
     50% { 
         opacity: 0.8 !important; 
-        background: linear-gradient(90deg, #d32f2f 0%, #b71c1c 100%) !important;
         transform: scale(1.02) !important;
+        filter: brightness(1.2) !important;
     }
 }
 
@@ -161,6 +168,20 @@
     border-radius: 2px !important;
 }
 
+.battle-hp-bar.healthy {
+    background: linear-gradient(90deg, #4caf50 0%, #2e7d32 100%) !important;
+    box-shadow: 
+        inset 0 1px 2px rgba(255, 255, 255, 0.3),
+        0 0 5px rgba(76, 175, 80, 0.4) !important;
+}
+
+.battle-hp-bar.damaged {
+    background: linear-gradient(90deg, #ff9800 0%, #f57c00 100%) !important;
+    box-shadow: 
+        inset 0 1px 2px rgba(255, 255, 255, 0.3),
+        0 0 5px rgba(255, 152, 0, 0.4) !important;
+}
+
 @keyframes hp-shine {
     0%, 100% {
         opacity: 0;
@@ -174,13 +195,22 @@
 
 .battle-hp-text {
     font-size: 16px !important;
-    color: #cccccc !important;
+    color: #ffffff !important;
     font-weight: 700 !important;
     text-align: center !important;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5) !important;
+    text-shadow: 
+        1px 1px 2px rgba(0, 0, 0, 0.8),
+        0 0 4px rgba(0, 0, 0, 0.5) !important;
     margin-top: 4px !important;
+    font-family: 'Courier New', monospace !important;
+    letter-spacing: 1px !important;
+    /* Принудительно показываем текст */
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 10 !important;
 }
-
 /* НИЖНЯЯ ОБЛАСТЬ */
 .battle-bottom-area {
     height: 320px;
@@ -660,4 +690,23 @@
         width: 100px !important;
         height: 18px !important;
     }
+}
+
+.enemy-battle-area .battle-hp-text {
+    font-size: 18px !important;
+    margin-top: 8px !important;
+}
+
+.player-battle-area .battle-hp-text {
+    font-size: 14px !important;
+    margin-top: 4px !important;
+}
+
+/* ПРИНУДИТЕЛЬНЫЕ СТИЛИ ДЛЯ HP КОНТЕЙНЕРОВ */
+.enemy-battle-area .battle-hp-container {
+    margin: 15px auto !important;
+}
+
+.player-battle-area .battle-hp-container {
+    margin: 8px auto !important;
 }
