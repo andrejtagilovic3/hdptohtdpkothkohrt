@@ -1,401 +1,212 @@
-// ===== НОВАЯ ПРОСТАЯ СИСТЕМА БИТВ =====
+// УЛЬТРА ПРОСТАЯ БОЕВАЯ СИСТЕМА - С НУЛЯ БЕЗ ВСЯКОЙ ФИГНИ
 
-class SimpleBattleSystem {
-    constructor() {
-        this.playerHP = 100;
-        this.enemyHP = 100;
-        this.maxHP = 100;
-        this.playerNft = null;
-        this.enemyNft = null;
-        this.isActive = false;
-        this.battleContainer = null;
-    }
-
-    // Инициализация битвы
-    init(playerNft, enemyNft) {
-        console.log('🚀 Запуск новой простой битвы');
+window.battleSystem = {
+    playerHP: 100,
+    enemyHP: 100,
+    isActive: false,
+    
+    init: function(playerNft, enemyNft) {
+        console.log('Запуск простой битвы');
         
         this.playerHP = 100;
         this.enemyHP = 100;
+        this.isActive = true;
         this.playerNft = playerNft;
         this.enemyNft = enemyNft;
-        this.isActive = true;
-
-        this.createUI();
-        this.updateDisplay();
         
+        this.createUI();
         return true;
-    }
-
-    // Создание интерфейса
-    createUI() {
-        // Удаляем старый интерфейс если есть
-        const existing = document.getElementById('simple-battle-container');
-        if (existing) existing.remove();
-
-        const battleHTML = `
-            <div id="simple-battle-container" style="
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: #000000;
-                color: #ffffff;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                z-index: 9999;
-                font-family: Arial, sans-serif;
-                gap: 30px;
-            ">
-                <!-- Враг -->
-                <div style="text-align: center;">
-                    <h2 id="enemy-name" style="margin: 0 0 15px 0; font-size: 24px;">ВРАГ</h2>
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <img id="enemy-img" style="width: 80px; height: 80px; border-radius: 10px; border: 2px solid #666;">
-                        <div>
-                            <div style="
-                                width: 200px;
-                                height: 20px;
-                                background: #333;
-                                border: 2px solid #666;
-                                border-radius: 10px;
-                                overflow: hidden;
-                                position: relative;
-                                margin-bottom: 5px;
-                            ">
-                                <div id="enemy-hp-bar" style="
-                                    width: 100%;
-                                    height: 100%;
-                                    background: linear-gradient(90deg, #4caf50, #2e7d32);
-                                    transition: width 0.5s ease;
-                                "></div>
-                            </div>
-                            <div id="enemy-hp-text" style="font-size: 14px; color: #ccc; text-align: center;">100/100 HP</div>
-                        </div>
-                    </div>
+    },
+    
+    createUI: function() {
+        // Убираем старое
+        const old = document.getElementById('battle-screen');
+        if (old) old.remove();
+        
+        // Создаем новое
+        const html = `
+        <div id="battle-screen" style="position:fixed; top:0; left:0; right:0; bottom:0; background:#000; color:#fff; z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:Arial;">
+            
+            <h1>БИТВА</h1>
+            
+            <div style="margin:20px;">
+                <h3>ВРАГ: ${this.enemyNft.name}</h3>
+                <div style="width:300px; height:30px; background:#333; border:2px solid #666; margin:10px 0;">
+                    <div id="enemy-bar" style="width:100%; height:100%; background:#00ff00;"></div>
                 </div>
-
-                <!-- Кнопка боя -->
-                <button id="battle-btn" style="
-                    background: #ff4444;
-                    color: white;
-                    border: none;
-                    padding: 15px 30px;
-                    font-size: 18px;
-                    font-weight: bold;
-                    border-radius: 10px;
-                    cursor: pointer;
-                    transition: background 0.2s;
-                " onmouseover="this.style.background='#ff6666'" onmouseout="this.style.background='#ff4444'">
-                    ⚔️ АТАКА
-                </button>
-
-                <!-- Игрок -->
-                <div style="text-align: center;">
-                    <h2 style="margin: 0 0 15px 0; font-size: 24px;">ВЫ</h2>
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <img id="player-img" style="width: 80px; height: 80px; border-radius: 10px; border: 2px solid #666;">
-                        <div>
-                            <div style="
-                                width: 200px;
-                                height: 20px;
-                                background: #333;
-                                border: 2px solid #666;
-                                border-radius: 10px;
-                                overflow: hidden;
-                                position: relative;
-                                margin-bottom: 5px;
-                            ">
-                                <div id="player-hp-bar" style="
-                                    width: 100%;
-                                    height: 100%;
-                                    background: linear-gradient(90deg, #4caf50, #2e7d32);
-                                    transition: width 0.5s ease;
-                                "></div>
-                            </div>
-                            <div id="player-hp-text" style="font-size: 14px; color: #ccc; text-align: center;">100/100 HP</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Кнопка выхода -->
-                <button id="exit-btn" style="
-                    background: #666;
-                    color: white;
-                    border: none;
-                    padding: 10px 20px;
-                    font-size: 14px;
-                    border-radius: 5px;
-                    cursor: pointer;
-                    position: absolute;
-                    top: 20px;
-                    right: 20px;
-                ">
-                    Выход
-                </button>
-
-                <!-- Результат битвы -->
-                <div id="battle-result" style="
-                    display: none;
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background: #222;
-                    border: 3px solid #666;
-                    border-radius: 15px;
-                    padding: 30px;
-                    text-align: center;
-                ">
-                    <h2 id="result-title" style="margin: 0 0 15px 0; font-size: 28px;"></h2>
-                    <p id="result-text" style="margin: 0 0 20px 0; font-size: 16px; color: #ccc;"></p>
-                    <button id="result-btn" style="
-                        background: #4caf50;
-                        color: white;
-                        border: none;
-                        padding: 10px 20px;
-                        font-size: 16px;
-                        border-radius: 5px;
-                        cursor: pointer;
-                    ">
-                        Вернуться
-                    </button>
-                </div>
+                <div id="enemy-hp">${this.enemyHP}/100 HP</div>
             </div>
-        `;
-
-        document.body.insertAdjacentHTML('beforeend', battleHTML);
-        this.battleContainer = document.getElementById('simple-battle-container');
-
-        // Привязываем события
-        document.getElementById('battle-btn').addEventListener('click', () => this.fight());
-        document.getElementById('exit-btn').addEventListener('click', () => this.exitBattle());
-        document.getElementById('result-btn').addEventListener('click', () => this.exitBattle());
-    }
-
-    // Обновление отображения
-    updateDisplay() {
-        // Обновляем изображения и названия
-        document.getElementById('player-img').src = this.playerNft.img;
-        document.getElementById('enemy-img').src = this.enemyNft.img;
-        document.getElementById('enemy-name').textContent = this.enemyNft.name.toUpperCase();
-
-        // Обновляем HP бары
-        this.updateHPBars();
-    }
-
-    // Обновление HP баров
-    updateHPBars() {
-        const playerPercent = (this.playerHP / this.maxHP) * 100;
-        const enemyPercent = (this.enemyHP / this.maxHP) * 100;
-
-        // Обновляем ширину баров
-        document.getElementById('player-hp-bar').style.width = playerPercent + '%';
-        document.getElementById('enemy-hp-bar').style.width = enemyPercent + '%';
-
-        // Обновляем цвета в зависимости от HP
-        const playerBar = document.getElementById('player-hp-bar');
-        const enemyBar = document.getElementById('enemy-hp-bar');
-
-        // Игрок
-        if (playerPercent > 50) {
-            playerBar.style.background = 'linear-gradient(90deg, #4caf50, #2e7d32)';
-        } else if (playerPercent > 25) {
-            playerBar.style.background = 'linear-gradient(90deg, #ff9800, #f57c00)';
-        } else {
-            playerBar.style.background = 'linear-gradient(90deg, #f44336, #d32f2f)';
-        }
-
-        // Враг
-        if (enemyPercent > 50) {
-            enemyBar.style.background = 'linear-gradient(90deg, #4caf50, #2e7d32)';
-        } else if (enemyPercent > 25) {
-            enemyBar.style.background = 'linear-gradient(90deg, #ff9800, #f57c00)';
-        } else {
-            enemyBar.style.background = 'linear-gradient(90deg, #f44336, #d32f2f)';
-        }
-
-        // Обновляем текст HP
-        document.getElementById('player-hp-text').textContent = `${this.playerHP}/100 HP`;
-        document.getElementById('enemy-hp-text').textContent = `${this.enemyHP}/100 HP`;
-    }
-
-    // Основная функция боя
-    fight() {
+            
+            <button id="fight-btn" style="padding:20px 40px; font-size:20px; background:#ff0000; color:#fff; border:none; cursor:pointer; margin:20px;">
+                БИТ!
+            </button>
+            
+            <div style="margin:20px;">
+                <h3>ИГРОК: ${this.playerNft.name}</h3>
+                <div style="width:300px; height:30px; background:#333; border:2px solid #666; margin:10px 0;">
+                    <div id="player-bar" style="width:100%; height:100%; background:#00ff00;"></div>
+                </div>
+                <div id="player-hp">${this.playerHP}/100 HP</div>
+            </div>
+            
+            <button onclick="window.battleSystem.exit()" style="position:absolute; top:20px; right:20px; padding:10px; background:#666; color:#fff; border:none; cursor:pointer;">
+                ВЫХОД
+            </button>
+            
+        </div>`;
+        
+        document.body.innerHTML += html;
+        
+        // Кнопка боя
+        document.getElementById('fight-btn').onclick = () => this.fight();
+    },
+    
+    fight: function() {
         if (!this.isActive) return;
-
-        console.log('⚔️ Бой начат!');
+        
+        console.log('БОЙ!');
         
         // Отключаем кнопку
-        const battleBtn = document.getElementById('battle-btn');
-        battleBtn.disabled = true;
-        battleBtn.textContent = '...';
-
-        // Случайно выбираем кто получит урон первым
-        const playerFirst = Math.random() < 0.5;
+        document.getElementById('fight-btn').disabled = true;
+        document.getElementById('fight-btn').textContent = 'БОЙ...';
         
-        if (playerFirst) {
-            console.log('💥 Первым урон получает игрок');
-            this.damagePlayer();
-            
+        // Случайно выбираем кто первый
+        if (Math.random() < 0.5) {
+            // Первый игрок
+            this.hitPlayer();
             setTimeout(() => {
-                if (this.isActive && this.enemyHP > 0) {
-                    console.log('💥 Вторым урон получает враг');
-                    this.damageEnemy();
-                    this.resetButton();
+                if (this.isActive) {
+                    this.hitEnemy();
+                    this.enableButton();
                 }
             }, 1000);
         } else {
-            console.log('💥 Первым урон получает враг');
-            this.damageEnemy();
-            
+            // Первый враг
+            this.hitEnemy();
             setTimeout(() => {
-                if (this.isActive && this.playerHP > 0) {
-                    console.log('💥 Вторым урон получает игрок');
-                    this.damagePlayer();
-                    this.resetButton();
+                if (this.isActive) {
+                    this.hitPlayer();
+                    this.enableButton();
                 }
             }, 1000);
         }
-    }
-
-    // Урон игроку
-    damagePlayer() {
-        const damage = Math.floor(Math.random() * 20) + 10; // 10-30 урона
-        this.playerHP = Math.max(0, this.playerHP - damage);
+    },
+    
+    hitPlayer: function() {
+        const damage = Math.floor(Math.random() * 20) + 10;
+        this.playerHP -= damage;
+        if (this.playerHP < 0) this.playerHP = 0;
         
-        console.log(`💀 Игрок получил ${damage} урона. HP: ${this.playerHP}`);
-        this.updateHPBars();
+        console.log(`Игрок получил ${damage} урона. HP: ${this.playerHP}`);
+        this.updateBars();
         
         if (this.playerHP <= 0) {
-            setTimeout(() => this.endBattle(false), 500);
+            setTimeout(() => this.gameOver(false), 500);
         }
-    }
-
-    // Урон врагу
-    damageEnemy() {
-        const damage = Math.floor(Math.random() * 20) + 10; // 10-30 урона
-        this.enemyHP = Math.max(0, this.enemyHP - damage);
+    },
+    
+    hitEnemy: function() {
+        const damage = Math.floor(Math.random() * 20) + 10;
+        this.enemyHP -= damage;
+        if (this.enemyHP < 0) this.enemyHP = 0;
         
-        console.log(`👹 Враг получил ${damage} урона. HP: ${this.enemyHP}`);
-        this.updateHPBars();
+        console.log(`Враг получил ${damage} урона. HP: ${this.enemyHP}`);
+        this.updateBars();
         
         if (this.enemyHP <= 0) {
-            setTimeout(() => this.endBattle(true), 500);
+            setTimeout(() => this.gameOver(true), 500);
         }
-    }
-
-    // Восстановление кнопки
-    resetButton() {
-        if (!this.isActive) return;
+    },
+    
+    updateBars: function() {
+        const playerPercent = (this.playerHP / 100) * 100;
+        const enemyPercent = (this.enemyHP / 100) * 100;
         
-        const battleBtn = document.getElementById('battle-btn');
-        battleBtn.disabled = false;
-        battleBtn.textContent = '⚔️ АТАКА';
-    }
-
-    // Завершение битвы
-    endBattle(playerWon) {
+        // ОБНОВЛЯЕМ БАРЫ ПРИНУДИТЕЛЬНО
+        const playerBar = document.getElementById('player-bar');
+        const enemyBar = document.getElementById('enemy-bar');
+        
+        if (playerBar) {
+            playerBar.style.width = playerPercent + '%';
+            console.log(`Бар игрока: ${playerPercent}%`);
+        }
+        
+        if (enemyBar) {
+            enemyBar.style.width = enemyPercent + '%';
+            console.log(`Бар врага: ${enemyPercent}%`);
+        }
+        
+        // ОБНОВЛЯЕМ ТЕКСТ
+        const playerHPText = document.getElementById('player-hp');
+        const enemyHPText = document.getElementById('enemy-hp');
+        
+        if (playerHPText) playerHPText.textContent = `${this.playerHP}/100 HP`;
+        if (enemyHPText) enemyHPText.textContent = `${this.enemyHP}/100 HP`;
+    },
+    
+    enableButton: function() {
+        if (!this.isActive) return;
+        const btn = document.getElementById('fight-btn');
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'БИТ!';
+        }
+    },
+    
+    gameOver: function(playerWon) {
         this.isActive = false;
         
-        const resultDiv = document.getElementById('battle-result');
-        const titleDiv = document.getElementById('result-title');
-        const textDiv = document.getElementById('result-text');
-
-        if (playerWon) {
-            titleDiv.textContent = '🏆 ПОБЕДА!';
-            titleDiv.style.color = '#4caf50';
-            textDiv.textContent = `Вы победили ${this.enemyNft.name}!`;
-            
-            // Добавляем NFT в коллекцию
-            if (window.collection) {
-                window.collection.push({
-                    ...this.enemyNft,
-                    buyPrice: this.enemyNft.price || 150
-                });
-            }
-        } else {
-            titleDiv.textContent = '💀 ПОРАЖЕНИЕ!';
-            titleDiv.style.color = '#f44336';
-            textDiv.textContent = `Вы проиграли ${this.enemyNft.name}...`;
-            
-            // Удаляем NFT из коллекции
-            if (window.collection && window.activeBattleNft) {
-                const index = window.collection.findIndex(nft => 
-                    nft.name === this.playerNft.name && 
-                    nft.img === this.playerNft.img
-                );
-                if (index !== -1) {
-                    window.collection.splice(index, 1);
-                    window.activeBattleNft = null;
-                }
-            }
-        }
-
-        // Добавляем в историю
-        if (window.battleHistory) {
-            window.battleHistory.push({
-                playerNft: {...this.playerNft},
-                opponentNft: {...this.enemyNft},
-                won: playerWon,
-                timestamp: new Date().toISOString()
+        let message = playerWon ? '🏆 ВЫ ВЫИГРАЛИ!' : '💀 ВЫ ПРОИГРАЛИ!';
+        
+        setTimeout(() => {
+            alert(message);
+            this.exit();
+        }, 1000);
+        
+        // Обновляем коллекцию
+        if (playerWon && window.collection) {
+            window.collection.push({
+                ...this.enemyNft,
+                buyPrice: this.enemyNft.price || 150
             });
+        } else if (!playerWon && window.collection && window.activeBattleNft) {
+            const index = window.collection.findIndex(nft => 
+                nft.name === this.playerNft.name && nft.img === this.playerNft.img
+            );
+            if (index !== -1) {
+                window.collection.splice(index, 1);
+                window.activeBattleNft = null;
+            }
         }
-
-        resultDiv.style.display = 'block';
-
-        // Обновляем игровые данные
+        
         if (window.updateUI) window.updateUI();
-        if (window.saveData) setTimeout(() => window.saveData(), 500);
-    }
-
-    // Выход из битвы
-    exitBattle() {
-        if (this.battleContainer) {
-            this.battleContainer.remove();
-        }
-
-        // Возврат в главное меню
+    },
+    
+    exit: function() {
+        const battleScreen = document.getElementById('battle-screen');
+        if (battleScreen) battleScreen.remove();
+        
+        // Возврат в меню
         const screens = document.querySelectorAll('.screen');
         screens.forEach(s => s.classList.remove('active'));
         
         const mainScreen = document.getElementById('main-screen');
-        if (mainScreen) {
-            mainScreen.classList.add('active');
-        }
-
-        // Обновляем навигацию
+        if (mainScreen) mainScreen.classList.add('active');
+        
         const navItems = document.querySelectorAll('.nav-item');
         navItems.forEach(item => item.classList.remove('active'));
-        if (navItems[0]) {
-            navItems[0].classList.add('active');
-        }
-
-        // Обновляем UI
+        if (navItems[0]) navItems[0].classList.add('active');
+        
         if (window.renderCenterArea) window.renderCenterArea();
         if (window.updateUI) window.updateUI();
-
-        console.log('🚪 Выход из битвы');
-    }
-}
-
-// Создаем глобальный экземпляр
-window.simpleBattleSystem = new SimpleBattleSystem();
-
-// Обновляем глобальный battleSystem для совместимости
-window.battleSystem = {
-    init: (playerNft, enemyNft) => {
-        return window.simpleBattleSystem.init(playerNft, enemyNft);
+        
+        console.log('Выход из битвы');
     }
 };
 
-// Функция запуска для совместимости
+// Совместимость
 window.startUndertaleBattle = function(playerNft, enemyNft) {
-    console.log('🚀 Запуск простой битвы');
-    return window.simpleBattleSystem.init(playerNft, enemyNft);
+    return window.battleSystem.init(playerNft, enemyNft);
 };
 
-console.log('✅ Простая боевая система загружена!');
+console.log('✅ ПРОСТЕЙШАЯ битва загружена');
